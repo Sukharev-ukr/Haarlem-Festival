@@ -3,6 +3,10 @@
 
 require_once __DIR__ . '/../models/UserModel.php';
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+
 class UserController
 {
     // Display login form (GET)
@@ -123,48 +127,80 @@ class UserController
 
     // Process the forgot password form (POST)
     public function forgotPasswordPost()
-    {
-        echo "DEBUG: In UserController->forgotPasswordPost()<br>";
-        
-        $email = trim($_POST['email'] ?? '');
-        $errorMessage = '';
-        $successMessage = '';
+{
+    echo "DEBUG: In UserController->forgotPasswordPost()<br>";
 
-        if (empty($email)) {
-            $errorMessage = 'Please enter your email.';
+    $email = trim($_POST['email'] ?? '');
+    $error = '';
+    $success = '';
+
+    if (empty($email)) {
+        $error = 'Please enter your email.';
+        require_once __DIR__ . '/../views/user/forgot_password.php';
+        echo "DEBUG: Exiting forgotPasswordPost() with error: email empty<br>";
+        return;
+    }
+
+    try {
+        $userModel = new UserModel();
+        $user = $userModel->findByEmail($email);
+        if (!$user) {
+            $error = 'No account found with that email.';
             require_once __DIR__ . '/../views/user/forgot_password.php';
-            echo "DEBUG: Exiting forgotPasswordPost() with error: email empty<br>";
+            echo "DEBUG: Exiting forgotPasswordPost() with error: no user found<br>";
             return;
         }
 
+        // Generate a reset token and expiration time (1 hour from now)
+        $token = bin2hex(random_bytes(16));
+        $expires = (new DateTime('+1 hour'))->format('Y-m-d H:i:s');
+        $userModel->createPasswordReset($email, $token, $expires);
+
+        // Use PHPMailer to send the email
+        require_once __DIR__ . '/../../vendor/autoload.php'; // Adjust the path as needed
+
+        // Import PHPMailer classes at the top of the file:
+        // use PHPMailer\PHPMailer\PHPMailer;
+        // use PHPMailer\PHPMailer\Exception;
+
+        $mail = new PHPMailer(true);
         try {
-            $userModel = new UserModel();
-            $user = $userModel->findByEmail($email);
-            if (!$user) {
-                $errorMessage = 'No account found with that email.';
-                require_once __DIR__ . '/../views/user/forgot_password.php';
-                echo "DEBUG: Exiting forgotPasswordPost() with error: no user found<br>";
-                return;
-            }
+            // Server settings
+            $mail->isSMTP();
+            $mail->Host       = 'sandbox.smtp.mailtrap.io'; // Mailtrap host
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'fa8f935d612207';            // Your Mailtrap username
+            $mail->Password   = 'ad3fcb9d2068b1';              // Your Mailtrap password
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption
+            $mail->Port       = 587;                           // Typically use port 587
 
-            // Generate a reset token and expiration (e.g., 1 hour from now)
-            $token = bin2hex(random_bytes(16));
-            $expires = (new DateTime('+1 hour'))->format('Y-m-d H:i:s');
-            // Assume createPasswordReset stores the token and expiration for the user
-            $userModel->createPasswordReset($email, $token, $expires);
+            // Recipients
+            $mail->setFrom('no-reply@yourdomain.com', 'Your App Name'); // Change as needed
+            $mail->addAddress($email);  // Recipient's email address
 
-            // In production, you would email the link. For testing, we display it.
+            // Email content
+            $mail->isHTML(false); // Set to false for plain text email
+            $mail->Subject = 'Password Reset Request';
             $resetLink = "http://localhost/reset_password?token=" . urlencode($token);
-            $successMessage = "Password reset link: " . $resetLink;
+            $mail->Body    = "Hello,\n\nWe received a request to reset your password.\n" .
+                              "Please click the link below to reset your password:\n\n" .
+                              $resetLink . "\n\nIf you did not request this, please ignore this email.";
 
-            require_once __DIR__ . '/../views/user/forgot_password.php';
-            echo "DEBUG: Exiting forgotPasswordPost() successfully<br>";
+            $mail->send();
+            $success = 'Password reset instructions have been emailed to you.';
         } catch (Exception $e) {
-            $errorMessage = 'Error: ' . $e->getMessage();
-            require_once __DIR__ . '/../views/user/forgot_password.php';
-            echo "DEBUG: Exiting forgotPasswordPost() with exception<br>";
+            $error = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         }
+
+        require_once __DIR__ . '/../views/user/forgot_password.php';
+        echo "DEBUG: Exiting forgotPasswordPost() successfully<br>";
+    } catch (Exception $e) {
+        $error = 'Error: ' . $e->getMessage();
+        require_once __DIR__ . '/../views/user/forgot_password.php';
+        echo "DEBUG: Exiting forgotPasswordPost() with exception<br>";
     }
+}
+
 
     // Forgot password wrapper method – chooses GET or POST based on the request method
     public function forgotPassword()
