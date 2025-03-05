@@ -18,9 +18,9 @@ services:
         image: mariadb:latest
         environment:
             MYSQL_ROOT_PASSWORD: 'secret123'
-            MYSQL_USER: 'developer'
+            MYSQL_USER: 'root'
             MYSQL_PASSWORD: 'secret123'
-            MYSQL_DATABASE: 'developmentdb'
+            MYSQL_DATABASE: 'haarlem_festival_v3'
         volumes:
             - mysqldata:/var/lib/mysql
         ports:
