@@ -74,4 +74,31 @@ class DanceController {
         }
     }
 
+    public function  getArtistDetailsByDanceID($danceID) {
+        try {
+            $detail = $this->danceModel->getArtistDetailsByDanceID($danceID);
+
+            if ($detail) {
+                return $detail;
+            } else {
+                echo "No details found for artists at Lichfabriek on Friday";
+            }
+        }
+        catch (PDOException $ex) {
+           error_log("Database Error: " . $ex->getMessage());
+           echo "An error occurred while fetching dance details. Please try again later.";
+        }
+    }
+
+    //For the Ticket
+    public function getEventDetails($danceID) {
+        return $this->danceModel->getEventDetailsByDanceID($danceID);
+    }
+    
+    public function getTicketDetails($danceID) {
+        return $this->danceModel->getTicketDetailsByDanceID($danceID);
+    }
+    
+
+
 }

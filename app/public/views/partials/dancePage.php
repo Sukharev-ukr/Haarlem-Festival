@@ -73,7 +73,7 @@
                                           <i class="fa fa-map-marker-alt me-1 text-warning"></i>  <!-- Location icon -->
                                           <?= $dance['location'] ?>
                                        </address>
-                                       <a href="/danceDetail?danceID=<?= $dance['danceID'] ?>" class="btn btn-detail">See In Detail</a>
+                                       <a href="/detailArtistPage?danceID=<?= $dance['danceID'] ?>" class="btn btn-detail">See In Detail</a>
                                      </figcaption>
                                    </figure>
                                </article>

@@ -1,119 +1,110 @@
+<?php
+require_once(__DIR__ . "/../../controllers/DanceController.php");
+
+$danceID = $_GET['danceID'] ?? null;
+$danceController = new DanceController();
+$artistDetails = $danceController->getArtistDetailsByDanceID($danceID);
+
+if (!$artistDetails) {
+    echo "<h3>No details found for the selected artist.</h3>";
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artist Detail - The Haarlem Festival</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        .banner {
-            position: relative;
-            background-image: url('banner.jpg'); /* Replace with actual banner path */
-            background-size: cover;
-            background-position: center;
-            height: 300px;
-            color: white;
-        }
-        .banner-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        .banner h2 {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px 10px;
-        }
-        .performance-card {
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .artist-info {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .badge {
-            margin-right: 5px;
-        }
-    </style>
+    <title>Haarlem Festival - Artist Details</title>
+    <link rel="stylesheet" href="../../assets/css/danceDetail.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body>
-    <!-- Header Section with Navigation Bar -->
-    <header class="bg-danger text-white text-center py-2">
-        <h1 class="display-4">The Haarlem Music Festival</h1>
-        <nav class="navbar navbar-expand-lg navbar-dark">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item"><a class="nav-link" href="#">History</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Dining</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Dance!</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Magic @ Taylers</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">FAQ</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
 
-    <!-- Banner Section -->
-    <div class="banner">
-        <div class="banner-overlay"></div>
-        <h2>SEE NICKY ROMERO IN HAARLEM</h2>
+<!-- Banner Section -->
+<section class="banner-container">
+    <img src="../../assets/imageArtits/event.jpeg" alt="Banner Background">
+    <div class="banner-text">
+    <h1>
+    <span class="white">SEE</span> 
+    <?php 
+    // Extract artist names and join with ' and '
+    $artistNames = array_map(function($artist) {
+        return strtoupper($artist['artistName']);
+    }, $artistDetails);
+
+    echo '<span class="orange">' . implode(' AND ', $artistNames) . '</span>';
+    ?>
+    <span class="white">IN HAARLEM</span>
+</h1>
     </div>
+</section>
 
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-4 performance-card">
-                <h5>Haarlem</h5>
-                <p>Netherlands</p>
-                <ul class="list-unstyled">
-                    <li>📅 Friday, 25 Jul 2025</li>
-                    <li>🕒 20:00 - 2:00</li>
-                    <li>📍 <a href="#">Energielaan 73, 2031 TC Haarlem</a></li>
-                    <li>🪑 1340/1500</li>
-                </ul>
-                <h4>Ticket Price: €75</h4>
-                <a href="#" class="btn btn-warning w-100">Get Concert Ticket</a>
-            </div>
-            <div class="col-md-8 artist-info">
-                <div class="row">
-                    <div class="col-md-4">
-                        <img src="artist_image.jpg" class="img-fluid rounded" alt="Artist Name">
-                    </div>
-                    <div class="col-md-8">
-                        <h3 class="text-warning">Nicky Romero</h3>
-                        <span class="badge bg-primary">Progressive House</span>
-                        <span class="badge bg-secondary">Electrohouse</span>
-                        <p class="mt-2">Nicky Romero, born January 6, 1989, is a renowned Dutch DJ...</p>
-                        <ul class="list-inline">
-                            <li class="list-inline-item"><a href="#" class="btn btn-outline-success">Spotify</a></li>
-                            <li class="list-inline-item"><a href="#" class="btn btn-outline-danger">YouTube</a></li>
-                        </ul>
-                        <h5>Country of Origin:</h5>
-                        <p>Netherlands</p>
-                        <h5>Career:</h5>
-                        <ul>
-                            <li>Nicky Romero Presents: Protocol ADE 2015</li>
-                            <li>Nicky Romero Presents: Miami 2014</li>
-                            <li>Nicky Romero Presents: Protocol Miami 2017</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <footer class="bg-primary text-white text-center py-3 mt-5">
-        <p>&copy; 2025 The Haarlem Festival. All Rights Reserved.</p>
-    </footer>
+<section class="container mt-5">
+    <h2 class="text-center mb-4 text-warning">Artists Performing at Haarlem</h2>
+
+    <!-- Grid Layout for Ticket and Artist Details -->
+    <section class="row gx-5">
+        <!-- Ticket Info Section (Left Side) -->
+        <aside class="col-md-4">
+            <section class="ticket-info shadow rounded p-3 mb-4 bg-light">
+                <h4><i class="fa fa-map-marker-alt text-danger me-2"></i>Haarlem</h4>
+                <p><strong><i class="fa fa-calendar-alt text-warning me-2"></i>Date:</strong> <?= date('l, d M Y', strtotime($artistDetails[0]['danceDate'])) ?></p>
+                <p><strong><i class="fa fa-clock text-warning me-2"></i>Time:</strong> <?= $artistDetails[0]['startTime'] ?> - <?= $artistDetails[0]['endTime'] ?></p>
+                <p><strong><i class="fa fa-map-marker text-danger me-2"></i>Location:</strong> <?= $artistDetails[0]['location'] ?></p>
+                <p><strong><i class="fa fa-ticket-alt text-warning me-2"></i>Tickets Left: </strong><?= $artistDetails[0]['totalSeats'] ?></p>
+                <h5 class="text-success">Ticket Price: €<?= $artistDetails[0]['ticketPrice'] ?></h5>
+                <?php if (isset($artistDetails[0]['danceID'])): ?>
+    <a href="/ticketSelection?danceID=<?php echo $artistDetails[0]['danceID']; ?>" class="btn btn-warning text-white mt-2">Get Concert Ticket</a>
+<?php else: ?>
+    <p>Dance ID not found.</p>
+<?php endif; ?>
+            </section>
+        </aside>
+
+        <!-- Artists Info Section (Right Side) -->
+        <section class="col-md-8">
+            <?php foreach ($artistDetails as $artist): ?>
+                <article class="artist-card shadow rounded p-4 mb-4 bg-white">
+                    <section class="row align-items-center">
+                        <figure class="col-md-5 text-center">
+                            <img src="/<?= $artist['artistPicture'] ?>" alt="<?= $artist['artistName'] ?>" class="img-fluid rounded mb-3 artist-image border">
+                        </figure>
+                        <section class="col-md-7">
+                            <h3 class="text-warning"><?= $artist['artistName'] ?></h3>
+                            <p><strong><i class="fa fa-music text-danger me-2"></i>Style:</strong> <?= $artist['artistStyle'] ?></p>
+                            <p><strong><i class="fa fa-flag text-warning me-2"></i>Country of Origin:</strong> <?= $artist['artistOrigin'] ?> <img src="../../assets/imageArtits/Netherlan flag.jpeg" alt="Netherlands" class="flag-icon"></p>
+                            <p><strong><i class="fa fa-info-circle text-warning me-2"></i>Description:</strong> <?= $artist['artistDescription'] ?></p>
+                            <h5 class="text-darkblue">Albums:</h5>
+                            <ul>
+                                <?php if ($artist['artistAlbums']): ?>
+                                    <?php foreach (explode(', ', $artist['artistAlbums']) as $album): ?>
+                                        <li><?= $album ?></li>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <li>No albums available.</li>
+                                <?php endif; ?>
+                            </ul>
+                            <h5 class="text-darkblue">Follow:</h5>
+                            <div class="social-icons">
+                                <a href="#" class="btn btn-outline-danger me-2">
+                                    <i class="fab fa-youtube"></i> YouTube
+                                </a>
+                                <a href="#" class="btn btn-outline-success">
+                                    <i class="fab fa-spotify"></i> Spotify
+                                </a>
+                            </div>
+                        </section>
+                    </section>
+                </article>
+            <?php endforeach; ?>
+        </section>
+    </section>
+</section>
+
 </body>
 </html>
