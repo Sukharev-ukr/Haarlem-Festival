@@ -30,4 +30,9 @@ class BaseModel
             self::$pdo = new PDO($dsn, $user, $pass, $options);
         }
     }
+    public function query($sql, $params = []) {
+        $statement = self::$pdo->prepare($sql);
+        $statement->execute($params);
+        return $statement;
+    }
 }

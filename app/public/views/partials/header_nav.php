@@ -6,4 +6,4 @@
             <a type="button" class="btn btn-primary" href="#">Login/Register</a>
         </div>
     </div>
-</nav>
+</nav>  
