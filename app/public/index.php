@@ -8,6 +8,7 @@ session_start();
 require_once(__DIR__ . "/lib/Route.php");
 require_once(__DIR__ . "/routes/index.php");
 require_once(__DIR__ . "/routes/user.php");
+require_once(__DIR__ . "/routes/restaurants.php");
 require_once(__DIR__ . "/routes/DancePageROute.php");
 require_once(__DIR__ . "/routes/detailArtistPage.php");
 require_once(__DIR__ . "/routes/ticketSelectionRoute.php");
