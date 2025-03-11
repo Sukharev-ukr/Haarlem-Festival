@@ -18,26 +18,14 @@ Route::add('/user/login', function() {
     $controller->loginPost();
 }, 'post');
 
-// Registration
+// ---------------------------------------------
+// REGISTRATION
+// ---------------------------------------------
 Route::add('/user/register', function() {
     require_once __DIR__ . '/../controllers/UserController.php';
     $controller = new UserController();
     $controller->register();
 }, ['get', 'post']);
-
-// Forgot Password
-Route::add('/user/forgot', function() {
-    require_once __DIR__ . '/../controllers/UserController.php';
-    $controller = new UserController();
-    $controller->forgotPassword();
-}, ['get', 'post']);
-
-// Forgot Password (GET/POST)
-Route::add('/user/forgot', function() {
-    require_once __DIR__ . '/../controllers/UserController.php';
-    $controller = new UserController();
-    $controller->forgotPassword();
-}, ['get','post']);
 
 // ---------------------------------------------
 // FORGOT PASSWORD
@@ -58,3 +46,4 @@ Route::add('/user/reset', function() {
     $controller = new UserController();
     $controller->resetPassword();
 }, ['get','post']);
+
