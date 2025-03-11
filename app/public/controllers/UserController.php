@@ -47,69 +47,52 @@ class UserController
     }
 
     // Handle user registration (GET for form, POST for submission)
-    public function registerGet()
-    {
-        
-        // Set empty messages for first load
-        $errorMessage = '';
-        $successMessage = '';
-        require_once __DIR__ . '/../views/user/register.php';
-        
-    }
-
-    // Process the registration form (POST)
-    public function registerPost()
-    {
-        echo "DEBUG: In UserController->registerPost()<br>";
-        
-        // Retrieve and trim form fields
-        $username = trim($_POST['username'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $password = trim($_POST['password'] ?? '');
-        $confirmPassword = trim($_POST['confirm_password'] ?? '');
-
-        $errorMessage = '';
-        $successMessage = '';
-
-        // Basic validation
-        if (empty($username) || empty($email) || empty($password) || empty($confirmPassword)) {
-            $errorMessage = 'All fields are required.';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errorMessage = 'Invalid email format.';
-        } elseif ($password !== $confirmPassword) {
-            $errorMessage = 'Passwords do not match.';
-        }
-
-        // If there is an error, show the form again with the error message
-        if ($errorMessage) {
-            require_once __DIR__ . '/../views/user/register.php';
-            echo "DEBUG: Exiting registerPost() with error<br>";
-            return;
-        }
-
-        try {
-            $userModel = new UserModel();
-            // Assume createUser returns the new user's ID or throws an exception on error
-            $userId = $userModel->createUser($username, $password, $email);
-            // Registration successful—redirect to login page
-            header('Location: /login');
-            exit;
-        } catch (Exception $e) {
-            $errorMessage = 'Error: ' . $e->getMessage();
-            require_once __DIR__ . '/../views/user/register.php';
-            echo "DEBUG: Exiting registerPost() with exception<br>";
-        }
-    }
-
-    // Registration wrapper method – chooses GET or POST based on the request method
     public function register()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->registerPost();
-        } else {
-            $this->registerGet();
-        }
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $this->registerPost();
+    } else {
+        $this->registerGet();
     }
+}
+
+public function registerGet()
+{
+    // Show the register form
+    $error = '';
+    $success = '';
+    require_once __DIR__ . '/../views/user/register.php';
+}
+
+public function registerPost()
+{
+    $userName    = trim($_POST['userName'] ?? '');
+    $mobilePhone = trim($_POST['mobilePhone'] ?? '');
+    $email       = trim($_POST['email'] ?? '');
+    $password    = trim($_POST['password'] ?? '');
+    $role        = trim($_POST['role'] ?? 'User');
+
+    if (empty($userName) || empty($mobilePhone) || empty($email) || empty($password)) {
+        $error = 'All fields are required.';
+        require_once __DIR__ . '/../views/user/register.php';
+        return;
+    }
+
+    // Hash password
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+    // Insert into DB
+    try {
+        $userModel = new UserModel();
+        $userModel->createUser($userName, $mobilePhone, $email, $hashedPassword, $role);
+        $success = 'Registration successful!';
+    } catch (Exception $e) {
+        $error = 'Error: ' . $e->getMessage();
+    }
+
+    require_once __DIR__ . '/../views/user/register.php';
+}
+
 
     // ------------------------------
     // FORGOT PASSWORD METHODS
@@ -127,79 +110,67 @@ class UserController
 
     // Process the forgot password form (POST)
     public function forgotPasswordPost()
-{
-    echo "DEBUG: In UserController->forgotPasswordPost()<br>";
-
-    $email = trim($_POST['email'] ?? '');
-    $error = '';
-    $success = '';
-
-    if (empty($email)) {
-        $error = 'Please enter your email.';
-        require_once __DIR__ . '/../views/user/forgot_password.php';
-        echo "DEBUG: Exiting forgotPasswordPost() with error: email empty<br>";
-        return;
-    }
-
-    try {
-        $userModel = new UserModel();
-        $user = $userModel->findByEmail($email);
-        if (!$user) {
-            $error = 'No account found with that email.';
+    {
+        echo "DEBUG: In UserController->forgotPasswordPost()<br>";
+    
+        $email = trim($_POST['email'] ?? '');
+        $error = '';
+        $success = '';
+    
+        if (empty($email)) {
+            $error = 'Please enter your email.';
             require_once __DIR__ . '/../views/user/forgot_password.php';
-            echo "DEBUG: Exiting forgotPasswordPost() with error: no user found<br>";
+            echo "DEBUG: Exiting forgotPasswordPost() with error: email empty<br>";
             return;
         }
-
-        // Generate a reset token and expiration time (1 hour from now)
-        $token = bin2hex(random_bytes(16));
-        $expires = (new DateTime('+1 hour'))->format('Y-m-d H:i:s');
-        $userModel->createPasswordReset($email, $token, $expires);
-
-        // Use PHPMailer to send the email
-        require_once __DIR__ . '/../../vendor/autoload.php'; // Adjust the path as needed
-
-        // Import PHPMailer classes at the top of the file:
-        // use PHPMailer\PHPMailer\PHPMailer;
-        // use PHPMailer\PHPMailer\Exception;
-
-        $mail = new PHPMailer(true);
+    
         try {
-            // Server settings
-            $mail->isSMTP();
-            $mail->Host       = 'sandbox.smtp.mailtrap.io'; // Mailtrap host
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'fa8f935d612207';            // Your Mailtrap username
-            $mail->Password   = 'ad3fcb9d2068b1';              // Your Mailtrap password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption
-            $mail->Port       = 587;                           // Typically use port 587
+            $userModel = new UserModel();
+            $user = $userModel->findByEmail($email);
+            if (!$user) {
+                $error = 'No account found with that email.';
+                require_once __DIR__ . '/../views/user/forgot_password.php';
+                echo "DEBUG: Exiting forgotPasswordPost() with error: no user found<br>";
+                return;
+            }
+    
+            // Generate a reset token and expiration (1 hour from now)
+            $token = bin2hex(random_bytes(16));
+            $expires = (new DateTime('+1 hour'))->format('Y-m-d H:i:s');
+    
+            // Call setResetToken() by userNumber (primary key)
+            // Make sure 'userNumber' matches the column name returned by findByEmail
+            $userModel->setResetToken($user['userNumber'], $token, $expires);
+    
+            // Prepare the email details
+            $to = $email;
+            $subject = 'Password Reset Request';
+            $resetLink = "http://localhost/user/reset?token=" . urlencode($token);
 
-            // Recipients
-            $mail->setFrom('no-reply@yourdomain.com', 'Your App Name'); // Change as needed
-            $mail->addAddress($email);  // Recipient's email address
-
-            // Email content
-            $mail->isHTML(false); // Set to false for plain text email
-            $mail->Subject = 'Password Reset Request';
-            $resetLink = "http://localhost/reset_password?token=" . urlencode($token);
-            $mail->Body    = "Hello,\n\nWe received a request to reset your password.\n" .
-                              "Please click the link below to reset your password:\n\n" .
-                              $resetLink . "\n\nIf you did not request this, please ignore this email.";
-
-            $mail->send();
-            $success = 'Password reset instructions have been emailed to you.';
+            $message = "Hello,\n\nWe received a request to reset your password.\n" .
+                       "Please click the link below to reset your password:\n\n" .
+                       $resetLink . "\n\nIf you did not request this, please ignore this email.";
+            $headers = "From: no-reply@yourdomain.com\r\n" .
+                       "Reply-To: no-reply@yourdomain.com\r\n" .
+                       "X-Mailer: PHP/" . phpversion();
+    
+            // Send the email using PHP's mail() function
+            if (mail($to, $subject, $message, $headers)) {
+                $success = 'Password reset instructions have been emailed to you.';
+            } else {
+                $error = 'Failed to send email. Please try again later.';
+            }
+    
+            require_once __DIR__ . '/../views/user/forgot_password.php';
+            echo "DEBUG: Exiting forgotPasswordPost() successfully<br>";
         } catch (Exception $e) {
-            $error = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+            $error = 'Error: ' . $e->getMessage();
+            require_once __DIR__ . '/../views/user/forgot_password.php';
+            echo "DEBUG: Exiting forgotPasswordPost() with exception<br>";
         }
-
-        require_once __DIR__ . '/../views/user/forgot_password.php';
-        echo "DEBUG: Exiting forgotPasswordPost() successfully<br>";
-    } catch (Exception $e) {
-        $error = 'Error: ' . $e->getMessage();
-        require_once __DIR__ . '/../views/user/forgot_password.php';
-        echo "DEBUG: Exiting forgotPasswordPost() with exception<br>";
     }
-}
+    
+
 
 
     // Forgot password wrapper method – chooses GET or POST based on the request method
@@ -213,30 +184,44 @@ class UserController
     }
     // Handle password reset (GET to show form, POST to update password)
     public function resetPassword()
-    {
-        $token = $_GET['token'] ?? '';
+{
+    echo "DEBUG: Entering resetPassword()<br>";
 
-        $userModel = new UserModel();
-        $user = $userModel->findByToken($token);
+    $token = $_GET['token'] ?? '';
+    echo "DEBUG: token = " . htmlspecialchars($token) . "<br>";
 
-        if (!$user) {
-            echo "<p>Invalid or expired token.</p>";
+    if (empty($token)) {
+        echo "DEBUG: No token provided.<br>";
+        return;
+    }
+
+    $userModel = new UserModel();
+    $user = $userModel->findByToken($token);
+    if (!$user) {
+        echo "DEBUG: Token invalid or expired.<br>";
+        return;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        echo "DEBUG: Received POST for password update.<br>";
+        $newPassword = trim($_POST['password'] ?? '');
+        if (empty($newPassword)) {
+            echo "DEBUG: No new password provided.<br>";
             return;
         }
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $newPassword = $_POST['password'] ?? '';
-            $hashed = password_hash($newPassword, PASSWORD_BCRYPT);
-            $userModel->updatePassword($user['id'], $hashed);
-            $userModel->clearResetToken($user['id']);
-
-            echo "<p>Password updated. You can <a href='/user/login'>login now</a>.</p>";
-            return;
-        }
-
-        // Show reset password form (GET)
+        $hashed = password_hash($newPassword, PASSWORD_BCRYPT);
+        $userModel->updatePassword($user['userNumber'], $hashed);
+        $userModel->clearResetToken($user['userNumber']);
+        echo "DEBUG: Password updated successfully.<br>";
+        return;
+    } else {
+        echo "DEBUG: Displaying reset password form.<br>";
         require_once __DIR__ . '/../views/user/reset_password.php';
     }
+
+    echo "DEBUG: Exiting resetPassword()<br>";
+}
+
 
     // Verify reCAPTCHA response using Google API
     private function verifyCaptcha($captchaResponse)
@@ -252,4 +237,6 @@ class UserController
         $json = json_decode($response, true);
         return isset($json['success']) && $json['success'] === true;
     }
+
+
 }
