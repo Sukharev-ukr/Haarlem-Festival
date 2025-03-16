@@ -16,3 +16,5 @@
 
 <body>
     <?php require(__DIR__ . "/header_nav.php");
+
+//duplicate header

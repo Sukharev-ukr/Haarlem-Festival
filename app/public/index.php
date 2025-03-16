@@ -1,12 +1,14 @@
 <?php
 require_once(__DIR__ . "/lib/env.php");
 require_once(__DIR__ . "/lib/error_reporting.php");
+require_once __DIR__ . '/vendor/autoload.php';
+
 session_start();
 
-
-
-require_once (__DIR__ . "/routes/passwordResetRoute.php");
+// Include the Route class definition first
 require_once(__DIR__ . "/lib/Route.php");
+
+// Now include your route files
 require_once(__DIR__ . "/routes/index.php");
 require_once(__DIR__ . "/routes/user.php");
 require_once(__DIR__ . "/routes/DancePageROute.php");
@@ -20,5 +22,3 @@ Route::pathNotFound(function($path) {
 
 // Run the router
 Route::run();
-
-
