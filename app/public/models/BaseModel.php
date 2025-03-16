@@ -30,4 +30,9 @@ class BaseModel
         // Now assign the static PDO to an instance property for easier use:
         $this->db = self::$pdo;
     }
+    public function query($sql, $params = []) {
+        $statement = self::$pdo->prepare($sql);
+        $statement->execute($params);
+        return $statement;
+    }
 }
