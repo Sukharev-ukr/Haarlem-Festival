@@ -213,7 +213,7 @@ private function loginGet()
     require_once __DIR__ . '/../views/user/login.php';
 }
 
-private function loginPost()
+public function loginPost()
 {
     $email = trim($_POST['email'] ?? '');
     $password = trim($_POST['password'] ?? '');
@@ -228,9 +228,10 @@ private function loginPost()
     $userModel = new UserModel();
     $user = $userModel->findByEmail($email);
     if ($user && password_verify($password, $user['password'])) {
-        // Login successful: set session variables or perform additional logic
+        // Login successful: set session variables
         $_SESSION['user'] = $user;
-        header("Location: /user/dashboard"); // Redirect to a dashboard or another page
+        // Redirect to homepage after login
+        header("Location: /");
         exit;
     } else {
         $error = "Invalid credentials.";

@@ -12,3 +12,7 @@ Route::add('/about', function() {
     $controller = new IndexController();
     $controller->about();
 }, 'get');
+
+Route::add('/', function() {
+    require_once __DIR__ . '/../views/homepage.php';
+}, 'get');

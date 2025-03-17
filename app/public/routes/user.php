@@ -33,3 +33,12 @@ Route::add('/user/login', function() {
     $controller = new UserController();
     $controller->login();
 }, ['get', 'post']);
+
+Route::add('/user/logout', function() {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    session_destroy();
+    header("Location: /");
+    exit;
+}, 'get');
