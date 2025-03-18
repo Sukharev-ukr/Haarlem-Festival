@@ -5,26 +5,26 @@
     <!-- =========================
          HERO / TIMER SECTION
     ========================== -->
-    <section class="hero-section" style="background-color: #8B0000; color: #fff; padding: 100px 0; text-align: center;">
-        <div class="container">
+    <section style="background-color: #8B0000; color: #fff; padding: 100px 0; text-align: center;">
+        <div style="max-width: 1200px; margin: 0 auto;">
             <h1 style="font-size: 3rem; margin-bottom: 1rem;">THE FESTIVAL IS COMING!</h1>
 
-            <!-- Countdown Timer (placeholder) -->
-            <div class="countdown-timer" style="font-size: 2rem; margin-bottom: 1rem;">
-                <span class="days" style="font-weight: bold;">245</span> : 
-                <span class="hours" style="font-weight: bold;">06</span> : 
-                <span class="minutes" style="font-weight: bold;">38</span> : 
-                <span class="seconds" style="font-weight: bold;">59</span>
+            <!-- Real Countdown Timer -->
+            <div id="countdown-container" style="font-size: 2rem; margin-bottom: 1rem; font-weight: bold;">
+                <span id="days">245</span> :
+                <span id="hours">06</span> :
+                <span id="minutes">38</span> :
+                <span id="seconds">59</span>
             </div>
-            <div class="timer-labels" style="font-size: 1rem; margin-bottom: 2rem;">
-                Days &nbsp;&nbsp; | &nbsp;&nbsp; hours &nbsp;&nbsp; | &nbsp;&nbsp; minutes &nbsp;&nbsp; | &nbsp;&nbsp; seconds
+            <div id="timer-labels" style="font-size: 1rem; margin-bottom: 2rem;">
+                Days &nbsp;&nbsp;|&nbsp;&nbsp; hours &nbsp;&nbsp;|&nbsp;&nbsp; minutes &nbsp;&nbsp;|&nbsp;&nbsp; seconds
             </div>
 
             <p style="max-width: 600px; margin: 0 auto 2rem auto;">
                 Experience the vibrant spirit of Haarlem in an unforgettable 4-day celebration 
                 of music, culture, food, and history.
             </p>
-            <a href="#" class="btn-primary" style="padding: 0.75rem 1.5rem; background-color: #fff; color: #8B0000; text-decoration: none; font-weight: bold;">
+            <a href="#" style="padding: 0.75rem 1.5rem; background-color: #fff; color: #8B0000; text-decoration: none; font-weight: bold;">
                 Join waiting list
             </a>
         </div>
@@ -33,8 +33,8 @@
     <!-- =========================
          DISCOVER HISTORY SECTION
     ========================== -->
-    <section class="discover-history" style="padding: 60px 0; background-color: #fff; color: #8B0000;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+    <section style="padding: 60px 0; background-color: #fff; color: #8B0000;">
+        <div style="max-width: 1200px; margin: 0 auto;">
             <h2 style="font-size: 2rem; margin-bottom: 1rem;">
                 Discover history 
                 <br><span style="font-size: 1.2rem; font-weight: normal;">on a Unique Walking Tour</span>
@@ -62,27 +62,27 @@
 
                 <!-- Right info cards -->
                 <div style="flex: 1 1 300px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div class="info-card" style="border: 1px solid #ccc; padding: 1rem;">
+                    <div style="border: 1px solid #ccc; padding: 1rem;">
                         <h4>Duration</h4>
                         <p>2.5 hours</p>
                     </div>
-                    <div class="info-card" style="border: 1px solid #ccc; padding: 1rem;">
+                    <div style="border: 1px solid #ccc; padding: 1rem;">
                         <h4>Available days</h4>
                         <p>Thu, Fri, Sat, Sun</p>
                     </div>
-                    <div class="info-card" style="border: 1px solid #ccc; padding: 1rem;">
+                    <div style="border: 1px solid #ccc; padding: 1rem;">
                         <h4>Meeting point</h4>
                         <p>Grote Markt</p>
                     </div>
-                    <div class="info-card" style="border: 1px solid #ccc; padding: 1rem;">
+                    <div style="border: 1px solid #ccc; padding: 1rem;">
                         <h4>Age</h4>
                         <p>12+</p>
                     </div>
-                    <div class="info-card" style="border: 1px solid #ccc; padding: 1rem;">
+                    <div style="border: 1px solid #ccc; padding: 1rem;">
                         <h4>Price p.p</h4>
                         <p>€15</p>
                     </div>
-                    <div class="info-card" style="border: 1px solid #ccc; padding: 1rem;">
+                    <div style="border: 1px solid #ccc; padding: 1rem;">
                         <h4>Family ticket</h4>
                         <p>€60</p>
                     </div>
@@ -94,8 +94,8 @@
     <!-- =========================
          MAP OF THE TOUR SECTION
     ========================== -->
-    <section class="map-of-the-tour" style="background-color: #8B0000; color: #fff; padding: 60px 0;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+    <section style="background-color: #8B0000; color: #fff; padding: 60px 0;">
+        <div style="max-width: 1200px; margin: 0 auto;">
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: start;">
                 
                 <!-- Visiting places -->
@@ -141,8 +141,8 @@
     <!-- =========================
          DISCOVER DINING SECTION
     ========================== -->
-    <section class="discover-dining" style="background-color: #fff; color: #000; padding: 60px 0;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+    <section style="background-color: #fff; color: #000; padding: 60px 0;">
+        <div style="max-width: 1200px; margin: 0 auto;">
             <h2 style="color: #8B0000; font-size: 2rem; margin-bottom: 1rem;">
                 Discover dining
             </h2>
@@ -172,7 +172,6 @@
                 <img src="/public/assets/images/dining4.jpg" alt="Dish 4" style="width: 200px;">
                 <img src="/public/assets/images/dining5.jpg" alt="Dish 5" style="width: 200px;">
                 <img src="/public/assets/images/dining6.jpg" alt="Dish 6" style="width: 200px;">
-                <!-- Add as many images as needed -->
             </div>
         </div>
     </section>
@@ -180,8 +179,8 @@
     <!-- =========================
          MAP OF THE RESTAURANTS
     ========================== -->
-    <section class="map-of-restaurants" style="background-color: #002F5E; color: #fff; padding: 60px 0;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+    <section style="background-color: #002F5E; color: #fff; padding: 60px 0;">
+        <div style="max-width: 1200px; margin: 0 auto;">
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
                 
                 <!-- Visiting places (restaurants) -->
@@ -227,15 +226,14 @@
     <!-- =========================
          DISCOVER DANCE SECTION
     ========================== -->
-    <section class="discover-dance" style="background-color: #fff; color: #8B0000; padding: 60px 0;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+    <section style="background-color: #fff; color: #8B0000; padding: 60px 0;">
+        <div style="max-width: 1200px; margin: 0 auto;">
             <h2 style="font-size: 2rem; margin-bottom: 1rem;">
                 Discover dance
                 <br><span style="font-size: 1.2rem; font-weight: normal;">on a Unique Walking Tour</span>
             </h2>
 
             <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-                <!-- Similar structure as "Discover History" text + button + images of DJs/dancers -->
                 <div style="flex: 1 1 400px;">
                     <p>
                         Join us for an exhilarating dance experience at some of Haarlem’s most iconic venues. 
@@ -272,8 +270,8 @@
     <!-- =========================
          MAP OF THE DANCE SECTION
     ========================== -->
-    <section class="map-of-dance" style="background-color: #8B0000; color: #fff; padding: 60px 0;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+    <section style="background-color: #8B0000; color: #fff; padding: 60px 0;">
+        <div style="max-width: 1200px; margin: 0 auto;">
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: start;">
                 
                 <!-- Visiting places (dance venues) -->
@@ -315,8 +313,8 @@
     <!-- =========================
          DISCOVER THE SECRET
     ========================== -->
-    <section class="discover-secret" style="background-color: #fff; color: #000; padding: 60px 0;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 40px; flex-wrap: wrap;">
+    <section style="background-color: #fff; color: #000; padding: 60px 0;">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 40px; flex-wrap: wrap;">
             <div style="flex: 1 1 400px; text-align: center;">
                 <img src="/public/assets/images/professor-teyler-app.png" alt="Professor Teyler App" style="max-width: 200px;">
             </div>
@@ -342,5 +340,36 @@
     </section>
 
 </main>
+
+<!-- Real-time countdown script -->
+<script>
+  // Adjust the festival date/time below:
+  const festivalDate = new Date("July 24, 2025 10:00:00").getTime();
+
+  // Update every second
+  const timer = setInterval(function() {
+    const now = new Date().getTime();
+    const distance = festivalDate - now;
+
+    if (distance < 0) {
+      clearInterval(timer);
+      document.getElementById("countdown-container").textContent = "The festival has started!";
+      document.getElementById("timer-labels").textContent = "";
+      return;
+    }
+
+    // Calculate days, hours, minutes, seconds
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Update the page
+    document.getElementById("days").textContent = days;
+    document.getElementById("hours").textContent = hours;
+    document.getElementById("minutes").textContent = minutes;
+    document.getElementById("seconds").textContent = seconds;
+  }, 1000);
+</script>
 
 <?php require(__DIR__ . '/../partials/footer.php'); ?>

@@ -6,6 +6,10 @@
 -- Generation Time: Mar 18, 2025 at 09:51 AM
 -- Server version: 11.5.2-MariaDB-ubu2404
 -- PHP Version: 8.2.25
+CREATE DATABASE IF NOT EXISTS `haarlem_festival_v3`;
+
+
+USE `haarlem_festival`;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -411,17 +415,17 @@ CREATE TABLE `User` (
   `Email` varchar(100) DEFAULT NULL,
   `role` enum('Admin','User') DEFAULT 'User',
   `registered_day` timestamp NULL DEFAULT current_timestamp(),
-  `reset_token_hash` varchar(64) DEFAULT NULL,
-  `reset_token_expires_at` datetime DEFAULT NULL
+  `reset_token` varchar(128) DEFAULT NULL,
+  `verify_token` VARCHAR(255) DEFAULT NULL,
+  `is_verified` TINYINT(1) NOT NULL DEFAULT 0,
+  `reset_token_expires` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 --
 -- Dumping data for table `User`
 --
 
-INSERT INTO `User` (`userID`, `userName`, `password`, `mobilePhone`, `Email`, `role`, `registered_day`, `reset_token_hash`, `reset_token_expires_at`) VALUES
-(1, 'Alice Johnson', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 641653766, 'alice.johnson@example.com', 'User', '2025-03-16 09:21:44', NULL, NULL),
-(2, 'Robben', 'ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f', 939441810, 'robben@gmail.com', 'User', '2025-03-16 09:28:45', NULL, NULL);
+
 
 --
 -- Indexes for dumped tables
@@ -559,6 +563,7 @@ ALTER TABLE `TicketType`
 --
 ALTER TABLE `User`
   ADD PRIMARY KEY (`userID`);
+  
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -659,6 +664,7 @@ ALTER TABLE `TicketType`
 --
 ALTER TABLE `User`
   MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  
 
 --
 -- Constraints for dumped tables
@@ -755,3 +761,15 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+CREATE TABLE pending_users (
+    pending_id INT AUTO_INCREMENT PRIMARY KEY,
+    userName VARCHAR(255) NOT NULL,
+    mobilePhone VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) DEFAULT 'User',
+    verify_token VARCHAR(64) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
