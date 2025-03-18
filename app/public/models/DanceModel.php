@@ -67,7 +67,7 @@
         return $stmt->fetchAll();
       }
 
-      //Get Dance and Artist by DanceID
+      //Get Dance and Artist by DanceID (Using For dancePage)
      public function getDanceAndArtistByDanceID($danceID) {
          $sql = "SELECT 
                 D.danceID,
@@ -92,6 +92,7 @@
             return $stmt->fetch(PDO::FETCH_ASSOC);
      } 
 
+     //Using for detailArtistPage
      public function getArtistDetailsByDanceID($danceID) {
         $sql = "
         SELECT 
@@ -124,6 +125,7 @@
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    //Using for ticketSelection
     public function getEventDetailsByDanceID($danceID) {
         $sql = "
         SELECT 
@@ -145,6 +147,7 @@
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
+    //Using for ticketSelection
     public function getTicketDetailsByDanceID($danceID) {
         $sql = "
         SELECT 
@@ -160,7 +163,5 @@
     }
     
     
-
-
 
 }
