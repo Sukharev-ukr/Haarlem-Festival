@@ -57,4 +57,14 @@ require_once(__DIR__ . ("../../models/CartModel.php"));
             echo json_encode(['status' => 'error', 'message' => 'Server error']);
         }
     }
+
+    //Get order in shopping cart
+    public function getCartItems($userId) {
+        return $this->cartModel->getCartItems($userId);
+    }
+    
+    //Remove order in shopping cart
+    public function removeItem($orderItemId) {
+        return $this->cartModel->removeOrderItem($orderItemId);
+    }
 }
