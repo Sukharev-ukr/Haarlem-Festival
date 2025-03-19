@@ -20,8 +20,12 @@ function capitalizeFirstLetter(string) {
 document.addEventListener("DOMContentLoaded", function () {
   loadUsers();
   loadDanceEvents(); // call Load Event
+  loadArtists(); // call Load Artist
+  loadAssignments(); //Load Dance and Artist assignemt
+  populateArtists(); // call populate artist
 });
 
+////////////////////////////////////////////////////////////////////User
 function loadUsers() {
   let search = document.getElementById("searchUser").value;
   fetch(`/api/admin/users?search=${search}`)
@@ -35,9 +39,37 @@ function loadUsers() {
               <td>${user.userName}</td>
               <td>${user.Email}</td>
               <td>${user.role}</td>
+              <td>
+                <button class="btn btn-warning btn-sm" onclick="editUser('${user.userID}', '${user.userName}', '${user.email}', '${user.role}')">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.userID}')">Delete</button>
+              </td>
             </tr>`;
       });
     });
+}
+
+/** 🎭 Open Add User Modal */
+function openAddUserModal() {
+  console.log("🆕 Opening Add User Modal..."); // ✅ Debugging Log
+
+  // Reset all fields
+  document.getElementById("userID").value = "";
+  document.getElementById("userName").value = "";
+  document.getElementById("userEmail").value = "";
+  document.getElementById("userPassword").value = "";
+  document.getElementById("userRole").value = "Employee";
+
+  // Set the button action properly
+  let saveButton = document.getElementById("saveUserButton");
+  saveButton.textContent = "Add User";
+  saveButton.setAttribute("onclick", "saveUser()");
+
+  // Debug: Check if modal exists before opening
+  if ($("#addUserModal").length) {
+    $("#addUserModal").modal("show");
+  } else {
+    console.error("❌ Modal with ID 'addUserModal' not found in DOM.");
+  }
 }
 
 function deleteUser(userID) {
@@ -291,7 +323,7 @@ function saveNewDanceEvent() {
     .catch((error) => console.error("Error adding dance event:", error));
 }
 
-///////////////////////////////////////////////////////////////////////////////Delete Dance Event
+//////////////////////Delete Dance Event
 function deleteDanceEvent(danceID) {
   if (!confirm("Are you sure you want to delete this event?")) return;
 
@@ -310,4 +342,391 @@ function deleteDanceEvent(danceID) {
       }
     })
     .catch((error) => console.error("Error deleting dance event:", error));
+}
+
+//////////////////////////////////////////////////////////////////////////////Artist
+// ✅ Load Artists
+function loadArtists() {
+  console.log("🔍 Fetching artist data...");
+
+  fetch("/api/admin/artists")
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("🎭 Artists API Response:", data);
+
+      let tableBody = document.querySelector("#artistTable tbody");
+      tableBody.innerHTML = "";
+
+      if (!data || !data.success || !Array.isArray(data.data)) {
+        console.warn("⚠️ Invalid API response format:", data);
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error loading artists.</td></tr>`;
+        return;
+      }
+
+      if (data.data.length === 0) {
+        console.log("📭 No artists found.");
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-warning">No artists available.</td></tr>`;
+        return;
+      }
+
+      data.data.forEach((artist) => {
+        tableBody.innerHTML += `
+          <tr>
+            <td>${artist.artistID}</td>
+            <td>${artist.name}</td>
+            <td>${artist.style}</td>
+            <td>${artist.description}</td>
+            <td>${artist.origin}</td>
+            <td> 
+              <button class="btn btn-warning btn-sm" onclick="openEditArtistModal(${artist.artistID}, '${artist.name}', '${artist.style}', '${artist.description}', '${artist.origin}')">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteArtist(${artist.artistID})">Delete</button> 
+            </td>
+          </tr>`;
+      });
+
+      console.log("✅ Artist data loaded successfully.");
+    })
+    .catch((error) => {
+      console.error("❌ Error loading artists:", error);
+    });
+}
+
+// ✅ Open Add Artist Modal
+function openAddArtistModal() {
+  document.getElementById("artistModalTitle").textContent = "Add Artist";
+  document.getElementById("artistID").value = "";
+  document.getElementById("artistName").value = "";
+  document.getElementById("artistStyle").value = "";
+  document.getElementById("artistDescription").value = "";
+  document.getElementById("artistOrigin").value = "";
+
+  document
+    .getElementById("saveArtistButton")
+    .setAttribute("onclick", "saveArtist()");
+  $("#artistModal").modal("show");
+}
+
+// ✅ Open Edit Artist Modal
+function openEditArtistModal(artistID, name, style, description, origin) {
+  document.getElementById("artistModalTitle").textContent = "Edit Artist";
+  document.getElementById("artistID").value = artistID;
+  document.getElementById("artistName").value = name;
+  document.getElementById("artistStyle").value = style;
+  document.getElementById("artistDescription").value = description;
+  document.getElementById("artistOrigin").value = origin;
+
+  document
+    .getElementById("saveArtistButton")
+    .setAttribute("onclick", "saveArtist()");
+  $("#artistModal").modal("show");
+}
+
+// ✅ Save Artist (Add or Update)
+function saveArtist() {
+  let artistID = document.getElementById("artistID").value;
+  let name = document.getElementById("artistName").value;
+  let style = document.getElementById("artistStyle").value;
+  let description = document.getElementById("artistDescription").value;
+  let origin = document.getElementById("artistOrigin").value;
+
+  let url = artistID ? "/api/admin/updateArtist" : "/api/admin/addArtist";
+  let method = artistID ? "PUT" : "POST";
+
+  fetch(url, {
+    method: method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ artistID, name, style, description, origin }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        $("#artistModal").modal("hide");
+        loadArtists();
+      } else {
+        alert("Error saving artist: " + data.message);
+      }
+    })
+    .catch((error) => console.error("❌ Error saving artist:", error));
+}
+
+// ✅ Delete Artist
+function deleteArtist(artistID) {
+  if (!confirm("Are you sure you want to delete this artist?")) return;
+
+  fetch("/api/admin/deleteArtist", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ artistID }),
+  })
+    .then(() => loadArtists())
+    .catch((error) => console.error("❌ Error deleting artist:", error));
+}
+
+/////////////////////////////////////////////////////////////////////////Artist and Dance Assignment
+
+let isEditMode = false; // Track if we are in edit mode
+let editingDanceID = null;
+let editingArtistID = null;
+
+/** 🎭 Load Dance-Artist Assignments */
+function loadAssignments() {
+  console.log("🔍 Fetching assignments...");
+
+  fetch("/api/admin/assignments")
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("📡 Assignments API Response:", data);
+
+      let tableBody = document.querySelector("#assignmentTable tbody");
+      tableBody.innerHTML = "";
+
+      if (!data || !data.success || !Array.isArray(data.data)) {
+        console.warn("⚠️ Invalid API response format:", data);
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Error loading assignments.</td></tr>`;
+        return;
+      }
+
+      if (data.data.length === 0) {
+        console.log("📭 No assignments found.");
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-warning">No assignments available.</td></tr>`;
+        return;
+      }
+
+      data.data.forEach((assignment) => {
+        tableBody.innerHTML += `
+          <tr>
+            <td>${assignment.danceID}</td>
+            <td>${assignment.location}</td>
+            <td>${assignment.artistID}</td>
+            <td>${assignment.name.replace(/"/g, "&quot;")}</td>
+            <td>${assignment.startTime} - ${assignment.endTime}</td>
+            <td>${assignment.danceDate} (${assignment.day})</td>
+            <td>
+              <button class="btn btn-warning btn-sm" onclick="editAssignment('${
+                assignment.danceID
+              }', '${assignment.artistID}', '${
+          assignment.danceDate
+        }')">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteAssignment('${
+                assignment.danceID
+              }', '${assignment.artistID}')">Delete</button>
+            </td>
+          </tr>`;
+      });
+
+      console.log("✅ Assignments loaded successfully.");
+    })
+    .catch((error) => {
+      console.error("❌ Error loading assignments:", error);
+      let tableBody = document.querySelector("#assignmentTable tbody");
+      tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Failed to load assignments.</td></tr>`;
+    });
+}
+
+/** 🎭 Open Assign Modal */
+function openAssignModal() {
+  console.log("🎭 Opening Assign Artist Modal...");
+
+  isEditMode = false;
+  editingDanceID = null;
+  editingArtistID = null;
+
+  // Reset form
+  document.getElementById("assignDanceDate").value = "2025-07-25";
+  document.getElementById("assignDanceLocation").innerHTML =
+    '<option value="">Select Location</option>';
+  document.getElementById("assignArtist").innerHTML =
+    '<option value="">Select Artist</option>';
+
+  // Populate dropdowns
+  document.getElementById("assignDanceDate").dispatchEvent(new Event("change"));
+  populateArtists();
+
+  // Show the modal
+  $("#assignArtistModal").modal("show");
+
+  // Update button to "Assign"
+  let saveButton = document.getElementById("saveAssignmentButton");
+  saveButton.textContent = "Assign";
+  saveButton.setAttribute("onclick", "assignArtist()");
+}
+
+/** 🎭 Fetch Dance Locations Based on Selected Date */
+document
+  .getElementById("assignDanceDate")
+  .addEventListener("change", function () {
+    let selectedDate = this.value;
+    if (!selectedDate) return;
+
+    console.log("📅 Fetching locations for date:", selectedDate);
+
+    fetch(`/api/admin/danceLocations?date=${selectedDate}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("📡 Received Dance Locations:", data);
+
+        let locationDropdown = document.getElementById("assignDanceLocation");
+        locationDropdown.innerHTML =
+          '<option value="">Select Location</option>';
+
+        if (data.success && Array.isArray(data.data)) {
+          data.data.forEach((dance) => {
+            let option = document.createElement("option");
+            option.value = dance.danceID;
+            option.textContent = dance.location;
+            locationDropdown.appendChild(option);
+          });
+        } else {
+          console.warn("⚠️ No dance locations found.");
+          locationDropdown.innerHTML =
+            '<option value="">No locations available</option>';
+        }
+      })
+      .catch((error) => {
+        console.error("❌ Error fetching dance locations:", error);
+      });
+  });
+
+/** 🎭 Populate Artists */
+function populateArtists() {
+  console.log("🔍 Fetching artists...");
+
+  fetch("/api/admin/artists")
+    .then((response) => response.json())
+    .then((data) => {
+      let artistDropdown = document.getElementById("assignArtist");
+      artistDropdown.innerHTML = '<option value="">Select Artist</option>';
+
+      if (!data.success || !Array.isArray(data.data)) {
+        console.warn("⚠️ No artists available.");
+        return;
+      }
+
+      data.data.forEach((artist) => {
+        let option = document.createElement("option");
+        option.value = artist.artistID;
+        option.textContent = artist.name;
+        artistDropdown.appendChild(option);
+      });
+
+      console.log("✅ Artists populated successfully.");
+    })
+    .catch((error) => console.error("❌ Error loading artists:", error));
+}
+
+/** 🎭 Assign Artist to Dance */
+function assignArtist() {
+  console.log("📤 Assigning Artist...");
+
+  let danceID = document.getElementById("assignDanceLocation").value;
+  let artistID = document.getElementById("assignArtist").value;
+
+  if (!danceID || !artistID) {
+    alert("Please select a dance and an artist.");
+    return;
+  }
+
+  let requestData = { danceID, artistID };
+
+  fetch("/api/admin/assignArtist", {
+    // ✅ Correct route
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(requestData),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        $("#assignArtistModal").modal("hide");
+        loadAssignments();
+      } else {
+        alert("Error assigning artist: " + data.message);
+      }
+    })
+    .catch((error) => console.error("❌ Error assigning artist:", error));
+}
+
+/** 🎭 Edit Existing Dance-Artist Assignment */
+function editAssignment(danceID, artistID, danceDate) {
+  console.log("✏️ Editing Assignment:", { danceID, artistID, danceDate });
+
+  isEditMode = true;
+  editingDanceID = danceID;
+  editingArtistID = artistID;
+
+  document.getElementById("assignDanceDate").value = danceDate;
+  $("#assignArtistModal").modal("show");
+
+  // Load locations & artists
+  document.getElementById("assignDanceDate").dispatchEvent(new Event("change"));
+  populateArtists();
+
+  document.getElementById("assignDanceLocation").value = danceID;
+  document.getElementById("assignArtist").value = artistID;
+
+  // Update button text & event listener
+  let saveButton = document.getElementById("saveAssignmentButton");
+  saveButton.textContent = "Save Changes";
+  saveButton.setAttribute("onclick", "updateAssignment()");
+}
+
+/** 🎭 Update Dance-Artist Assignment */
+function updateAssignment() {
+  let newDanceID = document.getElementById("assignDanceLocation").value;
+  let newArtistID = document.getElementById("assignArtist").value;
+
+  if (!newDanceID || !newArtistID) {
+    alert("Please select a dance and an artist.");
+    return;
+  }
+
+  let requestData = {
+    danceID: editingDanceID,
+    artistID: editingArtistID,
+    newDanceID,
+    newArtistID,
+  };
+
+  console.log("📤 Updating Assignment:", requestData);
+
+  fetch("/api/admin/updateAssignment", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(requestData),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        $("#assignArtistModal").modal("hide");
+        loadAssignments();
+      } else {
+        alert("Error updating assignment: " + data.message);
+      }
+    })
+    .catch((error) => console.error("❌ Error updating assignment:", error));
+}
+
+/** 🎭 Delete Assignment */
+function deleteAssignment(danceID, artistID) {
+  if (!confirm("Are you sure you want to delete this assignment?")) return;
+
+  let requestData = { danceID, artistID };
+
+  console.log("🗑 Deleting Assignment:", requestData);
+
+  fetch("/api/admin/deleteAssignment", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(requestData),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        console.log("✅ Assignment deleted successfully.");
+        loadAssignments(); // Reload assignments after deletion
+      } else {
+        alert("❌ Error deleting assignment: " + data.message);
+      }
+    })
+    .catch((error) => console.error("❌ Error deleting assignment:", error));
 }

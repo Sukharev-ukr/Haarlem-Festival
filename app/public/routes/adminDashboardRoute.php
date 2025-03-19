@@ -15,11 +15,11 @@ Route::add('/api/admin/users', function() use ($adminController) {
 }, 'GET');
 
 // API: Add a new user
-Route::add('/api/admin/users/add', function() use ($adminController) {
+Route::add('/api/admin/users/add', function() {
     header('Content-Type: application/json');
-    $adminController->addUser();
+    $controller = new AdminController();
+    $controller->createUser();
 }, 'POST');
-
 // API: Update user details
 Route::add('/api/admin/users/update', function() use ($adminController) {
     header('Content-Type: application/json');
@@ -67,5 +67,77 @@ Route::add('/api/admin/deleteDanceEvent', function() use ($adminController) {
 
     echo json_encode($adminController->deleteDanceEvent($input['danceID']));
 }, 'DELETE');
+
+//////////////////////////////////////////////////////////////////////////////Artistssssssssssssssssssssssssssss
+Route::add('/api/admin/artists', function() use ($adminController) {
+    header('Content-Type: application/json');
+
+    try {
+        $response = $adminController->getArtists();
+        if (!isset($response['success'])) {
+            throw new Exception("Invalid response format.");
+        }
+
+        echo json_encode($response);
+    } catch (Exception $e) {
+        error_log("Route Error: " . $e->getMessage());
+        echo json_encode(["success" => false, "message" => "Server error: " . $e->getMessage()]);
+    }
+}, 'GET');
+
+Route::add('/api/admin/artists', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->getArtists();
+}, 'GET');
+
+Route::add('/api/admin/addArtist', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->createArtist();
+}, 'POST');
+
+Route::add('/api/admin/updateArtist', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->updateArtist();
+}, 'PUT');
+
+Route::add('/api/admin/deleteArtist', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->deleteArtist();
+}, 'DELETE');
+
+////////////////////////////////////////////////////////////////////////////////Dance-Artist
+Route::add('/api/admin/assignments', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->getDanceArtistAssignments();
+}, 'GET');
+
+Route::add('/api/admin/assignArtist', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->assignArtistToDance();
+}, 'POST');
+
+Route::add('/api/admin/updateAssignment', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->updateDanceArtistAssignment();
+}, 'PUT');
+
+Route::add('/api/admin/deleteAssignment', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->deleteDanceArtistAssignment();
+}, 'DELETE');
+
+Route::add('/api/admin/danceLocations', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    echo json_encode($controller->getDanceLocationsByDate($_GET['date'] ?? ''));
+}, 'GET');
 
 ?>
