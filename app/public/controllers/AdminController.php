@@ -17,12 +17,32 @@ class AdminController {
     }
 
     // Handle User CRUD
-    public function addUser() {
-        $data = json_decode(file_get_contents("php://input"), true);
-        if ($this->adminModel->addUser($data['userName'], $data['Email'], $data['password'], $data['role'])) {
-            echo json_encode(["status" => "success"]);
-        } else {
-            echo json_encode(["status" => "error"]);
+    public function createUser() {
+        try {
+            $data = json_decode(file_get_contents("php://input"), true);
+
+            if (!isset($data['userName'], $data['email'], $data['password'], $data['role'])) {
+                throw new Exception("All fields are required.");
+            }
+
+            if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("Invalid email format.");
+            }
+
+            if (strlen($data['password']) < 6) {
+                throw new Exception("Password must be at least 6 characters long.");
+            }
+
+            $result = $this->adminModel->addUser(
+                $data['userName'],
+                $data['email'],
+                $data['password'],
+                $data['role']
+            );
+
+            echo json_encode($result);
+        } catch (Exception $e) {
+            echo json_encode(["success" => false, "message" => $e->getMessage()]);
         }
     }
 
@@ -129,5 +149,143 @@ class AdminController {
             return ["success" => false, "message" => $e->getMessage()];
         }
     } 
+
+    ////////////////////////////////////////////////////////////////////////////////////Artist
+    public function getArtists() {
+        try {
+            $result = $this->adminModel->getArtists();
+
+            if (!$result['success']) {
+                throw new Exception($result['message']);
+            }
+
+            return $result;
+        } catch (Exception $e) {
+            error_log("Controller Error: " . $e->getMessage());
+            return ["success" => false, "message" => "Error fetching artists: " . $e->getMessage()];
+        }
+    }
+
+     // Create a new artist
+     public function createArtist() {
+        try {
+            $data = json_decode(file_get_contents("php://input"), true);
+
+            if (!isset($data['name'], $data['style'], $data['description'], $data['origin'])) {
+                throw new Exception("All fields are required.");
+            }
+
+            echo json_encode($this->adminModel->addArtist(
+                $data['name'], 
+                $data['style'], 
+                $data['description'], 
+                $data['origin']
+            ));
+        } catch (Exception $e) {
+            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+        }
+    }
+
+    // Update an artist
+    public function updateArtist() {
+        try {
+            $data = json_decode(file_get_contents("php://input"), true);
+
+            if (!isset($data['artistID'], $data['name'], $data['style'], $data['description'], $data['origin'])) {
+                throw new Exception("All fields are required.");
+            }
+
+            echo json_encode($this->adminModel->updateArtist(
+                $data['artistID'], 
+                $data['name'], 
+                $data['style'], 
+                $data['description'], 
+                $data['origin']
+            ));
+        } catch (Exception $e) {
+            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+        }
+    }
+
+    // Delete an artist
+    public function deleteArtist() {
+        try {
+            $data = json_decode(file_get_contents("php://input"), true);
+
+            if (!isset($data['artistID'])) {
+                throw new Exception("Artist ID is required.");
+            }
+
+            echo json_encode($this->adminModel->deleteArtist($data['artistID']));
+        } catch (Exception $e) {
+            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+        }
+    }
+/////////////////////////////////////////////////////////////////////Dance-Arist
+
+ // Get all Dance-Artist Assignments
+ public function getDanceArtistAssignments() {
+    echo json_encode($this->adminModel->getDanceArtistAssignments());
+}
+
+// Assign a Dance to an Artist
+public function assignArtistToDance() {
+    try {
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($data['danceID'], $data['artistID'])) {
+            throw new Exception("All fields are required.");
+        }
+
+        echo json_encode($this->adminModel->assignArtistToDance($data['danceID'], $data['artistID']));
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+// Update an assignment
+public function updateDanceArtistAssignment() {
+    try {
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($data['danceID'], $data['artistID'], $data['newDanceID'], $data['newArtistID'])) {
+            throw new Exception("All fields are required.");
+        }
+
+        echo json_encode($this->adminModel->updateDanceArtistAssignment(
+            $data['danceID'], $data['artistID'], $data['newDanceID'], $data['newArtistID']
+        ));
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+// Delete an assignment
+public function deleteDanceArtistAssignment() {
+    try {
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($data['danceID'], $data['artistID'])) {
+            throw new Exception("All fields are required.");
+        }
+
+        echo json_encode($this->adminModel->deleteDanceArtistAssignment($data['danceID'], $data['artistID']));
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+public function getDanceLocationsByDate($date) {
+    try {
+        if (empty($date)) {
+            throw new Exception("Date is required.");
+        }
+
+        $locations = $this->adminModel->fetchDanceLocationsByDate($date);
+        return ["success" => true, "data" => $locations];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
 }
 ?>

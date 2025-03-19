@@ -26,7 +26,7 @@ if (!$artistDetails) {
 
 <!-- Banner Section -->
 <section class="banner-container">
-    <img src="../../assets/imageArtits/event.jpeg" alt="Banner Background">
+    <img src="../../assets/imageArtits/R (2).jpeg" alt="Banner Background">
     <div class="banner-text">
     <h1>
     <span class="white">SEE</span> 
