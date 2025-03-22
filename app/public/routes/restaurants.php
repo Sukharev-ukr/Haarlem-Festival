@@ -36,7 +36,7 @@ Route::add('/restaurant', function () {
     require "views/pages/detailRestaurantPage.php";
 });
 
-// Route::add('/restaurants/reserve', function () {
-//     $controller = new ReservationController();
-//     $controller->reserve();
-// }, 'post');
+Route::add('/reservation/make', function () {
+    $controller = new ReservationController();
+    $controller->reserve();
+}, 'post');

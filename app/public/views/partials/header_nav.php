@@ -8,8 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
         <a class="navbar-brand" style="color: white;" href="/">My Site</a>
         <a class="nav-item nav-link active" href="/">Home Page</a>
         <a class="nav-item nav-link active" href="#">History</a>
-        <a class="nav-item nav-link active" href="#">Dance</a>
-        <a class="nav-item nav-link active" href="#">Dining</a>
+        <a class="nav-item nav-link active" href="/dancePage">Dance</a>
+        <a class="nav-item nav-link active" href="/restaurants">Dining</a>
         <a class="nav-item nav-link active" href="#">Magic Tyler</a>
         <div>
             <?php if (isset($_SESSION['user'])): ?>

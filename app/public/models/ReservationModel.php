@@ -17,15 +17,36 @@ class ReservationModel extends BaseModel {
         return $this->query($sql, [$restaurantID])->fetch();
     }
     
-    private function getOrCreateOrder($userID) {
-        // logic to query order table by userID and status 'open'
-        // if not found, insert one
-        // return orderID
-    }
+    public function getOrCreateOrder($userID) {
+        // Check for open order
+        $sql = "SELECT orderID FROM `Order` WHERE userID = ? AND status = 'open' LIMIT 1";
+        $result = $this->query($sql, [$userID])->fetch();
     
-    private function createReservation($data, $orderID, $userID) {
-        // INSERT INTO reservations ...
+        if ($result) {
+            return $result['orderID'];
+        } else {
+            // Create new order
+            $sql = "INSERT INTO `Order` (userID, status, created_at) VALUES (?, 'open', NOW())";
+            $this->query($sql, [$userID]);
+            return $this->lastInsertId();
+        }
     }
+
+    public function calculateReservationCosts($restaurantID, $adults, $children) {
+        $stmt = self::$pdo->prepare("SELECT pricePerAdult, pricePerChild FROM Restaurant WHERE restaurantID = ?");
+        $stmt->execute([$restaurantID]);
+        $pricing = $stmt->fetch(PDO::FETCH_ASSOC);
     
+        $reservationFeePerPerson = 10;
+        $mealCost = ($adults * $pricing['pricePerAdult']) + ($children * $pricing['pricePerChild']);
+        $reservationFee = ($adults + $children) * $reservationFeePerPerson;
+        $totalCost = $mealCost + $reservationFee;
+    
+        return [
+            'mealCost' => $mealCost,
+            'reservationFee' => $reservationFee,
+            'totalCost' => $totalCost
+        ];
+    }    
 }
 ?>
