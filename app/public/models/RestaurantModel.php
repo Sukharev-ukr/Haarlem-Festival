@@ -1,5 +1,6 @@
 <?php
-require_once(__DIR__ . "/BaseModel.php");
+require_once __DIR__ . '/BaseModel.php';
+
 class RestaurantModel extends BaseModel {
     // Grab all restaurants
     public function getRestaurants() {

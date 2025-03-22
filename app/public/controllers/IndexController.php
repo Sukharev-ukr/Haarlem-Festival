@@ -7,7 +7,7 @@ class IndexController
     {
         // Render the homepage view
         // Make sure this file actually exists: app_public/views/home.php
-        require_once __DIR__ . '/../views/home.php';
+        require_once __DIR__ . '/../views/pages/home.php';
     }
 
     public function about()

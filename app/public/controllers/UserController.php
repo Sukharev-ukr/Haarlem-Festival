@@ -1,107 +1,12 @@
 <?php
-// app_public/controllers/UserController.php
+// app/controllers/UserController.php
 
 require_once __DIR__ . '/../models/UserModel.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
+require_once __DIR__ . '/../lib/mailer.php'; // Include our mailer helper
 
 class UserController
 {
-    // Display login form (GET)
-    public function login()
-{
-    
-    require_once __DIR__ . '/../views/user/login.php';
-    
-}
-
-    // Process login form submission (POST)
-    public function loginPost()
-    {
-        $email = $_POST['email'] ?? '';
-        $password = $_POST['password'] ?? '';
-        $captchaResponse = $_POST['g-recaptcha-response'] ?? '';
-
-        // 1. Verify CAPTCHA
-        if (!$this->verifyCaptcha($captchaResponse)) {
-            $error = "CAPTCHA verification failed. Please try again.";
-            require_once __DIR__ . '/../views/user/login.php';
-            return;
-        }
-
-        // 2. Check user in DB
-        $userModel = new UserModel();
-        $user = $userModel->findByEmail($email);
-
-        if ($user && password_verify($password, $user['password'])) {
-            // Login success: set session and redirect
-            $_SESSION['user_id'] = $user['id'];
-            header('Location: /');
-            exit;
-        } else {
-            $error = "Invalid credentials.";
-            require_once __DIR__ . '/../views/user/login.php';
-        }
-    }
-
-    // Handle user registration (GET for form, POST for submission)
-    public function registerGet()
-    {
-        
-        // Set empty messages for first load
-        $errorMessage = '';
-        $successMessage = '';
-        require_once __DIR__ . '/../views/user/register.php';
-        
-    }
-
-    // Process the registration form (POST)
-    public function registerPost()
-    {
-        echo "DEBUG: In UserController->registerPost()<br>";
-        
-        // Retrieve and trim form fields
-        $username = trim($_POST['username'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $password = trim($_POST['password'] ?? '');
-        $confirmPassword = trim($_POST['confirm_password'] ?? '');
-
-        $errorMessage = '';
-        $successMessage = '';
-
-        // Basic validation
-        if (empty($username) || empty($email) || empty($password) || empty($confirmPassword)) {
-            $errorMessage = 'All fields are required.';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errorMessage = 'Invalid email format.';
-        } elseif ($password !== $confirmPassword) {
-            $errorMessage = 'Passwords do not match.';
-        }
-
-        // If there is an error, show the form again with the error message
-        if ($errorMessage) {
-            require_once __DIR__ . '/../views/user/register.php';
-            echo "DEBUG: Exiting registerPost() with error<br>";
-            return;
-        }
-
-        try {
-            $userModel = new UserModel();
-            // Assume createUser returns the new user's ID or throws an exception on error
-            $userId = $userModel->createUser($username, $password, $email);
-            // Registration successful—redirect to login page
-            header('Location: /login');
-            exit;
-        } catch (Exception $e) {
-            $errorMessage = 'Error: ' . $e->getMessage();
-            require_once __DIR__ . '/../views/user/register.php';
-            echo "DEBUG: Exiting registerPost() with exception<br>";
-        }
-    }
-
-    // Registration wrapper method – chooses GET or POST based on the request method
+    // Registration: GET/POST
     public function register()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -111,98 +16,87 @@ class UserController
         }
     }
 
-    // ------------------------------
-    // FORGOT PASSWORD METHODS
-    // ------------------------------
-
-    // Display the forgot password form (GET)
-    public function forgotPasswordGet()
+    public function registerGet()
     {
-        
-        $errorMessage = '';
-        $successMessage = '';
-        require_once __DIR__ . '/../views/user/forgot_password.php';
-        
+        $error = '';
+        $success = '';
+        require_once __DIR__ . '/../views/user/register.php';
     }
 
-    // Process the forgot password form (POST)
-    public function forgotPasswordPost()
+    public function registerPost()
 {
-    echo "DEBUG: In UserController->forgotPasswordPost()<br>";
-
-    $email = trim($_POST['email'] ?? '');
+    $userName    = trim($_POST['userName'] ?? '');
+    $mobilePhone = trim($_POST['mobilePhone'] ?? '');
+    $email       = trim($_POST['email'] ?? '');
+    $password    = trim($_POST['password'] ?? '');
     $error = '';
     $success = '';
 
-    if (empty($email)) {
-        $error = 'Please enter your email.';
-        require_once __DIR__ . '/../views/user/forgot_password.php';
-        echo "DEBUG: Exiting forgotPasswordPost() with error: email empty<br>";
+    if (empty($userName) || empty($mobilePhone) || empty($email) || empty($password)) {
+        $error = 'All fields are required.';
+        require_once __DIR__ . '/../views/user/register.php';
         return;
     }
 
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
     try {
-        $userModel = new UserModel();
-        $user = $userModel->findByEmail($email);
-        if (!$user) {
-            $error = 'No account found with that email.';
-            require_once __DIR__ . '/../views/user/forgot_password.php';
-            echo "DEBUG: Exiting forgotPasswordPost() with error: no user found<br>";
-            return;
+        // Insert into pending_users instead of the main User table
+        require_once __DIR__ . '/../models/PendingUserModel.php';
+        $pendingModel = new PendingUserModel();
+        $verifyToken = bin2hex(random_bytes(16));
+        $pendingId = $pendingModel->createPendingUser($userName, $mobilePhone, $email, $hashedPassword, 'User', $verifyToken);
+
+        if (sendEmailRegister($userName, $email, $verifyToken)) {
+            $success = 'Registration successful! Please check your email to verify your account.';
+        } else {
+            $error = $_SESSION['email_error'] ?? 'Failed to send verification email.';
         }
-
-        // Generate a reset token and expiration time (1 hour from now)
-        $token = bin2hex(random_bytes(16));
-        $expires = (new DateTime('+1 hour'))->format('Y-m-d H:i:s');
-        $userModel->createPasswordReset($email, $token, $expires);
-
-        // Use PHPMailer to send the email
-        require_once __DIR__ . '/../../vendor/autoload.php'; // Adjust the path as needed
-
-        // Import PHPMailer classes at the top of the file:
-        // use PHPMailer\PHPMailer\PHPMailer;
-        // use PHPMailer\PHPMailer\Exception;
-
-        $mail = new PHPMailer(true);
-        try {
-            // Server settings
-            $mail->isSMTP();
-            $mail->Host       = 'sandbox.smtp.mailtrap.io'; // Mailtrap host
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'fa8f935d612207';            // Your Mailtrap username
-            $mail->Password   = 'ad3fcb9d2068b1';              // Your Mailtrap password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption
-            $mail->Port       = 587;                           // Typically use port 587
-
-            // Recipients
-            $mail->setFrom('no-reply@yourdomain.com', 'Your App Name'); // Change as needed
-            $mail->addAddress($email);  // Recipient's email address
-
-            // Email content
-            $mail->isHTML(false); // Set to false for plain text email
-            $mail->Subject = 'Password Reset Request';
-            $resetLink = "http://localhost/reset_password?token=" . urlencode($token);
-            $mail->Body    = "Hello,\n\nWe received a request to reset your password.\n" .
-                              "Please click the link below to reset your password:\n\n" .
-                              $resetLink . "\n\nIf you did not request this, please ignore this email.";
-
-            $mail->send();
-            $success = 'Password reset instructions have been emailed to you.';
-        } catch (Exception $e) {
-            $error = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-        }
-
-        require_once __DIR__ . '/../views/user/forgot_password.php';
-        echo "DEBUG: Exiting forgotPasswordPost() successfully<br>";
     } catch (Exception $e) {
         $error = 'Error: ' . $e->getMessage();
-        require_once __DIR__ . '/../views/user/forgot_password.php';
-        echo "DEBUG: Exiting forgotPasswordPost() with exception<br>";
     }
+    require_once __DIR__ . '/../views/user/register.php';
 }
 
 
-    // Forgot password wrapper method – chooses GET or POST based on the request method
+    // Email Verification
+    public function verifyEmail()
+{
+    $token = $_GET['token'] ?? '';
+    if (empty($token)) {
+        echo "No token provided.";
+        return;
+    }
+    
+    // Use PendingUserModel to fetch pending registration
+    require_once __DIR__ . '/../models/PendingUserModel.php';
+    $pendingModel = new PendingUserModel();
+    $pendingUser = $pendingModel->findByVerifyToken($token);
+    
+    if (!$pendingUser) {
+        echo "Invalid token or user not found.";
+        return;
+    }
+    
+    // Create the user in the main User table using details from pending_users
+    $userModel = new UserModel();
+    $userId = $userModel->createUser(
+        $pendingUser['userName'],
+        $pendingUser['mobilePhone'],
+        $pendingUser['email'],
+        $pendingUser['password'], // already hashed
+        $pendingUser['role']
+    );
+    
+    // Optionally, perform any additional actions (e.g., log the user in, send a welcome email, etc.)
+    
+    // Delete the pending record
+    $pendingModel->deletePendingUser($pendingUser['pending_id']);
+    
+    echo "Your email has been verified and your account has been created. Please <a href='/user/login'>login</a>.";
+}
+
+
+    // Forgot Password: GET/POST
     public function forgotPassword()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -211,45 +105,138 @@ class UserController
             $this->forgotPasswordGet();
         }
     }
-    // Handle password reset (GET to show form, POST to update password)
-    public function resetPassword()
+
+    public function forgotPasswordGet()
     {
-        $token = $_GET['token'] ?? '';
+        $error = '';
+        $success = '';
+        require_once __DIR__ . '/../views/user/forgot_password.php';
+    }
 
-        $userModel = new UserModel();
-        $user = $userModel->findByToken($token);
+    public function forgotPasswordPost()
+    {
+        $email = trim($_POST['email'] ?? '');
+        $error = '';
+        $success = '';
 
-        if (!$user) {
-            echo "<p>Invalid or expired token.</p>";
+        if (empty($email)) {
+            $error = 'Please enter your email.';
+            require_once __DIR__ . '/../views/user/forgot_password.php';
             return;
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $newPassword = $_POST['password'] ?? '';
-            $hashed = password_hash($newPassword, PASSWORD_BCRYPT);
-            $userModel->updatePassword($user['id'], $hashed);
-            $userModel->clearResetToken($user['id']);
+        try {
+            $userModel = new UserModel();
+            $user = $userModel->findByEmail($email);
+            if (!$user) {
+                $error = 'No account found with that email.';
+                require_once __DIR__ . '/../views/user/forgot_password.php';
+                return;
+            }
+            // Generate reset token and expiration (1 hour from now)
+            $resetToken = bin2hex(random_bytes(16));
+            $expires = (new DateTime('+1 hour'))->format('Y-m-d H:i:s');
+            $userModel->setResetToken($user['userID'], $resetToken, $expires);
 
-            echo "<p>Password updated. You can <a href='/user/login'>login now</a>.</p>";
+            if (sendEmailReset($email, $resetToken)) {
+                $success = 'Password reset instructions have been emailed to you.';
+            } else {
+                $error = $_SESSION['email_error'] ?? 'Failed to send reset email.';
+            }
+        } catch (Exception $e) {
+            $error = 'Error: ' . $e->getMessage();
+        }
+        require_once __DIR__ . '/../views/user/forgot_password.php';
+    }
+
+    // Reset Password: GET/POST
+    public function resetPassword()
+{
+    $token = $_GET['token'] ?? '';
+    if (empty($token)) {
+        echo "No token provided.";
+        return;
+    }
+    
+    $userModel = new UserModel();
+    $user = $userModel->findByToken($token);
+    if (!$user) {
+        echo "Invalid or expired token.";
+        return;
+    }
+    
+    // Initialize messages for the view
+    $error = '';
+    $success = '';
+    
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $newPassword = trim($_POST['password'] ?? '');
+        $confirmPassword = trim($_POST['confirm_password'] ?? '');
+        
+        if (empty($newPassword) || empty($confirmPassword)) {
+            $error = "Please fill in both password fields.";
+            require_once __DIR__ . '/../views/user/reset_password.php';
             return;
         }
-
-        // Show reset password form (GET)
+        
+        if ($newPassword !== $confirmPassword) {
+            $error = "Passwords do not match.";
+            require_once __DIR__ . '/../views/user/reset_password.php';
+            return;
+        }
+        
+        // Hash the new password and update the database
+        $hashed = password_hash($newPassword, PASSWORD_BCRYPT);
+        $userModel->updatePassword($user['userID'], $hashed);
+        $userModel->clearResetToken($user['userID']);
+        
+        $success = "Password updated successfully. You can now <a href='/user/login'>login</a>.";
+        require_once __DIR__ . '/../views/user/reset_password.php';
+    } else {
         require_once __DIR__ . '/../views/user/reset_password.php';
     }
+}
 
-    // Verify reCAPTCHA response using Google API
-    private function verifyCaptcha($captchaResponse)
-    {
-        if (empty($captchaResponse)) {
-            return false;
-        }
-
-        $secret = $_ENV["RECAPTCHA_SECRET_KEY"] ?? '';
-        $response = file_get_contents(
-            "https://www.google.com/recaptcha/api/siteverify?secret={$secret}&response={$captchaResponse}"
-        );
-        $json = json_decode($response, true);
-        return isset($json['success']) && $json['success'] === true;
+    public function login()
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $this->loginPost();
+    } else {
+        $this->loginGet();
     }
+}
+
+private function loginGet()
+{
+    $error = '';
+    // Load the login view (create this file as needed)
+    require_once __DIR__ . '/../views/user/login.php';
+}
+
+public function loginPost()
+{
+    $email = trim($_POST['email'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+    $error = '';
+
+    if (empty($email) || empty($password)) {
+        $error = "Please fill in both email and password.";
+        require_once __DIR__ . '/../views/user/login.php';
+        return;
+    }
+
+    $userModel = new UserModel();
+    $user = $userModel->findByEmail($email);
+    if ($user && password_verify($password, $user['password'])) {
+        // Login successful: set session variables
+        $_SESSION['user'] = $user;
+        // Redirect to homepage after login
+        header("Location: /");
+        exit;
+    } else {
+        $error = "Invalid credentials.";
+        require_once __DIR__ . '/../views/user/login.php';
+        return;
+    }
+}
 }

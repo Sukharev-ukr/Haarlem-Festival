@@ -1,52 +1,57 @@
-</body>
-<footer class="festival-footer">
-    <div class="footer-container">
-        <div class="footer-logo">
-            <h2>the <br> festival <br> HAARLEM</h2>
+<!-- footer.php -->
+<footer style="background-color: #000; color: #fff; padding: 40px 0;">
+    <div class="container" style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+
+        <!-- 1. Logo or festival name -->
+        <div>
+            <h2 style="margin-bottom: 1rem;">the festival.<br>Haarlem</h2>
         </div>
 
-        <div class="footer-column">
+        <!-- 2. Information -->
+        <div>
             <h3>Information</h3>
-            <ul>
-                <li><a href="/history">History</a></li>
-                <li><a href="/dining">Dining</a></li>
-                <li><a href="/dance">Dance!</a></li>
-                <li><a href="/magic">Magic @ Teylers</a></li>
-                <li><a href="/faq">FAQ!</a></li>
+            <ul style="list-style: none; padding-left: 0;">
+                <li><a href="#" style="color: #fff; text-decoration: none;">History</a></li>
+                <li><a href="#" style="color: #fff; text-decoration: none;">Dining</a></li>
+                <li><a href="#" style="color: #fff; text-decoration: none;">Dance</a></li>
+                <li><a href="#" style="color: #fff; text-decoration: none;">Magic @ Teylers</a></li>
+                <li><a href="#" style="color: #fff; text-decoration: none;">FAQ</a></li>
             </ul>
         </div>
 
-        <div class="footer-column">
+        <!-- 3. Helpful links -->
+        <div>
             <h3>Helpful links</h3>
-            <ul>
-                <li><a href="/services">Services</a></li>
-                <li><a href="/support">Support</a></li>
-                <li><a href="/terms">Terms & Conditions</a></li>
-                <li><a href="/privacy">Privacy & Policy</a></li>
+            <ul style="list-style: none; padding-left: 0;">
+                <li><a href="#" style="color: #fff; text-decoration: none;">Services</a></li>
+                <li><a href="#" style="color: #fff; text-decoration: none;">Support</a></li>
+                <li><a href="#" style="color: #fff; text-decoration: none;">Terms & Conditions</a></li>
+                <li><a href="#" style="color: #fff; text-decoration: none;">Privacy & Policy</a></li>
             </ul>
         </div>
 
-        <div class="footer-column">
+        <!-- 4. Our Festival / Contact -->
+        <div>
             <h3>Our Festival</h3>
-            <ul>
-                <li><a href="/history">History</a></li>
-                <li><a href="/sponsors">Sponsors</a></li>
-                <li><a href="/contact">Contact</a></li>
+            <ul style="list-style: none; padding-left: 0;">
+                <li><a href="#" style="color: #fff; text-decoration: none;">History</a></li>
+                <li><a href="#" style="color: #fff; text-decoration: none;">Sponsors</a></li>
+                <li><a href="#" style="color: #fff; text-decoration: none;">Contact</a></li>
             </ul>
+            <br>
+            <h3>Contact Us</h3>
+            <p style="margin: 0;">+31 6 666 6666</p>
+            <p style="margin: 0;"><a href="mailto:the.festival@gmail.com" style="color: #fff; text-decoration: none;">the.festival@gmail.com</a></p>
+            <p style="margin-top: 0.5rem;">
+                <!-- Social icons (use your own icons/links) -->
+                <a href="#" style="color: #fff; margin-right: 1rem;">FB</a>
+                <a href="#" style="color: #fff; margin-right: 1rem;">IG</a>
+                <a href="#" style="color: #fff;">TW</a>
+            </p>
         </div>
 
-        <div class="footer-column contact-info">
-            <h3>Contact Us</h3>
-            <p><i class="fas fa-phone"></i> +31 66 666 6666</p>
-            <p><i class="fas fa-envelope"></i> the.festival@gmail.com</p>
-            <div class="social-icons">
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-facebook"></i></a>
-                <a href="#"><i class="fab fa-linkedin"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-            </div>
-        </div>
     </div>
 </footer>
 
+</body>
 </html>
