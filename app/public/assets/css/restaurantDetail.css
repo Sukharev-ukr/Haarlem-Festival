@@ -1,0 +1,253 @@
+/* === General Reset === */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f2f2f2; /* Matches Figma background */
+}
+
+/* === Back Button === */
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease-in-out;
+    z-index: 10;
+}
+
+.back-button:hover {
+    background-color: #f4f4f4;
+}
+
+/* === Banner Section === */
+.restaurant-detail-header {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+}
+
+.restaurant-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* === Title Overlay === */
+.restaurant-banner-overlay {
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    padding: 20px 40px;
+    border-radius: 10px;
+    display: inline-block;
+    max-width: 450px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.restaurant-title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #D99000;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* === Description Section === */
+.restaurant-description-section {
+    background-color: #800000;
+    color: white;
+    text-align: center;
+    padding: 50px;
+    width: 100%;
+}
+
+.restaurant-description-section h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.restaurant-description-section p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: auto;
+}
+
+/* === Reservation Section === */
+.reservation-container {
+    width: 85%;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.reservation-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* === Session Selection === */
+.session-selection {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* Default (Inactive) */
+.session-btn {
+    background-color: white;
+    color: #800000;
+    border: 2px solid #800000;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease, border 0.3s ease;
+}
+
+/* Active (Clicked) */
+.session-btn.active {
+    background-color: #800000;
+    color: white;
+}
+
+/* === Form Layout Fixes === */
+.reservation-form-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    width: 100%;
+    max-width: 900px;
+    margin: auto;
+}
+
+/* === Left & Right Sections === */
+.reservation-left,
+.reservation-right {
+    width: 48%;
+}
+
+/* === Form Group for Labels & Inputs === */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* === Special Requests Styling === */
+.special-requests textarea {
+    height: 80px;
+    resize: none;
+}
+
+/* === Date Picker Section === */
+.reservation-calendar {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* === Pricing Information Section === */
+.pricing-info {
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* === Reservation Info Box === */
+.reservation-info-box {
+    background-color: #800000;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+/* === Buttons === */
+.reservation-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.cart-btn,
+.reserve-btn {
+    background-color: #D99000;
+    color: black;
+    padding: 15px 25px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.cart-btn:hover,
+.reserve-btn:hover {
+    background-color: #C88000;
+}
+
+/* === Total Cost Styling === */
+.total-cost {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+/* === Responsive Fixes === */
+@media (max-width: 768px) {
+    .reservation-form-container {
+        flex-direction: column;
+    }
+
+    .reservation-left,
+    .reservation-right {
+        width: 100%;
+    }
+
+    .reservation-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .cart-btn,
+    .reserve-btn {
+        width: 100%;
+    }
+}
+    

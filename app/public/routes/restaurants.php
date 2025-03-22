@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . '/../controllers/RestaurantController.php');
+require_once(__DIR__ . '/../controllers/ReservationController.php');
 
 Route::add('/restaurants', function () {
     $controller = new RestaurantController();
@@ -17,7 +18,25 @@ Route::add('/restaurants/slots', function () {
     $controller->showSlots($restaurantID);
 });
 
-Route::add('/restaurants/reserve', function () {
+Route::add('/restaurant', function () {
+    $restaurantID = $_GET['restaurantID'] ?? null;
+    if (!$restaurantID) {
+        echo "Invalid restaurant ID.";
+        return;
+    }
+
     $controller = new RestaurantController();
-    $controller->reserve();
-}, 'post');
+    $restaurant = $controller->showRestaurantDetails($restaurantID);
+
+    if (!$restaurant) {
+        echo "Restaurant not found.";
+        return;
+    }
+
+    require "views/pages/detailRestaurantPage.php";
+});
+
+// Route::add('/restaurants/reserve', function () {
+//     $controller = new ReservationController();
+//     $controller->reserve();
+// }, 'post');

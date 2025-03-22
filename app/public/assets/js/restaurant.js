@@ -20,3 +20,18 @@ document.addEventListener("DOMContentLoaded", function () {
                         Distance from Patronaat: ${restaurant.distance_from_patronaat}m`);
     });
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+    const buttons = document.querySelectorAll(".session-btn");
+
+    buttons.forEach(button => {
+        button.addEventListener("click", function() {
+            // Remove active class from all buttons
+            buttons.forEach(btn => btn.classList.remove("active"));
+
+            // Add active class to clicked button
+            this.classList.add("active");
+        });
+    });
+});
+

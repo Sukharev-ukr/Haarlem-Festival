@@ -30,5 +30,10 @@ class RestaurantController {
             header("Location: /restaurants?success=1");
         }
     }
+    public function showRestaurantDetails($restaurantID) {
+        return $this->model->getRestaurantByID($restaurantID);
+    }
+    
+    
 }
 ?>
