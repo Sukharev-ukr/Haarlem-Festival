@@ -1,8 +1,9 @@
 <?php
+require_once(__DIR__ . "/BaseModel.php");
 class RestaurantModel extends BaseModel {
-    // Grab all restaurants with lat/lng/distance
+    // Grab all restaurants
     public function getRestaurants() {
-        $sql = "SELECT restaurantID, restaurantName, address, phone, cuisine, latitude, longitude, distance_from_patronaat FROM Restaurant";
+        $sql = "SELECT restaurantID, restaurantName, address, phone, cuisine, description, stars, pricePerAdult, pricePerChild, latitude, longitude, distance_from_patronaat FROM Restaurant";
         return $this->query($sql)->fetchAll();
     }
 
@@ -18,5 +19,10 @@ class RestaurantModel extends BaseModel {
                 VALUES (?, ?, ?, ?, ?, 'Pending', NOW(), 69.69)";
         return $this->query($sql, [$userID, $restaurantID, $slotID, $adults, $children]);
     }
+    // get restaurant ID
+    public function getRestaurantByID($restaurantID) {
+        $sql = "SELECT * FROM Restaurant WHERE restaurantID = ?";
+        return $this->query($sql, [$restaurantID])->fetch();
+    }    
 }
 ?>
