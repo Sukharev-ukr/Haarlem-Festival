@@ -72,8 +72,8 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'] . $imgPathJpg)) {
     <!-- Session Selection -->
     <div class="session-selection">
         <?php foreach ($sessions as $session): ?>
-            <button type="button" class="session-btn" onclick="selectSlot(<?= $session['slotID'] ?>)">
-                <?= htmlspecialchars($session["startTime"]) ?> - <?= htmlspecialchars($session["endTime"]) ?>
+            <button type="button" class="session-btn" onclick="selectSlot(this, <?= $session['slotID'] ?>)">
+                <?= date("H:i", strtotime($session["startTime"])) ?> - <?= date("H:i", strtotime($session["endTime"])) ?>
             </button>
         <?php endforeach; ?>
     </div>
@@ -82,6 +82,8 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'] . $imgPathJpg)) {
 <form id="reservationForm" action="/reservation/make" method="POST">
     <input type="hidden" name="restaurantID" value="<?= $restaurantID ?>">
     <input type="hidden" id="selectedSlot" name="slotID" value="">
+    <input type="hidden" id="pricePerAdult" value="<?= $restaurant['pricePerAdult'] ?>">
+    <input type="hidden" id="pricePerChild" value="<?= $restaurant['pricePerChild'] ?>">
 
     <div class="reservation-form-container">
         <!-- LEFT SIDE (User Info) -->
@@ -92,13 +94,21 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'] . $imgPathJpg)) {
             </div>
 
             <div class="form-group">
-                <label for="phoneNumber">Phone Number *</label>
-                <input type="text" name="phoneNumber" id="phoneNumber" required>
+            <label for="phoneNumber">Phone Number *</label>
+            <input 
+            type="tel"
+            name="phoneNumber"
+            id="phoneNumber"
+            required
+            pattern="^\+?[0-9]{7,15}$"
+            placeholder="+31612345678"
+            title="Enter a valid phone number (digits only, 7 to 15 characters, optional +)"
+            >
             </div>
 
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" name="email" id="email">
+                <input type="email" name="email" id="email" required>
             </div>
 
             <div class="form-group special-requests">
@@ -126,8 +136,8 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'] . $imgPathJpg)) {
             </div>
 
             <div class="form-group pricing-info">
-                <p>€ 35 p.p Adults</p>
-                <p>€17.50 p.p (under 12 years old)</p>
+                <p>€ <?= number_format($restaurant['pricePerAdult'], 2) ?> p.p Adults</p>
+                <p>€ <?= number_format($restaurant['pricePerChild'], 2) ?> p.p (under 12 years old)</p>
             </div>
         </div>
     </div>
@@ -138,9 +148,12 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'] . $imgPathJpg)) {
         <p>Reservations are mandatory. A reservation fee of €10 per person will be charged when booking through the Haarlem Festival website. This fee will be deducted from your final bill during your visit.</p>
     </div>
 
-    <!-- Total Cost -->
-    <div class="total-cost">
-        <p>Total Cost: € <span id="totalPrice">0</span></p>
+    <!-- Pricing Summary -->
+    <div class="pricing-summary text-center mt-4">
+        <p><strong>Reservation Price:</strong> €<span id="reservationPrice">0.00</span></p>
+        <p><strong>Reservation Fee:</strong> €<span id="reservationFee">0.00</span></p>
+        <hr style="width: 60%; margin: 10px auto;">
+        <p><strong>Total Cost:</strong> €<span id="totalPrice">0.00</span></p>
     </div>
 
     <!-- Buttons -->
@@ -149,7 +162,6 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'] . $imgPathJpg)) {
         <button type="submit" class="reserve-btn">Reserve</button>
     </div>
 </form>
-
 </div>
 
 <script>
@@ -167,7 +179,65 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'] . $imgPathJpg)) {
         $("#datepicker").val($("#inline-datepicker").datepicker("getDate"));
     });
 
-function selectSlot(slotID) {
-    document.getElementById("selectedSlot").value = slotID;
+function selectSlot(button, slotID) {
+    // Remove 'active' class from all buttons
+    document.querySelectorAll('.session-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Add 'active' class to the clicked button
+    button.classList.add('active');
+
+    // Set selected slot value in hidden input
+    document.getElementById('selectedSlot').value = slotID;
 }
+    $(document).ready(function () {
+        $("#inline-datepicker").datepicker({
+            dateFormat: "dd-mm-yy",
+            minDate: 0,
+            showAnim: "fadeIn",
+            onSelect: function (dateText) {
+                $("#datepicker").val(dateText);
+            }
+        });
+
+        $("#datepicker").val($("#inline-datepicker").datepicker("getDate"));
+    });
+
+    function selectSlot(button, slotID) {
+        document.querySelectorAll('.session-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        document.getElementById('selectedSlot').value = slotID;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const adultInput = document.getElementById("adults");
+    const childInput = document.getElementById("children");
+
+    const reservationPriceDisplay = document.getElementById("reservationPrice");
+    const reservationFeeDisplay = document.getElementById("reservationFee");
+    const totalPriceDisplay = document.getElementById("totalPrice");
+
+    const pricePerAdult = 35.00;
+    const pricePerChild = 17.50;
+    const reservationFeePerPerson = 10.00;
+
+    function updatePrices() {
+        const adults = parseInt(adultInput.value) || 0;
+        const children = parseInt(childInput.value) || 0;
+
+        const reservationTotal = (adults * pricePerAdult) + (children * pricePerChild);
+        const reservationFee = (adults + children) * reservationFeePerPerson;
+        const total = reservationTotal + reservationFee;
+
+        reservationPriceDisplay.textContent = reservationTotal.toFixed(2);
+        reservationFeeDisplay.textContent = reservationFee.toFixed(2);
+        totalPriceDisplay.textContent = total.toFixed(2);
+    }
+
+    adultInput.addEventListener("input", updatePrices);
+    childInput.addEventListener("input", updatePrices);
+
+    updatePrices(); // Initial call
+});
 </script>

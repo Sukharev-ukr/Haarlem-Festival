@@ -38,6 +38,55 @@
         return true;
     }
 
+    private function getRestaurantPrices($restaurantID) {
+        $stmt = self::$pdo->prepare("SELECT pricePerAdult, pricePerChild FROM Restaurant WHERE restaurantID = ?");
+        $stmt->execute([$restaurantID]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    public function addReservationToCart($userID, $reservationData, $pricing) {
+        // 1. Check or create unpaid order
+        $stmt = self::$pdo->prepare("SELECT orderID FROM `Order` WHERE userID = ? AND status = 'unpaid' LIMIT 1");
+        $stmt->execute([$userID]);
+        $orderID = $stmt->fetchColumn();
+    
+        if (!$orderID) {
+            $stmt = self::$pdo->prepare("INSERT INTO `Order` (userID, orderDate, status, total) VALUES (?, NOW(), 'unpaid', 0)");
+            $stmt->execute([$userID]);
+            $orderID = self::$pdo->lastInsertId();
+        }
+    
+        // 2. Insert into OrderItem
+        $stmt = self::$pdo->prepare("INSERT INTO `OrderItem` (orderID, price, BookingType) VALUES (?, ?, 'Restaurant')");
+        $stmt->execute([$orderID, $pricing['totalCost']]);
+        $orderItemID = self::$pdo->lastInsertId();
+    
+        // 3. Insert into Reservation
+        $stmt = self::$pdo->prepare("
+            INSERT INTO Reservation (
+                orderItemID, restaurantID, reservationDate, specialRequests,
+                amountAdults, amountChildren, reservationFee
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $orderItemID,
+            $reservationData['restaurantID'],
+            $reservationData['reservationDate'],
+            $reservationData['specialRequests'],
+            $reservationData['adults'],
+            $reservationData['children'],
+            $pricing['reservationFee']
+        ]);
+    
+        // 4. Link slot to reservation
+        $reservationID = self::$pdo->lastInsertId();
+        $stmt = self::$pdo->prepare("INSERT INTO ReservationSlot (slotID, reservationID) VALUES (?, ?)");
+        $stmt->execute([$reservationData['slotID'], $reservationID]);
+    
+        return true;
+    }
+    
+
     //Using at ShoppingCart to retreive all of order in cart
     public function getCartItems($userId) {
         $sql = "

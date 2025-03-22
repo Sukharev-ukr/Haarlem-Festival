@@ -1,5 +1,6 @@
 <?php
 require_once "models/ReservationModel.php";
+require_once "models/CartModel.php";
 
 class ReservationController {
     private $model;
@@ -17,28 +18,68 @@ class ReservationController {
         return $this->model->getRestaurantByID($restaurantID);
     }
 
-    // public function reserve() {
-    //     $userID = $this->getLoggedInUserID();
-    //     if (!$userID) {
-    //         header("Location: /login");
-    //         exit;
-    //     }
+    private function getLoggedInUserID() {
+        return $_SESSION['user']['userID'] ?? null;
+    }
     
-    //     $data = $this->getPostData();
-    //     $errors = $this->validateReservationFields($data);
+    private function getPostData() {
+        return [
+            'fullName' => $_POST['fullName'] ?? '',
+            'phoneNumber' => $_POST['phoneNumber'] ?? '',
+            'email' => $_POST['email'] ?? '',
+            'adults' => $_POST['adults'] ?? 0,
+            'children' => $_POST['children'] ?? 0,
+            'specialRequests' => $_POST['specialRequests'] ?? '',
+            'slotID' => $_POST['slotID'] ?? null,
+            'reservationDate' => $_POST['reservationDate'] ?? null
+        ];
+    }
     
-    //     if (!empty($errors)) {
-    //         // Return view with errors
-    //         return;
-    //     }
+    private function validateReservationFields($data) {
+        $errors = [];
     
-    //     $orderID = $this->model->getOrCreateOrder($userID);
-    //     $this->model->createReservation($data, $orderID, $userID);
+        if (empty($data['fullName'])) $errors[] = "Full name is required";
+        if (empty($data['phoneNumber'])) $errors[] = "Phone number is required";
+        if (empty($data['slotID'])) $errors[] = "Please select a time slot";
+        if (empty($data['reservationDate'])) $errors[] = "Please pick a reservation date";
     
-    //     header("Location: /cart");
-    //     exit;
-    // }
-      
+        return $errors;
+    }
+
+    public function reserve() {
+        $userID = $_SESSION['user']['userID'] ?? null;
+        if (!$userID) {
+            header("Location: /login");
+            exit;
+        }
+    
+        // 1. Collect reservation data from POST
+        $data = [
+            'restaurantID' => $_POST['restaurantID'],
+            'slotID' => $_POST['slotID'],
+            'fullName' => $_POST['fullName'],
+            'phoneNumber' => $_POST['phoneNumber'],
+            'email' => $_POST['email'] ?? '',
+            'adults' => $_POST['adults'],
+            'children' => $_POST['children'],
+            'specialRequests' => $_POST['specialRequests'] ?? '',
+            'reservationDate' => $_POST['reservationDate']
+        ];
+    
+        // 2. Calculate reservation pricing using ReservationModel
+        $pricing = $this->model->calculateReservationCosts(
+            $data['restaurantID'],
+            $data['adults'],
+            $data['children']
+        );
+    
+        // 3. Pass both data + pricing to the CartModel
+        $cartModel = new CartModel();
+        $cartModel->addReservationToCart($userID, $data, $pricing);
+    
+        // 4. Redirect to shopping cart
+        header("Location: /shoppingCart");
+        exit;
+    }
 }
-?>
 

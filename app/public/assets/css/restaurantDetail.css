@@ -107,19 +107,19 @@ body {
     margin-bottom: 20px;
 }
 
-/* Default (Inactive) */
+/* Default style (inactive) */
 .session-btn {
     background-color: white;
     color: #800000;
     border: 2px solid #800000;
-    padding: 12px 20px;
+    padding: 10px 20px;
     font-size: 16px;
     border-radius: 25px;
     cursor: pointer;
-    transition: background 0.3s ease, color 0.3s ease, border 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-/* Active (Clicked) */
+/* Active/selected button */
 .session-btn.active {
     background-color: #800000;
     color: white;
