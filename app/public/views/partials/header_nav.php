@@ -2,8 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-?>
-<nav class="navbar" style="background-color: #8B0000 !important; color: white;">
+?>  
+<nav class="navbar" style="background-color:rgb(0, 0, 0) !important; color: white;">
     <div class="container-fluid">
         <a class="navbar-brand" style="color: white;" href="/">My Site</a>
         <a class="nav-item nav-link active" href="/">Home Page</a>

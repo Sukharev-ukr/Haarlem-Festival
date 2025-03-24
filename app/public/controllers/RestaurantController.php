@@ -1,5 +1,5 @@
 <?php
-require_once "models/RestaurantModel.php";
+require_once __DIR__ . '/../models/RestaurantModel.php';
 
 class RestaurantController {
     private $model;
@@ -10,7 +10,11 @@ class RestaurantController {
 
     public function showRestaurants() {
         $restaurants = $this->model->getRestaurants();
-        require "views/pages/restaurants.php"; // Pass restaurants to view
+        require __DIR__ . '/../views/pages/restaurants.php';
+    }
+
+    public function getAllRestaurants() {
+        return $this->model->getRestaurants();
     }
 
     public function showSlots($restaurantID) {
