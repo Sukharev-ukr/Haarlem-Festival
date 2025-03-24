@@ -9,7 +9,7 @@
 CREATE DATABASE IF NOT EXISTS `haarlem_festival_v3`;
 
 
-USE `haarlem_festival`;
+USE `haarlem_festival_v3`;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -773,3 +773,77 @@ CREATE TABLE pending_users (
     verify_token VARCHAR(64) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add missing restaurantID column to RestaurantSlot (if not already added)
+ALTER TABLE `RestaurantSlot`
+ADD COLUMN `restaurantID` INT(11) NOT NULL AFTER `capacity`;
+
+-- Add foreign key relationship to Restaurant
+ALTER TABLE `RestaurantSlot`
+ADD CONSTRAINT `fk_restaurantslot_restaurant`
+FOREIGN KEY (`restaurantID`) REFERENCES `Restaurant`(`restaurantID`)
+ON DELETE CASCADE;
+
+-- Add reservedSeats to ReservationSlot
+ALTER TABLE `ReservationSlot`
+ADD COLUMN `reservedSeats` INT(11) DEFAULT 0 AFTER `reservationID`;
+
+-- ✅ Change startTime and endTime from DATE to TIME
+ALTER TABLE `RestaurantSlot`
+MODIFY COLUMN `startTime` TIME NOT NULL,
+MODIFY COLUMN `endTime` TIME NOT NULL;
+
+INSERT INTO `RestaurantSlot` (`slotID`, `startTime`, `endTime`, `capacity`, `restaurantID`) VALUES
+(1, '18:00:00', '19:30:00', 35, 1),
+(2, '19:30:00', '21:00:00', 35, 1),
+(3, '21:00:00', '22:30:00', 35, 1),
+(4, '17:00:00', '19:00:00', 52, 2),
+(5, '19:00:00', '21:00:00', 52, 2),
+(6, '21:00:00', '23:00:00', 52, 2),
+(7, '17:00:00', '19:00:00', 60, 3),
+(8, '19:00:00', '21:00:00', 60, 3),
+(9, '17:30:00', '19:00:00', 45, 4),
+(10, '19:00:00', '20:30:00', 45, 4),
+(11, '20:30:00', '22:00:00', 45, 4),
+(12, '17:00:00', '18:30:00', 36, 5),
+(13, '18:30:00', '20:00:00', 36, 5),
+(14, '20:00:00', '21:30:00', 36, 5),
+(15, '16:30:00', '18:00:00', 100, 6),
+(16, '18:00:00', '19:30:00', 100, 6),
+(17, '19:30:00', '21:00:00', 100, 6),
+(18, '17:30:00', '19:00:00', 48, 7),
+(19, '19:00:00', '20:30:00', 48, 7),
+(20, '20:30:00', '22:00:00', 48, 7);
+
+-- Change to TEXT for more chars
+ALTER TABLE Restaurant
+MODIFY COLUMN description TEXT;
+
+-- Add description to restaurants
+UPDATE Restaurant
+SET description = 'Café de Roemer is a cozy café in Haarlem, offering a warm atmosphere and friendly service. It\'s a popular spot among locals, especially on weekends when the nearby market is bustling.'
+WHERE restaurantName = 'Café de Roemer';
+
+UPDATE Restaurant
+SET description = 'Ratatouille Food & Wine offers a culinary adventure where classic flavors are reimagined with exciting twists. Chef Jozua Jaring\'s meticulous presentation and innovative techniques provide diners with a "wow" factor in every dish.'
+WHERE restaurantName = 'Ratatouille';
+
+UPDATE Restaurant
+SET description = 'Restaurant ML is known for its creative cuisine, blending traditional techniques with modern flavors. The establishment offers a sophisticated dining experience in the heart of Haarlem.'
+WHERE restaurantName = 'Restaurant ML';
+
+UPDATE Restaurant
+SET description = 'At Restaurant Fris, French and Asian culinary worlds meet. Dishes like sea bass terrine and veal sweetbreads are prepared with classic techniques and top-quality ingredients, offering playful originality.'
+WHERE restaurantName = 'Restaurant Fris';
+
+UPDATE Restaurant
+SET description = 'New Vegas offers a modern dining experience with a diverse menu that caters to various tastes. Its contemporary ambiance makes it a popular choice for both locals and visitors.'
+WHERE restaurantName = 'New Vegas';
+
+UPDATE Restaurant
+SET description = 'Grand Café Brinkmann boasts a good beer selection with about 12 options on tap. The service is commendable, and guests can enjoy a pleasant dining experience without prior reservations.'
+WHERE restaurantName = 'Grand Cafe Brinkman';
+
+UPDATE Restaurant
+SET description = 'Urban Frenchy Bistro Toujours combines a joyful interior with curious food and cocktails. Open seven days a week, it offers a vibrant atmosphere for lunch, dinner, or drinks.'
+WHERE restaurantName = 'Urban Frenchy Bistro Toujours';
