@@ -16,7 +16,7 @@ require_once(__DIR__ . "/routes/DancePageROute.php");
 require_once(__DIR__ . "/routes/detailArtistPage.php");
 require_once(__DIR__ . "/routes/ticketSelectionRoute.php");
 require_once(__DIR__ . "/routes/shoppingCartRoute.php");
-require_once __DIR__ . '/routes/homepageRoute.php';
+//require_once __DIR__ . '/routes/homepageRoute.php';
 require_once(__DIR__ . "/routes/adminDashboardRoute.php");
 require_once(__DIR__ . "/routes/personalProgramRoute.php");
 
