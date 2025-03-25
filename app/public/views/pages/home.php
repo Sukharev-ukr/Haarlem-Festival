@@ -1,5 +1,19 @@
-<?php require(__DIR__ . '/../partials/header.php');?>
+<?php 
+// ✅ Start session if not started yet
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+// ✅ Redirect if user not logged in
+if (!isset($_SESSION['user'])) {
+    header("Location: /user/login"); // send them to login page
+    exit;
+}
+
+// ✅ Get user ID to use for cart/ticket actions
+$userId = $_SESSION['user']['userID'];
+
+require(__DIR__ . '/../partials/header.php'); ?>
 <!-- Link to external CSS for the homepage -->
 <link rel="stylesheet" href="/assets/css/homepage.css">
 

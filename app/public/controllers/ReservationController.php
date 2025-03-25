@@ -53,7 +53,23 @@ class ReservationController {
             exit;
         }
     
-        // 1. Collect reservation data from POST
+        // 1. Get and convert the date first
+        $inputDate = $_POST['reservationDate'] ?? null;
+
+        // var_dump($inputDate);
+        // exit;
+
+        $dateObj = DateTime::createFromFormat('Y-m-d', $inputDate);
+    
+        if (!$dateObj) {
+            echo "Invalid reservation date format";
+            exit;
+        }
+    
+        // 2. Then format it correctly
+        $convertedDate = $dateObj->format('Y-m-d');
+    
+        // 3. Now safely populate $data with converted value
         $data = [
             'restaurantID' => $_POST['restaurantID'],
             'slotID' => $_POST['slotID'],
@@ -63,23 +79,24 @@ class ReservationController {
             'adults' => $_POST['adults'],
             'children' => $_POST['children'],
             'specialRequests' => $_POST['specialRequests'] ?? '',
-            'reservationDate' => $_POST['reservationDate']
+            'reservationDate' => $convertedDate  // ✅ fixed here
         ];
     
-        // 2. Calculate reservation pricing using ReservationModel
+        // 4. Calculate reservation pricing
         $pricing = $this->model->calculateReservationCosts(
             $data['restaurantID'],
             $data['adults'],
             $data['children']
         );
     
-        // 3. Pass both data + pricing to the CartModel
+        // 5. Add to cart
         $cartModel = new CartModel();
         $cartModel->addReservationToCart($userID, $data, $pricing);
     
-        // 4. Redirect to shopping cart
+        // 6. Redirect to shopping cart
         header("Location: /shoppingCart");
         exit;
     }
+    
 }
 

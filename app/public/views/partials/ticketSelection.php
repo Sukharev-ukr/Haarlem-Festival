@@ -1,4 +1,18 @@
 <?php
+//Start session if not started yet
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+//Redirect if user not logged in
+if (!isset($_SESSION['user'])) {
+    header("Location: /user/login"); // send them to login page
+    exit;
+}
+
+// Get user ID to use for cart/ticket actions
+$userId = $_SESSION['user']['userID'];
+
 require_once(__DIR__ . "/../../controllers/DanceController.php");
 
 $danceID = $_GET['danceID'] ?? null;
@@ -30,7 +44,7 @@ if (!$eventDetails || !$ticketDetails) {
 <body>
 
 <section class="container mt-5">
-    <h2 class="text-center mb-4 text-warning">SATURDAY</h2>
+    <h2 class="text-center mb-4 text-warning">Ticket Selection</h2>
 
     <div class="event-details shadow rounded mb-4 p-3 text-white">
         <h4><?= $eventDetails['artists'] ?></h4>
@@ -67,7 +81,7 @@ if (!$eventDetails || !$ticketDetails) {
         <h3 id="total-price">€0.00</h3>
         <div class="text-end">
             <button class="btn btn-outline-light me-2" id="add-to-cart-btn">Add To Cart</button>
-            <button class="btn btn-danger" id="buy-now-btn">Buy Now</button>
+            <!--<button class="btn btn-danger" id="buy-now-btn">Buy Now</button>-->
         </div>
     </div>
 

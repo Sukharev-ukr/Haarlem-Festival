@@ -71,12 +71,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /////////////////////////////////////////////////////////////////////////////Check Out
 
+//ticketSelection.js - Updated for Auth Handling
+
 document.addEventListener("DOMContentLoaded", () => {
   const addToCartBtn = document.getElementById("add-to-cart-btn");
   const buyNowBtn = document.getElementById("buy-now-btn");
 
   const danceID = new URLSearchParams(window.location.search).get("danceID");
 
+  /** ✨ Add to Cart Handler */
   addToCartBtn.addEventListener("click", () => {
     const tickets = [];
     document.querySelectorAll(".ticket-type").forEach((ticketContainer) => {
@@ -96,30 +99,45 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (tickets.length > 0) {
-      console.log("Sending data:", JSON.stringify({ danceID, tickets }));
+      const payload = { danceID, tickets };
+      console.log("📤 Sending data:", payload);
+
       fetch("/api/addToCart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ danceID, tickets }),
+        body: JSON.stringify(payload),
       })
-        .then((response) => response.json())
+        .then(async (response) => {
+          if (!response.ok) {
+            if (response.status === 401) {
+              alert("⚠️ You need to log in to add tickets to the cart.");
+              //window.location.href = "/user/login";
+              return;
+            }
+
+            const errorText = await response.text();
+            throw new Error(`Unexpected error: ${errorText}`);
+          }
+
+          return response.json();
+        })
         .then((data) => {
-          console.log("API Response:", data);
-          if (data.status === "success") {
-            alert("Tickets added to cart successfully!");
+          if (data?.status === "success") {
+            alert("✅ Tickets added to cart successfully!");
           } else {
-            alert("Failed to add tickets to cart.");
+            alert("❌ Failed to add tickets to cart.");
           }
         })
-        .catch((error) => console.error("Error:", error));
+        .catch((error) => console.error("❌ Error:", error));
     } else {
-      alert("Please select at least one ticket.");
+      alert("⚠️ Please select at least one ticket.");
     }
   });
 
+  /** ✨ Buy Now Handler 
   buyNowBtn.addEventListener("click", () => {
     window.location.href = "/checkout";
-  });
+  });*/
 });
