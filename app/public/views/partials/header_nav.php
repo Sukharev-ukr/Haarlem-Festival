@@ -11,6 +11,8 @@ if (session_status() === PHP_SESSION_NONE) {
         <a class="nav-item nav-link active" href="/dancePage">Dance</a>
         <a class="nav-item nav-link active" href="/restaurants">Dining</a>
         <a class="nav-item nav-link active" href="#">Magic Tyler</a>
+        <a class="nav-item nav-link active" href="/personal-program">Personal Program</a>
+        <a class="nav-item nav-link active" href="/shoppingCart">Cart</a>
         <div>
             <?php if (isset($_SESSION['user'])): ?>
                 <a type="button" class="btn btn-primary" href="/user/logout">Logout</a>
