@@ -3,13 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Mar 18, 2025 at 09:51 AM
+-- Generation Time: Mar 25, 2025 at 09:24 AM
 -- Server version: 11.5.2-MariaDB-ubu2404
 -- PHP Version: 8.2.25
-CREATE DATABASE IF NOT EXISTS `haarlem_festival_v3`;
-
-
-USE `haarlem_festival_v3`;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -147,6 +143,16 @@ CREATE TABLE `DanceTicket` (
   `ticketTypeID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
+--
+-- Dumping data for table `DanceTicket`
+--
+
+INSERT INTO `DanceTicket` (`danceTicketID`, `danceTicketOrderID`, `ticketTypeID`) VALUES
+(1, 1, 10),
+(2, 2, 10),
+(3, 3, 10),
+(4, 4, 11);
+
 -- --------------------------------------------------------
 
 --
@@ -159,6 +165,16 @@ CREATE TABLE `DanceTicketOrder` (
   `ticketQuantity` int(11) DEFAULT 1,
   `totalPrice` double DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+--
+-- Dumping data for table `DanceTicketOrder`
+--
+
+INSERT INTO `DanceTicketOrder` (`DanceTicketOrderID`, `orderItemID`, `ticketQuantity`, `totalPrice`) VALUES
+(1, 1, 2, 150),
+(2, 2, 1, 75),
+(3, 3, 1, 75),
+(4, 4, 1, 125);
 
 -- --------------------------------------------------------
 
@@ -223,6 +239,14 @@ CREATE TABLE `Order` (
   `total` double DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
+--
+-- Dumping data for table `Order`
+--
+
+INSERT INTO `Order` (`orderID`, `userID`, `orderDate`, `status`, `total`) VALUES
+(1, 1, '2025-03-25', 'unpaid', 0),
+(2, 3, '2025-03-25', 'unpaid', 0);
+
 -- --------------------------------------------------------
 
 --
@@ -235,6 +259,56 @@ CREATE TABLE `OrderItem` (
   `price` double DEFAULT 0,
   `bookingType` enum('History','Restaurant','Dance') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+--
+-- Dumping data for table `OrderItem`
+--
+
+INSERT INTO `OrderItem` (`orderItemID`, `orderID`, `price`, `bookingType`) VALUES
+(1, 1, 150, 'Dance'),
+(2, 2, 75, 'Dance'),
+(3, 2, 75, 'Dance'),
+(4, 2, 125, 'Dance');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Payment`
+--
+
+CREATE TABLE `Payment` (
+  `paymentID` int(11) NOT NULL,
+  `orderID` int(11) NOT NULL,
+  `paymentDate` datetime NOT NULL,
+  `amount` double NOT NULL,
+  `paymentMethod` enum('CreditCard','iDEAL','PayPal','Cash') NOT NULL,
+  `paymentStatus` enum('Successful','Failed','Pending') NOT NULL,
+  `transactionID` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pending_users`
+--
+
+CREATE TABLE `pending_users` (
+  `pending_id` int(11) NOT NULL,
+  `userName` varchar(255) NOT NULL,
+  `mobilePhone` varchar(50) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` varchar(50) DEFAULT 'User',
+  `verify_token` varchar(64) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+--
+-- Dumping data for table `pending_users`
+--
+
+INSERT INTO `pending_users` (`pending_id`, `userName`, `mobilePhone`, `email`, `password`, `role`, `verify_token`, `created_at`) VALUES
+(2, 'RobbenLe', '0641653777', 'lehungrobben18@gmail.com', '$2y$12$M4ukYeyZmJpEh5NGa2E4euo1ORYgS0IzpslQjyRsjeeHOikN7klyq', 'User', '80a614d4c576748e00e4c4b3411db18f', '2025-03-25 08:42:07');
 
 -- --------------------------------------------------------
 
@@ -416,8 +490,8 @@ CREATE TABLE `User` (
   `role` enum('Admin','User') DEFAULT 'User',
   `registered_day` timestamp NULL DEFAULT current_timestamp(),
   `reset_token` varchar(128) DEFAULT NULL,
-  `verify_token` VARCHAR(255) DEFAULT NULL,
-  `is_verified` TINYINT(1) NOT NULL DEFAULT 0,
+  `verify_token` varchar(255) DEFAULT NULL,
+  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
   `reset_token_expires` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
@@ -425,7 +499,8 @@ CREATE TABLE `User` (
 -- Dumping data for table `User`
 --
 
-
+INSERT INTO `User` (`userID`, `userName`, `password`, `mobilePhone`, `Email`, `role`, `registered_day`, `reset_token`, `verify_token`, `is_verified`, `reset_token_expires`) VALUES
+(3, 'RobbenLe', '$2y$12$rCjjuXVAyTExvubsV5lDNuEoCRkVUYLEcdx/hGa5pPC/6B//eNUxa', 641653777, 'lehungrobben18@gmail.com', 'User', '2025-03-25 08:43:11', NULL, NULL, 0, NULL);
 
 --
 -- Indexes for dumped tables
@@ -469,6 +544,7 @@ ALTER TABLE `DanceTicket`
 -- Indexes for table `DanceTicketOrder`
 --
 ALTER TABLE `DanceTicketOrder`
+  ADD PRIMARY KEY (`DanceTicketOrderID`),
   ADD KEY `FK_DanceTicketOrder_OrderItem` (`orderItemID`);
 
 --
@@ -505,6 +581,19 @@ ALTER TABLE `Order`
 ALTER TABLE `OrderItem`
   ADD PRIMARY KEY (`orderItemID`),
   ADD KEY `FK_OrderItem_Order` (`orderID`);
+
+--
+-- Indexes for table `Payment`
+--
+ALTER TABLE `Payment`
+  ADD PRIMARY KEY (`paymentID`),
+  ADD KEY `orderID` (`orderID`);
+
+--
+-- Indexes for table `pending_users`
+--
+ALTER TABLE `pending_users`
+  ADD PRIMARY KEY (`pending_id`);
 
 --
 -- Indexes for table `PersonalProgram`
@@ -562,7 +651,6 @@ ALTER TABLE `TicketType`
 --
 ALTER TABLE `User`
   ADD PRIMARY KEY (`userID`);
-  
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -590,7 +678,13 @@ ALTER TABLE `Dance`
 -- AUTO_INCREMENT for table `DanceTicket`
 --
 ALTER TABLE `DanceTicket`
-  MODIFY `danceTicketID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `danceTicketID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `DanceTicketOrder`
+--
+ALTER TABLE `DanceTicketOrder`
+  MODIFY `DanceTicketOrderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `HistoryTour`
@@ -608,13 +702,25 @@ ALTER TABLE `HistoryTourSession`
 -- AUTO_INCREMENT for table `Order`
 --
 ALTER TABLE `Order`
-  MODIFY `orderID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `orderID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `OrderItem`
 --
 ALTER TABLE `OrderItem`
-  MODIFY `orderItemID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `orderItemID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `Payment`
+--
+ALTER TABLE `Payment`
+  MODIFY `paymentID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `pending_users`
+--
+ALTER TABLE `pending_users`
+  MODIFY `pending_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `PersonalProgram`
@@ -662,8 +768,7 @@ ALTER TABLE `TicketType`
 -- AUTO_INCREMENT for table `User`
 --
 ALTER TABLE `User`
-  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-  
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
@@ -686,173 +791,22 @@ ALTER TABLE `DanceArtist`
 -- Constraints for table `DanceTicket`
 --
 ALTER TABLE `DanceTicket`
-  ADD CONSTRAINT `fk_ticketType` FOREIGN KEY (`ticketTypeID`) REFERENCES `TicketType` (`ticketTypeID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_danceticketorder` FOREIGN KEY (`danceTicketOrderID`) REFERENCES `DanceTicketOrder` (`DanceTicketOrderID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `DanceTicketOrder`
 --
 ALTER TABLE `DanceTicketOrder`
-  ADD CONSTRAINT `FK_DanceTicketOrder_OrderItem` FOREIGN KEY (`orderItemID`) REFERENCES `OrderItem` (`orderItemID`);
+  ADD CONSTRAINT `FK_DanceTicketOrder_OrderItem` FOREIGN KEY (`orderItemID`) REFERENCES `OrderItem` (`orderItemID`),
+  ADD CONSTRAINT `fk_orderItemID` FOREIGN KEY (`orderItemID`) REFERENCES `OrderItem` (`orderItemID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `HistoryTourReservation`
+-- Constraints for table `Payment`
 --
-ALTER TABLE `HistoryTourReservation`
-  ADD CONSTRAINT `FK_HistoryTourReservation_OrderItem` FOREIGN KEY (`orderItemID`) REFERENCES `OrderItem` (`orderItemID`),
-  ADD CONSTRAINT `FK_HistoryTourReservation_Reservation` FOREIGN KEY (`reservationID`) REFERENCES `Reservation` (`reservationID`),
-  ADD CONSTRAINT `FK_HistoryTourReservation_Session` FOREIGN KEY (`sessionID`) REFERENCES `HistoryTourSession` (`sessionID`);
-
---
--- Constraints for table `HistoryTourSession`
---
-ALTER TABLE `HistoryTourSession`
-  ADD CONSTRAINT `FK_HistoryTourSession_Tour` FOREIGN KEY (`historyTourID`) REFERENCES `HistoryTour` (`historyTourID`);
-
---
--- Constraints for table `Order`
---
-ALTER TABLE `Order`
-  ADD CONSTRAINT `FK_Order_User` FOREIGN KEY (`userID`) REFERENCES `User` (`userID`);
-
---
--- Constraints for table `OrderItem`
---
-ALTER TABLE `OrderItem`
-  ADD CONSTRAINT `FK_OrderItem_Order` FOREIGN KEY (`orderID`) REFERENCES `Order` (`orderID`);
-
---
--- Constraints for table `PersonalProgram`
---
-ALTER TABLE `PersonalProgram`
-  ADD CONSTRAINT `FK_PersonalProgram_User` FOREIGN KEY (`userID`) REFERENCES `User` (`userID`);
-
---
--- Constraints for table `PersonalProgramItem`
---
-ALTER TABLE `PersonalProgramItem`
-  ADD CONSTRAINT `FK_PPItem_OrderItem` FOREIGN KEY (`orderItemID`) REFERENCES `OrderItem` (`orderItemID`),
-  ADD CONSTRAINT `FK_PPItem_Program` FOREIGN KEY (`programID`) REFERENCES `PersonalProgram` (`programID`),
-  ADD CONSTRAINT `FK_PPItem_Reservation` FOREIGN KEY (`reservationID`) REFERENCES `Reservation` (`reservationID`);
-
---
--- Constraints for table `Reservation`
---
-ALTER TABLE `Reservation`
-  ADD CONSTRAINT `FK_Reservation_Restaurant` FOREIGN KEY (`restaurantID`) REFERENCES `Restaurant` (`restaurantID`),
-  ADD CONSTRAINT `fk_reservation_orderItem` FOREIGN KEY (`orderItemID`) REFERENCES `OrderItem` (`orderItemID`) ON DELETE CASCADE;
-
---
--- Constraints for table `ReservationSlot`
---
-ALTER TABLE `ReservationSlot`
-  ADD CONSTRAINT `FK_ReservationSlot_Reservation` FOREIGN KEY (`reservationID`) REFERENCES `Reservation` (`reservationID`),
-  ADD CONSTRAINT `FK_ReservationSlot_Slot` FOREIGN KEY (`slotID`) REFERENCES `RestaurantSlot` (`slotID`);
-
---
--- Constraints for table `TicketType`
---
-ALTER TABLE `TicketType`
-  ADD CONSTRAINT `TicketType_ibfk_1` FOREIGN KEY (`danceID`) REFERENCES `Dance` (`danceID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Payment`
+  ADD CONSTRAINT `Payment_ibfk_1` FOREIGN KEY (`orderID`) REFERENCES `Order` (`orderID`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-
-CREATE TABLE pending_users (
-    pending_id INT AUTO_INCREMENT PRIMARY KEY,
-    userName VARCHAR(255) NOT NULL,
-    mobilePhone VARCHAR(50) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) DEFAULT 'User',
-    verify_token VARCHAR(64) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-
--- Add missing restaurantID column to RestaurantSlot (if not already added)
-ALTER TABLE `RestaurantSlot`
-ADD COLUMN `restaurantID` INT(11) NOT NULL AFTER `capacity`;
-
--- Add foreign key relationship to Restaurant
-ALTER TABLE `RestaurantSlot`
-ADD CONSTRAINT `fk_restaurantslot_restaurant`
-FOREIGN KEY (`restaurantID`) REFERENCES `Restaurant`(`restaurantID`)
-ON DELETE CASCADE;
-
--- Add reservedSeats to ReservationSlot
-ALTER TABLE `ReservationSlot`
-ADD COLUMN `reservedSeats` INT(11) DEFAULT 0 AFTER `reservationID`;
-
--- ✅ Change startTime and endTime from DATE to TIME
-ALTER TABLE `RestaurantSlot`
-MODIFY COLUMN `startTime` TIME NOT NULL,
-MODIFY COLUMN `endTime` TIME NOT NULL;
-
-INSERT INTO `RestaurantSlot` (`slotID`, `startTime`, `endTime`, `capacity`, `restaurantID`) VALUES
-(1, '18:00:00', '19:30:00', 35, 1),
-(2, '19:30:00', '21:00:00', 35, 1),
-(3, '21:00:00', '22:30:00', 35, 1),
-(4, '17:00:00', '19:00:00', 52, 2),
-(5, '19:00:00', '21:00:00', 52, 2),
-(6, '21:00:00', '23:00:00', 52, 2),
-(7, '17:00:00', '19:00:00', 60, 3),
-(8, '19:00:00', '21:00:00', 60, 3),
-(9, '17:30:00', '19:00:00', 45, 4),
-(10, '19:00:00', '20:30:00', 45, 4),
-(11, '20:30:00', '22:00:00', 45, 4),
-(12, '17:00:00', '18:30:00', 36, 5),
-(13, '18:30:00', '20:00:00', 36, 5),
-(14, '20:00:00', '21:30:00', 36, 5),
-(15, '16:30:00', '18:00:00', 100, 6),
-(16, '18:00:00', '19:30:00', 100, 6),
-(17, '19:30:00', '21:00:00', 100, 6),
-(18, '17:30:00', '19:00:00', 48, 7),
-(19, '19:00:00', '20:30:00', 48, 7),
-(20, '20:30:00', '22:00:00', 48, 7);
-
--- Change to TEXT for more chars
-ALTER TABLE Restaurant
-MODIFY COLUMN description TEXT;
-
--- Add description to restaurants
-UPDATE Restaurant
-SET description = 'Café de Roemer is a cozy café in Haarlem, offering a warm atmosphere and friendly service. It\'s a popular spot among locals, especially on weekends when the nearby market is bustling.'
-WHERE restaurantName = 'Café de Roemer';
-
-UPDATE Restaurant
-SET description = 'Ratatouille Food & Wine offers a culinary adventure where classic flavors are reimagined with exciting twists. Chef Jozua Jaring\'s meticulous presentation and innovative techniques provide diners with a "wow" factor in every dish.'
-WHERE restaurantName = 'Ratatouille';
-
-UPDATE Restaurant
-SET description = 'Restaurant ML is known for its creative cuisine, blending traditional techniques with modern flavors. The establishment offers a sophisticated dining experience in the heart of Haarlem.'
-WHERE restaurantName = 'Restaurant ML';
-
-UPDATE Restaurant
-SET description = 'At Restaurant Fris, French and Asian culinary worlds meet. Dishes like sea bass terrine and veal sweetbreads are prepared with classic techniques and top-quality ingredients, offering playful originality.'
-WHERE restaurantName = 'Restaurant Fris';
-
-UPDATE Restaurant
-SET description = 'New Vegas offers a modern dining experience with a diverse menu that caters to various tastes. Its contemporary ambiance makes it a popular choice for both locals and visitors.'
-WHERE restaurantName = 'New Vegas';
-
-UPDATE Restaurant
-SET description = 'Grand Café Brinkmann boasts a good beer selection with about 12 options on tap. The service is commendable, and guests can enjoy a pleasant dining experience without prior reservations.'
-WHERE restaurantName = 'Grand Cafe Brinkman';
-
-UPDATE Restaurant
-SET description = 'Urban Frenchy Bistro Toujours combines a joyful interior with curious food and cocktails. Open seven days a week, it offers a vibrant atmosphere for lunch, dinner, or drinks.'
-WHERE restaurantName = 'Urban Frenchy Bistro Toujours';
-
-
-CREATE TABLE Payment (
-    paymentID INT AUTO_INCREMENT PRIMARY KEY,
-    orderID INT NOT NULL,
-    paymentDate DATETIME NOT NULL,
-    amount DOUBLE NOT NULL,
-    paymentMethod ENUM('CreditCard', 'iDEAL', 'PayPal', 'Cash') NOT NULL,
-    paymentStatus ENUM('Successful', 'Failed', 'Pending') NOT NULL,
-    transactionID VARCHAR(255), -- for external payment references
-    FOREIGN KEY (orderID) REFERENCES `Order`(orderID) ON DELETE CASCADE
-);

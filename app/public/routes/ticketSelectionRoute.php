@@ -35,7 +35,16 @@ Route::add('/api/tickets', function() {
 }, 'GET');
 
 // Route to load the ticket selection page
-Route::add("/ticketSelection", function() {
+Route::add("/ticketSelection", function () {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['user']['userID'])) {
+        header("Location: /login"); // or whatever your login page is
+        exit;
+    }
+
     $danceID = $_GET['danceID'] ?? null;
     if ($danceID) {
         require_once(__DIR__ . "/../views/pages/ticketSelection.php");
@@ -44,53 +53,36 @@ Route::add("/ticketSelection", function() {
     }
 }, 'GET');
 
+
 // API Route to add tickets to cart
 Route::add('/api/addToCart', function() {
+    if (session_status() === PHP_SESSION_NONE) session_start();
     header('Content-Type: application/json');
 
-    // Ensure session is started
-    if (session_status() == PHP_SESSION_NONE) {
-        session_start();
-    }
-
-    $input = json_decode(file_get_contents('php://input'), true);
-    $userId = $_SESSION['userID'] ?? null;  // Ensure user is logged in
-
-    // Check if user is logged in
+    $userId = $_SESSION['user']['userID'] ?? null;
     if (!$userId) {
-        http_response_code(401);  // Unauthorized
+        http_response_code(401);
         echo json_encode([
             'status' => 'error',
             'message' => 'User not logged in.'
         ]);
-        exit;
+        return;
     }
 
-    // Validate input
-    if (isset($input['danceID'], $input['tickets']) && is_array($input['tickets'])) {
-        $cartController = new CartController();
-
-        // Use the addTicketsToCart method since it accepts parameters
-        $result = $cartController->addToCart($userId, $input['danceID'], $input['tickets']);
-
-        if ($result) {
-            http_response_code(200);  // OK
-            echo json_encode([
-                'status' => 'success',
-                'message' => 'Tickets added to cart successfully!'
-            ]);
-        } else {
-            http_response_code(500);  // Internal Server Error
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Failed to add tickets to cart.'
-            ]);
-        }
-    } else {
-        http_response_code(400);  // Bad Request
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!isset($input['danceID'], $input['tickets']) || !is_array($input['tickets'])) {
+        http_response_code(400);
         echo json_encode([
             'status' => 'error',
             'message' => 'Invalid input data.'
         ]);
+        return;
     }
+
+    $cartController = new CartController();
+    $cartController->addToCart($userId, $input['danceID'], $input['tickets']); // ✅ this method already echoes
 }, 'POST');
+
+
+
+

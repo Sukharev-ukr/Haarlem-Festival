@@ -1,5 +1,8 @@
 <?php
 // routes/index.php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 Route::add('/', function() {
     require_once __DIR__ . '/../controllers/IndexController.php';

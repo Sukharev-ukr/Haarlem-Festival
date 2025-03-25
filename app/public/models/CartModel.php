@@ -7,36 +7,67 @@
           parent::__construct();
       }    
       
-      public function addTicketsToCart($userId, $danceID, $tickets) {
-        // Get or create unpaid order
+      public function addTicketsToCart($userId, $danceID, $tickets)
+{
+    try {
+        // Begin transaction to ensure rollback on failure
+        self::$pdo->beginTransaction();
+
+        // heck if there's already an unpaid order for the user
         $stmt = self::$pdo->prepare("SELECT orderID FROM `Order` WHERE userID = ? AND status = 'unpaid' LIMIT 1");
         $stmt->execute([$userId]);
         $orderId = $stmt->fetchColumn();
 
+        //If not, create a new unpaid order
         if (!$orderId) {
             $stmt = self::$pdo->prepare("INSERT INTO `Order` (userID, orderDate, status, total) VALUES (?, NOW(), 'unpaid', 0)");
             $stmt->execute([$userId]);
             $orderId = self::$pdo->lastInsertId();
         }
 
+        //Loop through selected ticket types
         foreach ($tickets as $ticket) {
             $ticketTypeId = $ticket['ticketTypeId'];
-            $quantity = $ticket['quantity'];
-            $price = $ticket['price'];
-            $totalPrice = $price * $quantity;
+            $quantity     = (int)$ticket['quantity'];
+            $price        = (float)$ticket['price'];
+            $totalPrice   = $price * $quantity;
 
-            // Insert into OrderItem
-            $stmt = self::$pdo->prepare("INSERT INTO `OrderItem` (orderID, price, BookingType) VALUES (?, ?, 'DanceTicket')");
+            // Check valid quantity and price
+            if ($quantity <= 0 || $price < 0) {
+                throw new Exception("Invalid quantity or price for ticketTypeId: $ticketTypeId");
+            }
+
+            //Insert into OrderItem
+            $stmt = self::$pdo->prepare("INSERT INTO OrderItem (orderID, price, bookingType) VALUES (?, ?, 'Dance')");
             $stmt->execute([$orderId, $totalPrice]);
             $orderItemId = self::$pdo->lastInsertId();
 
-            // Insert into DanceTicketOrder
-            $stmt = self::$pdo->prepare("INSERT INTO `DanceTicketOrder` (danceTicketId, OrderItemId, TicketQuantity, TotalPrice) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$ticketTypeId, $orderItemId, $quantity, $totalPrice]);
+            //Insert into DanceTicketOrder
+            $stmt = self::$pdo->prepare("INSERT INTO DanceTicketOrder (orderItemID, ticketQuantity, totalPrice) VALUES (?, ?, ?)");
+            $stmt->execute([$orderItemId, $quantity, $totalPrice]);
+            $danceTicketOrderId = self::$pdo->lastInsertId();
+
+            // Insert into DanceTicket for each ticket (1 row per physical ticket)
+            $stmt = self::$pdo->prepare("INSERT INTO DanceTicket (danceTicketOrderID, ticketTypeID) VALUES (?, ?)");
+            for ($i = 0; $i < $quantity; $i++) {
+                $stmt->execute([$danceTicketOrderId, $ticketTypeId]);
+            }
         }
 
+        // All queries successful, commit the transaction
+        self::$pdo->commit();
         return true;
+    } catch (Exception $e) {
+        //Something went wrong, rollback any DB changes
+        self::$pdo->rollBack();
+
+        // Optional: Log the error for debugging
+        error_log("❌ Error in addTicketsToCart: " . $e->getMessage());
+
+        return false; // Return failure to controller
     }
+}
+
 
     private function getRestaurantPrices($restaurantID) {
         $stmt = self::$pdo->prepare("SELECT pricePerAdult, pricePerChild FROM Restaurant WHERE restaurantID = ?");
