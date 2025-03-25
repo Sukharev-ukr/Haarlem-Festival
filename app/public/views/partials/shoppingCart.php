@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . "../../../controllers/CartController.php");
+
 // ✅ Start session if not started yet
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -13,8 +14,6 @@ if (!isset($_SESSION['user'])) {
 
 // ✅ Get user ID to use for cart/ticket actions
 $userId = $_SESSION['user']['userID'];
-
-
 
 $cartController = new CartController();
 $cartItems = $cartController->getCartItems($userId);
@@ -63,13 +62,25 @@ $totalPrice = 0;
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <strong><?= $item['artistName'] ?? $item['restaurantName'] ?? 'Dance Event' ?></strong>
-                            <p class="mb-0">
-                                <?= $item['location'] ?? $item['restaurantLocation'] ?? 'N/A' ?><br>
-                                <?php if (isset($item['amountAdults'])): ?>
-                                    Name: John Doe - Number of guests: <?= $item['amountAdults'] ?> Adults, <?= $item['amountChildren'] ?> Children
-                                <?php endif; ?>
-                            </p>
+                          <?php if ($item['bookingType'] === 'Restaurant'): ?>
+                              <strong>🍽️ <?= htmlspecialchars($item['restaurantName']) ?></strong>
+                              <p class="mb-0">
+                                  Location: <?= htmlspecialchars($item['restaurantLocation']) ?><br>
+                                  Guests: <?= $item['amountAdults'] ?> Adults, <?= $item['amountChildren'] ?> Children<br>
+                                  <?php if (!empty($item['specialRequests'])): ?>
+                                      Special request: <?= htmlspecialchars($item['specialRequests']) ?><br>
+                                  <?php endif; ?>
+                                  Date: <?= htmlspecialchars($item['reservationDate']) ?>
+                              </p>
+                          <?php else: ?>
+                              <strong><?= $item['artistName'] ?? $item['restaurantName'] ?? 'Dance Event' ?></strong>
+                              <p class="mb-0">
+                                  <?= $item['location'] ?? 'N/A' ?><br>
+                                  <?php if (isset($item['amountAdults'])): ?>
+                                      Name: John Doe - Number of guests: <?= $item['amountAdults'] ?> Adults, <?= $item['amountChildren'] ?> Children
+                                  <?php endif; ?>
+                              </p>
+                          <?php endif; ?>
                         </div>
                         <div class="col-md-2 text-end">
                             <span class="badge bg-primary"><?= $item['ticketType'] ?? 'Reservation Fee' ?> (<?= $item['TicketQuantity'] ?? 1 ?>x)</span>
