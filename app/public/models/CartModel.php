@@ -88,7 +88,7 @@
         }
     
         // 2. Insert into OrderItem
-        $stmt = self::$pdo->prepare("INSERT INTO `OrderItem` (orderID, price, BookingType) VALUES (?, ?, 'Restaurant')");
+        $stmt = self::$pdo->prepare("INSERT INTO `OrderItem` (orderID, price, bookingType) VALUES (?, ?, 'Restaurant')");
         $stmt->execute([$orderID, $pricing['totalCost']]);
         $orderItemID = self::$pdo->lastInsertId();
     
