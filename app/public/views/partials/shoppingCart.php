@@ -1,7 +1,6 @@
 <?php
 require_once(__DIR__ . "../../../controllers/CartController.php");
-
-$userId = $_SESSION['userID'] ?? null;
+$userId = $_SESSION['user']['userID'] ?? null;
 
 //if (!$userId) {
     //echo "<h3>User not logged in.</h3>";
@@ -55,13 +54,25 @@ $totalPrice = 0;
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <strong><?= $item['danceEvent'] ?? $item['restaurantName'] ?? 'History Tour' ?></strong>
+                        <?php if ($item['bookingType'] === 'Restaurant'): ?>
+                            <strong>🍽️ <?= htmlspecialchars($item['restaurantName']) ?></strong>
                             <p class="mb-0">
-                                <?= $item['location'] ?? $item['restaurantLocation'] ?? 'N/A' ?><br>
+                                Location: <?= htmlspecialchars($item['restaurantLocation']) ?><br>
+                                Guests: <?= $item['amountAdults'] ?> Adults, <?= $item['amountChildren'] ?> Children<br>
+                                <?php if (!empty($item['specialRequests'])): ?>
+                                    Special request: <?= htmlspecialchars($item['specialRequests']) ?><br>
+                                <?php endif; ?>
+                                Date: <?= htmlspecialchars($item['reservationDate']) ?>
+                            </p>
+                        <?php else: ?>
+                            <strong><?= $item['danceEvent'] ?? 'History Tour' ?></strong>
+                            <p class="mb-0">
+                                <?= $item['location'] ?? 'N/A' ?><br>
                                 <?php if (isset($item['amountAdults'])): ?>
                                     Name: John Doe - Number of guests: <?= $item['amountAdults'] ?> Adults, <?= $item['amountChildren'] ?> Children
                                 <?php endif; ?>
                             </p>
+                        <?php endif; ?>
                         </div>
                         <div class="col-md-2 text-end">
                             <span class="badge bg-primary"><?= $item['ticketType'] ?? 'Reservation Fee' ?> (<?= $item['TicketQuantity'] ?? 1 ?>x)</span>
