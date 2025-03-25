@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once(__DIR__ . "/../controllers/DanceController.php");
 
 Route::add('/detailArtistPage', function () {

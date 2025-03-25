@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . "/../controllers/DanceController.php");
 
 Route::add('/dancePage', function () {
