@@ -125,10 +125,9 @@
         </div>
     </section>
     <!-- DISCOVER DANCE SECTION -->
-<section class="discover-dance" style="padding: 60px 0; background-color: #fff; color: #8B0000;">
-  <div class="container" style="max-width: 1200px; margin: 0 auto;">
-    
-    <!-- Heading -->
+<!-- DISCOVER DANCE SECTION -->
+<section style="background-color: #fff; color: #8B0000; padding: 60px 0;">
+  <div style="max-width: 1200px; margin: 0 auto;">
     <h2 style="font-size: 2rem; margin-bottom: 1rem;">
       Discover dance
       <br><span style="font-size: 1.2rem; font-weight: normal;">on a Unique Walking Tour</span>
@@ -138,38 +137,30 @@
       
       <!-- Left text block -->
       <div style="flex: 1 1 400px;">
-        <p>
-          Join us for an exhilarating dance experience at some of Haarlem’s most iconic venues. 
-          From modern clubs to open-air theaters, feel the energy of live performances and vibrant music.
-        </p>
-        <p>
-          Whether you’re into EDM, hip-hop, or traditional folk dance, our lineup offers a 
-          diverse range of styles for everyone. Family tickets available for €60, covering up 
-          to 4 participants.
-        </p>
-        <p>
-          Get ready to move, groove, and create unforgettable memories in the heart of Haarlem!
-        </p>
+        <p>Join us for an exhilarating dance experience...</p>
         <a href="#" style="color: #fff; background-color: #8B0000; padding: 0.5rem 1rem; text-decoration: none;">
           Learn more
         </a>
       </div>
-      
-      <!-- Right image grid (8 images) -->
+
+      <!-- Right image grid -->
       <div style="flex: 1 1 400px; display: flex; flex-wrap: wrap; gap: 10px;">
-        <img src="/public/assets/images/dance1.jpg" alt="Dancer 1" style="width: 48%;">
-        <img src="/public/assets/images/dance2.jpg" alt="Dancer 2" style="width: 48%;">
-        <img src="/public/assets/images/dance3.jpg" alt="Dancer 3" style="width: 48%;">
-        <img src="/public/assets/images/dance4.jpg" alt="Dancer 4" style="width: 48%;">
-        <img src="/public/assets/images/dance5.jpg" alt="Dancer 5" style="width: 48%;">
-        <img src="/public/assets/images/dance6.jpg" alt="Dancer 6" style="width: 48%;">
-        <img src="/public/assets/images/dance7.jpg" alt="Dancer 7" style="width: 48%;">
-        <img src="/public/assets/images/dance8.jpg" alt="Dancer 8" style="width: 48%;">
+        <?php if (!empty($artists)): ?>
+          <?php foreach ($artists as $artist): ?>
+            <img 
+              src="/<?= htmlspecialchars($artist['picture']) ?>" 
+              alt="<?= htmlspecialchars($artist['name']) ?>" 
+              style="width: 48%;">
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p>No artists found.</p>
+        <?php endif; ?>
       </div>
 
     </div>
   </div>
 </section>
+
 
 
      <!-- =========================

@@ -10,6 +10,7 @@ $danceController = new DanceController();
 $danceFriday = $danceController->getDanceAtFriday();
 $danceSaturday = $danceController->getDanceAtSaturday();
 $danceSunday = $danceController->getDanceAtSunday();
+$artists = $danceController->getAllDanceArtists();
 
 // Load the homepage view, passing the variables
 require __DIR__ . '/../views/pages/home.php';

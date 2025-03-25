@@ -98,6 +98,12 @@ class DanceController {
     public function getTicketDetails($danceID) {
         return $this->danceModel->getTicketDetailsByDanceID($danceID);
     }
+
+    public function getAllDanceArtists() {
+        $sql = "SELECT * FROM Artist"; 
+        // Or filter if only some artists are for dance
+        return $this->db->query($sql)->fetchAll();
+    }
     
 
 
