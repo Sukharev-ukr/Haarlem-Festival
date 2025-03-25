@@ -165,43 +165,65 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'] . $imgPathJpg)) {
 </div>
 
 <script>
-    $(document).ready(function() {
-        $("#inline-datepicker").datepicker({
-            dateFormat: "dd-mm-yy",
-            minDate: 0, // Prevent past dates
-            showAnim: "fadeIn",
-            onSelect: function(dateText) {
-                $("#datepicker").val(dateText); // Store selected date in the hidden input
-            }
-        });
-
-        // Default value for hidden input (in case user does not change it)
-        $("#datepicker").val($("#inline-datepicker").datepicker("getDate"));
-    });
-
-function selectSlot(button, slotID) {
-    // Remove 'active' class from all buttons
-    document.querySelectorAll('.session-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    // Add 'active' class to the clicked button
-    button.classList.add('active');
-
-    // Set selected slot value in hidden input
-    document.getElementById('selectedSlot').value = slotID;
-}
     $(document).ready(function () {
+        // Initialize datepicker
         $("#inline-datepicker").datepicker({
             dateFormat: "dd-mm-yy",
             minDate: 0,
             showAnim: "fadeIn",
             onSelect: function (dateText) {
-                $("#datepicker").val(dateText);
+                // Convert to yyyy-mm-dd for PHP
+                const parts = dateText.split('-'); // [dd, mm, yyyy]
+                const formattedForPHP = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                $("#datepicker").val(formattedForPHP);
             }
         });
 
-        $("#datepicker").val($("#inline-datepicker").datepicker("getDate"));
+        // Set today's date in yyyy-mm-dd format by default
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = today.getFullYear();
+        const formattedForPHP = `${year}-${month}-${day}`;
+        $("#datepicker").val(formattedForPHP);
+
+        // Prevent form submission if no slot is selected
+        $("#reservationForm").on("submit", function (e) {
+            const selectedSlot = $("#selectedSlot").val();
+            if (!selectedSlot) {
+                e.preventDefault();
+                alert("Please select a time slot before submitting your reservation.");
+            }
+        });
+
+        // Auto-update pricing
+        const adultInput = $("#adults");
+        const childInput = $("#children");
+
+        const reservationPriceDisplay = $("#reservationPrice");
+        const reservationFeeDisplay = $("#reservationFee");
+        const totalPriceDisplay = $("#totalPrice");
+
+        const pricePerAdult = parseFloat($("#pricePerAdult").val());
+        const pricePerChild = parseFloat($("#pricePerChild").val());
+        const reservationFeePerPerson = 10.00;
+
+        function updatePrices() {
+            const adults = parseInt(adultInput.val()) || 0;
+            const children = parseInt(childInput.val()) || 0;
+
+            const reservationTotal = (adults * pricePerAdult) + (children * pricePerChild);
+            const reservationFee = (adults + children) * reservationFeePerPerson;
+            const total = reservationTotal + reservationFee;
+
+            reservationPriceDisplay.text(reservationTotal.toFixed(2));
+            reservationFeeDisplay.text(reservationFee.toFixed(2));
+            totalPriceDisplay.text(total.toFixed(2));
+        }
+
+        adultInput.on("input", updatePrices);
+        childInput.on("input", updatePrices);
+        updatePrices(); // Initial call
     });
 
     function selectSlot(button, slotID) {
@@ -209,35 +231,4 @@ function selectSlot(button, slotID) {
         button.classList.add('active');
         document.getElementById('selectedSlot').value = slotID;
     }
-
-    document.addEventListener("DOMContentLoaded", function () {
-    const adultInput = document.getElementById("adults");
-    const childInput = document.getElementById("children");
-
-    const reservationPriceDisplay = document.getElementById("reservationPrice");
-    const reservationFeeDisplay = document.getElementById("reservationFee");
-    const totalPriceDisplay = document.getElementById("totalPrice");
-
-    const pricePerAdult = 35.00;
-    const pricePerChild = 17.50;
-    const reservationFeePerPerson = 10.00;
-
-    function updatePrices() {
-        const adults = parseInt(adultInput.value) || 0;
-        const children = parseInt(childInput.value) || 0;
-
-        const reservationTotal = (adults * pricePerAdult) + (children * pricePerChild);
-        const reservationFee = (adults + children) * reservationFeePerPerson;
-        const total = reservationTotal + reservationFee;
-
-        reservationPriceDisplay.textContent = reservationTotal.toFixed(2);
-        reservationFeeDisplay.textContent = reservationFee.toFixed(2);
-        totalPriceDisplay.textContent = total.toFixed(2);
-    }
-
-    adultInput.addEventListener("input", updatePrices);
-    childInput.addEventListener("input", updatePrices);
-
-    updatePrices(); // Initial call
-});
 </script>
