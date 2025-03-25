@@ -102,7 +102,7 @@
                 HTR.reservationID, HTS.startTime AS tourStartTime, HTR.numParticipants, HTR.price AS tourPrice,
     
                 -- Restaurant Reservations
-                R.reservationID AS restReservationID, R.restaurantID, R.amountAdults, R.amountChildren, R.reservationFee,
+                R.reservationID AS restReservationID, R.restaurantID, R.amountAdults, R.amountChildren, R.reservationFee, R.reservationDate,
                 Rest.restaurantName AS restaurantName, Rest.address AS restaurantLocation
     
             FROM `Order` O
