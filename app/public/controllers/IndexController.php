@@ -4,11 +4,21 @@
 class IndexController
 {
     public function home()
-    {
-        // Render the homepage view
-        // Make sure this file actually exists: app_public/views/home.php
-        require_once __DIR__ . '/../views/pages/home.php';
-    }
+{
+    require_once __DIR__ . '/../controllers/RestaurantController.php';
+    require_once __DIR__ . '/../controllers/DanceController.php';
+
+    $restaurantController = new RestaurantController();
+    $danceController = new DanceController();
+
+    $restaurants = $restaurantController->getAllRestaurants();
+    $danceFriday = $danceController->getDanceAtFriday();
+    $danceSaturday = $danceController->getDanceAtSaturday();
+    $danceSunday = $danceController->getDanceAtSunday();
+
+    require_once __DIR__ . '/../views/pages/home.php';
+}
+
 
     public function about()
     {

@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__ .("/../models/DanceModel.php"));
+require_once __DIR__ . '/../models/DanceModel.php';
 
 class DanceController {
     private $danceModel;
@@ -98,6 +98,11 @@ class DanceController {
     public function getTicketDetails($danceID) {
         return $this->danceModel->getTicketDetailsByDanceID($danceID);
     }
+    public function getAllDanceArtists() {
+        // This method calls your model method getArtistNamePicture()
+        return $this->danceModel->getArtistNamePicture();
+    }
+    
     
 
 

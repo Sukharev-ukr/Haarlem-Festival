@@ -162,6 +162,18 @@
         $stmt->execute([$danceID]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getArtistNamePicture() {
+        $sql = "SELECT name AS artistName, picture AS artistImage FROM Artist";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+        var_dump($results); // Debug
+        die();
+    
+        return $results;
+    }
     
     
 

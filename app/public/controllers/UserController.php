@@ -239,4 +239,81 @@ public function loginPost()
         return;
     }
 }
+
+public function editProfile() {
+    // Start session if not already started
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    // Ensure user is logged in
+    if (!isset($_SESSION['user'])) {
+        header("Location: /user/login");
+        exit;
+    }
+
+    // Handle form submission
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $userName = trim($_POST['userName'] ?? '');
+        $email    = trim($_POST['email'] ?? '');
+        $password = trim($_POST['password'] ?? '');
+
+        // Basic validation could go here
+        if (empty($userName) || empty($email)) {
+            $error = "Name and e-mail cannot be empty.";
+        } else {
+            // Update user data in DB, assume you have a method updateUser($userID, $userName, $email, $password)
+            $userID = $_SESSION['user']['userID'];
+            $userModel = new UserModel();
+            
+            // If password is provided, update it; otherwise update only name and email.
+            if (!empty($password)) {
+                $hashed = password_hash($password, PASSWORD_BCRYPT);
+                $userModel->updateUser($userID, $userName, $email, $hashed);
+            } else {
+                $userModel->updateUser($userID, $userName, $email);
+            }
+            
+            // Optionally update the session with new details
+            $_SESSION['user']['userName'] = $userName;
+            $_SESSION['user']['Email'] = $email;
+            
+            $success = "Profile updated successfully.";
+        }
+    }
+
+    // Load the edit profile view
+    require __DIR__ . '/../views/user/editProfile.php';
+}
+public function updateUser($userID, $userName, $email, $password = null) {
+    if ($password !== null && $password !== '') {
+        $sql = "UPDATE User 
+                SET userName = :userName, Email = :email, password = :password 
+                WHERE userID = :userID";
+        $stmt = self::$pdo->prepare($sql);
+        return $stmt->execute([
+            'userName' => $userName,
+            'email'    => $email,
+            'password' => $password, // make sure this is already hashed
+            'userID'   => $userID
+        ]);
+    } else {
+        $sql = "UPDATE User 
+                SET userName = :userName, Email = :email 
+                WHERE userID = :userID";
+        $stmt = self::$pdo->prepare($sql);
+        return $stmt->execute([
+            'userName' => $userName,
+            'email'    => $email,
+            'userID'   => $userID
+        ]);
+    }
+}
+
+
+
+
+
+
+
 }

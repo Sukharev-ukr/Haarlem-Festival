@@ -118,4 +118,30 @@ public function clearResetToken($userId)
            $stmt->execute([$email]);
            return $stmt->fetch();
        }
+
+       public function updateUser($userID, $userName, $email, $password = null) {
+        if ($password) {
+            $sql = "UPDATE User 
+                    SET userName = :userName, Email = :email, password = :password 
+                    WHERE userID = :userID";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                'userName' => $userName,
+                'email'    => $email,
+                'password' => $password,  // Assumes you pass a hashed password
+                'userID'   => $userID
+            ]);
+        } else {
+            $sql = "UPDATE User 
+                    SET userName = :userName, Email = :email 
+                    WHERE userID = :userID";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([
+                'userName' => $userName,
+                'email'    => $email,
+                'userID'   => $userID
+            ]);
+        }
+    }
+    
 }

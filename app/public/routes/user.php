@@ -42,3 +42,9 @@ Route::add('/user/logout', function() {
     header("Location: /");
     exit;
 }, 'get');
+
+Route::add('/user/editProfile', function() {
+    require_once __DIR__ . '/../controllers/UserController.php';
+    $controller = new UserController();
+    $controller->editProfile();
+}, ['get', 'post']);
