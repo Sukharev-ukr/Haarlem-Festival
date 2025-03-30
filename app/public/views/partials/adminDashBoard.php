@@ -114,7 +114,7 @@
 
 <!-- User Modal (For Adding & Editing Users) -->
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">User Information</h5>
@@ -124,19 +124,19 @@
                 <input type="hidden" id="userID"> <!-- Hidden field for editing -->
 
                 <div class="form-group">
-                    <label for="userName">Name</label>
+                    <label for="userName">Name: </label>
                     <input type="text" class="form-control" id="userName">
                 </div>
                 <div class="form-group">
-                    <label for="userEmail">Email</label>
+                    <label for="userEmail">Email: </label>
                     <input type="email" class="form-control" id="userEmail">
                 </div>
                 <div class="form-group">
-                    <label for="userPassword">Password</label>
+                    <label for="userPassword">Password: </label>
                     <input type="password" class="form-control" id="userPassword">
                 </div>
                 <div class="form-group">
-                    <label for="userRole">Role</label>
+                    <label for="userRole">Role: </label>
                     <select class="form-control" id="userRole">
                         <option value="Admin">Admin</option>
                         <option value="Employee">Employee</option>
@@ -151,7 +151,7 @@
 
 <!-- Modal for Editing Dance Event -->
 <div class="modal fade" id="editDanceModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Edit Dance Event</h5>
@@ -160,19 +160,20 @@
             <div class="modal-body">
                 <input type="hidden" id="editDanceID">
                 <div class="form-group">
-                    <label for="editDanceLocation">Location</label>
-                    <input type="text" class="form-control" id="editDanceLocation">
+                    <label for="editDanceLocation">Location: </label>
+                    <input id="editDanceLocation" name="editDanceLocation" type="hidden">
+                    <trix-editor input="editDanceLocation"></trix-editor>
                 </div>
                 <div class="form-group">
-                    <label for="editDanceStartTime">Start Time</label>
+                    <label for="editDanceStartTime">Start Time: </label>
                     <input type="time" class="form-control" id="editDanceStartTime">
                 </div>
                 <div class="form-group">
-                    <label for="editDanceEndTime">End Time</label>
+                    <label for="editDanceEndTime">End Time: </label>
                     <input type="time" class="form-control" id="editDanceEndTime">
                 </div>
                 <div class="form-group">
-                    <label for="editDanceDay">Day</label>
+                    <label for="editDanceDay">Day: </label>
                     <select class="form-control" id="editDanceDay">
                         <option value="Friday">Friday</option>
                         <option value="Saturday">Saturday</option>
@@ -180,16 +181,16 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="editDanceDate">Date</label>
+                    <label for="editDanceDate">Date: </label>
                     <input type="date" class="form-control" id="editDanceDate">
                 </div>
                 <div class="form-group">
-                    <label for="editDanceCapacity">Capacity</label>
+                    <label for="editDanceCapacity">Capacity: </label>
                     <input type="number" class="form-control" id="editDanceCapacity" min="1">
                 </div>
 
                 <div class="form-group">
-                    <label for="editDanceDuration">Duration (HH:MM)</label>
+                    <label for="editDanceDuration">Duration (HH:MM): </label>
                     <input type="time" class="form-control" id="editDanceDuration">
                 </div>
                 <button class="btn btn-primary" id="saveDanceEventButton" onclick="saveDanceEvent()">Save Changes</button>
@@ -200,7 +201,7 @@
 
 <!-- Modal for Adding / Editing Artist -->
 <div class="modal fade" id="artistModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="artistModalTitle">Add Artist</h5>
@@ -208,28 +209,41 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" id="artistID">
+
+                <!-- Name -->
                 <div class="form-group">
-                    <label for="artistName">Name</label>
-                    <input type="text" class="form-control" id="artistName">
+                    <label for="artistName">Name: </label>
+                    <input id="artistName" name="artistName" type="hidden">
+                    <trix-editor input="artistName"></trix-editor>
                 </div>
+
+                <!-- Style -->
                 <div class="form-group">
-                    <label for="artistStyle">Style</label>
-                    <input type="text" class="form-control" id="artistStyle">
+                    <label for="artistStyle">Style: </label>
+                    <input id="artistStyle" name="artistStyle" type="hidden">
+                    <trix-editor input="artistStyle"></trix-editor>
                 </div>
+
+                <!-- Description -->
                 <div class="form-group">
-                    <label for="artistDescription">Description</label>
+                    <label for="artistDescription">Description: </label>
                     <input id="artistDescription" name="artistDescription" type="hidden">
                     <trix-editor input="artistDescription"></trix-editor>
                 </div>
+
+                <!-- Origin -->
                 <div class="form-group">
-                    <label for="artistOrigin">Origin</label>
-                    <input type="text" class="form-control" id="artistOrigin">
+                    <label for="artistOrigin">Origin: </label>
+                    <input id="artistOrigin" name="artistOrigin" type="hidden">
+                    <trix-editor input="artistOrigin"></trix-editor>
                 </div>
+
                 <button class="btn btn-primary" id="saveArtistButton" onclick="saveArtist()">Save</button>
             </div>
         </div>
     </div>
 </div>
+
 
 
 <!-- Assign Artist Modal -->

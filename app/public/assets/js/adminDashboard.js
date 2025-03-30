@@ -178,11 +178,17 @@ function editDanceEvent(
 ) {
   document.getElementById("editDanceID").value = danceID;
   document.getElementById("editDanceLocation").value = location;
+
+  // ✅ Load the location into Trix editor
+  document
+    .querySelector("trix-editor[input='editDanceLocation']")
+    .editor.loadHTML(location);
+
   document.getElementById("editDanceStartTime").value = startTime;
   document.getElementById("editDanceEndTime").value = endTime;
   document.getElementById("editDanceDay").value = day;
   document.getElementById("editDanceDate").value = danceDate;
-  document.getElementById("editDanceCapacity").value = danceCapacity; // ✅ Điền số lượng chỗ ngồi
+  document.getElementById("editDanceCapacity").value = danceCapacity;
 
   // Change button action to UPDATE mode
   document
@@ -250,9 +256,12 @@ function saveDanceEvent() {
 /////////////////////////////////////////////////////////////////////Add Dance Event
 // Open Add Dance Modal (Reusing Edit Modal)
 function addDanceEvent() {
-  // Clear previous values
   document.getElementById("editDanceID").value = "";
-  document.getElementById("editDanceLocation").value = "";
+  document.getElementById("editDanceLocation").value = ""; // hidden input
+  document
+    .querySelector("trix-editor[input='editDanceLocation']")
+    .editor.loadHTML(); // trix editor
+
   document.getElementById("editDanceStartTime").value = "";
   document.getElementById("editDanceEndTime").value = "";
   document.getElementById("editDanceDay").value = "";
@@ -260,13 +269,10 @@ function addDanceEvent() {
   document.getElementById("editDanceCapacity").value = "";
   document.getElementById("editDanceDuration").value = "";
 
-  // Change button action
   document
     .getElementById("saveDanceEventButton")
     .setAttribute("onclick", "saveNewDanceEvent()");
-  // Debugging log to ensure the modal function is triggered
   console.log("Opening Modal...");
-  // Show the modal
   $("#editDanceModal").modal("show");
 }
 
@@ -414,10 +420,25 @@ function htmlEntities(str) {
 function openAddArtistModal() {
   document.getElementById("artistModalTitle").textContent = "Add Artist";
   document.getElementById("artistID").value = "";
+
+  // Clear all trix-enabled fields
   document.getElementById("artistName").value = "";
+  document.querySelector("trix-editor[input='artistName']").editor.loadHTML("");
+
   document.getElementById("artistStyle").value = "";
+  document
+    .querySelector("trix-editor[input='artistStyle']")
+    .editor.loadHTML("");
+
   document.getElementById("artistDescription").value = "";
+  document
+    .querySelector("trix-editor[input='artistDescription']")
+    .editor.loadHTML("");
+
   document.getElementById("artistOrigin").value = "";
+  document
+    .querySelector("trix-editor[input='artistOrigin']")
+    .editor.loadHTML("");
 
   document
     .getElementById("saveArtistButton")
@@ -429,18 +450,27 @@ function openAddArtistModal() {
 function openEditArtistModal(button) {
   document.getElementById("artistModalTitle").textContent = "Edit Artist";
   document.getElementById("artistID").value = button.dataset.id;
+
   document.getElementById("artistName").value = button.dataset.name;
+  document
+    .querySelector("trix-editor[input='artistName']")
+    .editor.loadHTML(button.dataset.name);
+
   document.getElementById("artistStyle").value = button.dataset.style;
+  document
+    .querySelector("trix-editor[input='artistStyle']")
+    .editor.loadHTML(button.dataset.style);
 
-  const descInput = document.getElementById("artistDescription");
-  descInput.value = button.dataset.description;
-  descInput.dispatchEvent(new Event("input", { bubbles: true }));
-
+  document.getElementById("artistDescription").value =
+    button.dataset.description;
   document
     .querySelector("trix-editor[input='artistDescription']")
     .editor.loadHTML(button.dataset.description);
 
   document.getElementById("artistOrigin").value = button.dataset.origin;
+  document
+    .querySelector("trix-editor[input='artistOrigin']")
+    .editor.loadHTML(button.dataset.origin);
 
   document
     .getElementById("saveArtistButton")

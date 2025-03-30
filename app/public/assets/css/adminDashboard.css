@@ -26,3 +26,12 @@ button {
   margin-right: 5px;
 }
 
+.modal-body label {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #0d0433;
+}
+
+.modal-dialog {
+  max-width: 900px; /* You can increase it */
+}
