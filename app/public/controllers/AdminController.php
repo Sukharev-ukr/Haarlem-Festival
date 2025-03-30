@@ -169,43 +169,89 @@ class AdminController {
      // Create a new artist
      public function createArtist() {
         try {
-            $data = json_decode(file_get_contents("php://input"), true);
-
-            if (!isset($data['name'], $data['style'], $data['description'], $data['origin'])) {
-                throw new Exception("All fields are required.");
+            // ✅ Get form data via $_POST
+            $name = $_POST['name'];
+            $style = $_POST['style'];
+            $description = $_POST['description'];
+            $origin = $_POST['origin'];
+    
+            $picturePath = null;
+    
+            // ✅ Handle picture upload
+            if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
+                $ext = pathinfo($_FILES['picture']['name'], PATHINFO_EXTENSION);
+                $filename = uniqid('artist_') . '.' . $ext;
+    
+                $uploadDir = __DIR__ . '/../assets/imageArtits/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+    
+                move_uploaded_file($_FILES['picture']['tmp_name'], $uploadDir . $filename);
+                $picturePath = '/assets/imageArtits/' . $filename;
             }
-
-            echo json_encode($this->adminModel->addArtist(
-                $data['name'], 
-                $data['style'], 
-                $data['description'], 
-                $data['origin']
-            ));
+    
+            // ✅ Call model with picturePath
+            echo json_encode($this->adminModel->addArtist($name, $style, $description, $origin, $picturePath));
+    
         } catch (Exception $e) {
             echo json_encode(["success" => false, "message" => $e->getMessage()]);
         }
     }
+    
 
     // Update an artist
     public function updateArtist() {
         try {
-            $data = json_decode(file_get_contents("php://input"), true);
-
-            if (!isset($data['artistID'], $data['name'], $data['style'], $data['description'], $data['origin'])) {
-                throw new Exception("All fields are required.");
+            // ✅ 1. Grab form fields
+            $artistID = $_POST['artistID'];
+            $name = $_POST['name'];
+            $style = $_POST['style'];
+            $description = $_POST['description'];
+            $origin = $_POST['origin'];
+    
+            // ✅ 2. Set null picturePath (will stay null if no new upload)
+            $picturePath = null;
+    
+            // ✅ 3. Check if a picture file was uploaded
+            if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
+                $ext = pathinfo($_FILES['picture']['name'], PATHINFO_EXTENSION);
+                $filename = uniqid('artist_') . '.' . $ext;
+    
+                // ✅ Use your preferred path: imageArtits
+                $uploadDir = __DIR__ . '/../assets/imageArtits/';
+    
+                // ✅ Create folder if it doesn't exist (good practice)
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+    
+                // ✅ Move the uploaded file
+                if (!move_uploaded_file($_FILES['picture']['tmp_name'], $uploadDir . $filename)) {
+                    throw new Exception("Failed to move uploaded file.");
+                }
+    
+                // ✅ Save relative path to DB
+                $picturePath = '/assets/imageArtits/' . $filename;
             }
-
-            echo json_encode($this->adminModel->updateArtist(
-                $data['artistID'], 
-                $data['name'], 
-                $data['style'], 
-                $data['description'], 
-                $data['origin']
-            ));
+    
+            // ✅ 4. Call your model function
+            echo json_encode(
+                $this->adminModel->updateArtist(
+                    $artistID,
+                    $name,
+                    $style,
+                    $description,
+                    $origin,
+                    $picturePath // can be null, your model handles it
+                )
+            );
         } catch (Exception $e) {
             echo json_encode(["success" => false, "message" => $e->getMessage()]);
         }
     }
+    
+    
 
     // Delete an artist
     public function deleteArtist() {
