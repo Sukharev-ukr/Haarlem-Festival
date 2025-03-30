@@ -218,7 +218,8 @@
                 </div>
                 <div class="form-group">
                     <label for="artistDescription">Description</label>
-                    <textarea class="form-control" id="artistDescription"></textarea>
+                    <input id="artistDescription" name="artistDescription" type="hidden">
+                    <trix-editor input="artistDescription"></trix-editor>
                 </div>
                 <div class="form-group">
                     <label for="artistOrigin">Origin</label>

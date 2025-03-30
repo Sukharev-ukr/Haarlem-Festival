@@ -378,8 +378,17 @@ function loadArtists() {
             <td>${artist.description}</td>
             <td>${artist.origin}</td>
             <td> 
-              <button class="btn btn-warning btn-sm" onclick="openEditArtistModal(${artist.artistID}, '${artist.name}', '${artist.style}', '${artist.description}', '${artist.origin}')">Edit</button>
-              <button class="btn btn-danger btn-sm" onclick="deleteArtist(${artist.artistID})">Delete</button> 
+              <button 
+                class="btn btn-warning btn-sm"
+                data-id="${artist.artistID}"
+                data-name="${htmlEntities(artist.name)}"
+                data-style="${htmlEntities(artist.style)}"
+                data-description="${htmlEntities(artist.description)}"
+                data-origin="${htmlEntities(artist.origin)}"
+                onclick="openEditArtistModal(this)">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteArtist(${
+                artist.artistID
+              })">Delete</button> 
             </td>
           </tr>`;
       });
@@ -389,6 +398,16 @@ function loadArtists() {
     .catch((error) => {
       console.error("❌ Error loading artists:", error);
     });
+}
+
+function htmlEntities(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 // ✅ Open Add Artist Modal
@@ -407,13 +426,21 @@ function openAddArtistModal() {
 }
 
 // ✅ Open Edit Artist Modal
-function openEditArtistModal(artistID, name, style, description, origin) {
+function openEditArtistModal(button) {
   document.getElementById("artistModalTitle").textContent = "Edit Artist";
-  document.getElementById("artistID").value = artistID;
-  document.getElementById("artistName").value = name;
-  document.getElementById("artistStyle").value = style;
-  document.getElementById("artistDescription").value = description;
-  document.getElementById("artistOrigin").value = origin;
+  document.getElementById("artistID").value = button.dataset.id;
+  document.getElementById("artistName").value = button.dataset.name;
+  document.getElementById("artistStyle").value = button.dataset.style;
+
+  const descInput = document.getElementById("artistDescription");
+  descInput.value = button.dataset.description;
+  descInput.dispatchEvent(new Event("input", { bubbles: true }));
+
+  document
+    .querySelector("trix-editor[input='artistDescription']")
+    .editor.loadHTML(button.dataset.description);
+
+  document.getElementById("artistOrigin").value = button.dataset.origin;
 
   document
     .getElementById("saveArtistButton")
