@@ -79,6 +79,7 @@
                     <th>Style</th>
                     <th>Description</th>
                     <th>Origin</th>
+                    <th>Picture</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -141,7 +142,7 @@
                         <option value="Admin">Admin</option>
                         <option value="Employee">Employee</option>
                     </select>
-                </div>
+                </div
                 <button class="btn btn-primary" id="saveUserButton" onclick="saveUser()">Add User</button>
             </div>
         </div>
@@ -210,32 +211,40 @@
             <div class="modal-body">
                 <input type="hidden" id="artistID">
 
-                <!-- Name -->
+                                <!-- Name -->
                 <div class="form-group">
-                    <label for="artistName">Name: </label>
-                    <input id="artistName" name="artistName" type="hidden">
-                    <trix-editor input="artistName"></trix-editor>
+                    <label for="artistName">Name</label>
+                    <input type="text" class="form-control" id="artistName">
                 </div>
 
                 <!-- Style -->
                 <div class="form-group">
-                    <label for="artistStyle">Style: </label>
-                    <input id="artistStyle" name="artistStyle" type="hidden">
-                    <trix-editor input="artistStyle"></trix-editor>
+                    <label for="artistStyle">Style</label>
+                    <input type="text" class="form-control" id="artistStyle">
                 </div>
 
-                <!-- Description -->
+                <!-- Description (KEEP Trix only here) -->
                 <div class="form-group">
-                    <label for="artistDescription">Description: </label>
+                    <label for="artistDescription">Description</label>
                     <input id="artistDescription" name="artistDescription" type="hidden">
                     <trix-editor input="artistDescription"></trix-editor>
                 </div>
 
                 <!-- Origin -->
                 <div class="form-group">
-                    <label for="artistOrigin">Origin: </label>
-                    <input id="artistOrigin" name="artistOrigin" type="hidden">
-                    <trix-editor input="artistOrigin"></trix-editor>
+                    <label for="artistOrigin">Origin</label>
+                    <input type="text" class="form-control" id="artistOrigin">
+                </div>
+
+                <!-- Picture Upload -->
+                <!-- Picture Upload -->
+                <div class="form-group">
+                    <label for="artistPicture">Picture</label>
+                    <!-- ✅ Show preview of the old or new selected image -->
+                    <div>
+                        <img id="artistPreview" src="" alt="No Image" style="max-width:200px; display: block; margin-bottom: 10px;">
+                    </div>
+                    <input type="file" class="form-control" id="artistPicture" accept="image/*" onchange="previewArtistImage(event)">
                 </div>
 
                 <button class="btn btn-primary" id="saveArtistButton" onclick="saveArtist()">Save</button>

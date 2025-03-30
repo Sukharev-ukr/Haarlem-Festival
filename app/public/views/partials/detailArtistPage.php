@@ -87,7 +87,7 @@ if (!$artistDetails) {
                 <article class="artist-card shadow rounded p-4 mb-4 bg-white">
                     <section class="row align-items-center">
                         <figure class="col-md-5 text-center">
-                            <img src="/<?= $artist['artistPicture'] ?>" alt="<?= $artist['artistName'] ?>" class="img-fluid rounded mb-3 artist-image border">
+                            <img src="<?= $artist['artistPicture'] ?>" alt="<?= $artist['artistName'] ?>" class="img-fluid rounded mb-3 artist-image border">
                         </figure>
                         <section class="col-md-7">
                             <h3 class="text-warning"><?= $artist['artistName'] ?></h3>

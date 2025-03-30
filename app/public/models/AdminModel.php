@@ -111,7 +111,7 @@ public function deleteDanceEvent($danceID) {
 ///////////////////////////////////////////////////////////////////////////////Artistttttttttttttttttttttttttt
 public function getArtists() {
     try {
-        $sql = "SELECT artistID, name, style, description, origin FROM Artist";
+        $sql = "SELECT artistID, name, style, description, origin, picture FROM Artist";
         $stmt = self::$pdo->query($sql);
         $artists = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -127,11 +127,11 @@ public function getArtists() {
 }
 
 // Add a new artist
-public function addArtist($name, $style, $description, $origin) {
+public function addArtist($name, $style, $description, $origin, $picturePath = null) {
     try {
-        $sql = "INSERT INTO Artist (name, style, description, origin) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO Artist (name, style, description, origin, picture) VALUES (?, ?, ?, ?, ?)";
         $stmt = self::$pdo->prepare($sql);
-        $stmt->execute([$name, $style, $description, $origin]);
+        $stmt->execute([$name, $style, $description, $origin, $picturePath]);
 
         return ["success" => true, "message" => "Artist added successfully"];
     } catch (Exception $e) {
@@ -139,18 +139,27 @@ public function addArtist($name, $style, $description, $origin) {
     }
 }
 
+
 // Update an artist
-public function updateArtist($artistID, $name, $style, $description, $origin) {
+public function updateArtist($artistID, $name, $style, $description, $origin, $picturePath = null) {
     try {
-        $sql = "UPDATE Artist SET name = ?, style = ?, description = ?, origin = ? WHERE artistID = ?";
-        $stmt = self::$pdo->prepare($sql);
-        $stmt->execute([$name, $style, $description, $origin, $artistID]);
+        if ($picturePath) {
+            $sql = "UPDATE Artist SET name = ?, style = ?, description = ?, origin = ?, picture = ? WHERE artistID = ?";
+            $stmt = self::$pdo->prepare($sql);
+            $stmt->execute([$name, $style, $description, $origin, $picturePath, $artistID]);
+        } else {
+            // If no new picture, don't touch old picture
+            $sql = "UPDATE Artist SET name = ?, style = ?, description = ?, origin = ? WHERE artistID = ?";
+            $stmt = self::$pdo->prepare($sql);
+            $stmt->execute([$name, $style, $description, $origin, $artistID]);
+        }
 
         return ["success" => true, "message" => "Artist updated successfully"];
     } catch (Exception $e) {
         return ["success" => false, "message" => "Error updating artist: " . $e->getMessage()];
     }
 }
+
 
 // Delete an artist
 public function deleteArtist($artistID) {

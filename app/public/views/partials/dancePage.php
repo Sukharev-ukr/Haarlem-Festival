@@ -71,7 +71,7 @@ $userId = $_SESSION['user']['userID'];
                             <?php foreach ($dances as $dance): ?>
                                 <article class="col-sm-6 col-md-4 d-flex justify-content-center align-items-stretch">
                                    <figure class="card h-100 shadow-sm">
-                                   <img class="card-img-top" src="/<?= $dance['artistImage'] ?>" alt="<?= $dance['artistName'] ?>">
+                                   <img class="card-img-top" src="<?= $dance['artistImage'] ?>" alt="<?= $dance['artistName'] ?>">
                                      <figcaption class="card-body text-center">
                                        <p class="text-muted mb-1">
                                          <time datetime="<?= $dance['danceDate'] ?>">

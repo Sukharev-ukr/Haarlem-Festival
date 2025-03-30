@@ -101,7 +101,7 @@ Route::add('/api/admin/updateArtist', function() {
     header('Content-Type: application/json');
     $controller = new AdminController();
     $controller->updateArtist();
-}, 'PUT');
+}, 'POST');
 
 Route::add('/api/admin/deleteArtist', function() {
     header('Content-Type: application/json');

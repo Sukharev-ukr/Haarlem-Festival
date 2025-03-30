@@ -365,38 +365,50 @@ function loadArtists() {
 
       if (!data || !data.success || !Array.isArray(data.data)) {
         console.warn("⚠️ Invalid API response format:", data);
-        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">Error loading artists.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Error loading artists.</td></tr>`;
         return;
       }
 
       if (data.data.length === 0) {
         console.log("📭 No artists found.");
-        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-warning">No artists available.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-warning">No artists available.</td></tr>`;
         return;
       }
 
       data.data.forEach((artist) => {
         tableBody.innerHTML += `
-          <tr>
-            <td>${artist.artistID}</td>
-            <td>${artist.name}</td>
-            <td>${artist.style}</td>
-            <td>${artist.description}</td>
-            <td>${artist.origin}</td>
-            <td> 
-              <button 
-                class="btn btn-warning btn-sm"
-                data-id="${artist.artistID}"
-                data-name="${htmlEntities(artist.name)}"
-                data-style="${htmlEntities(artist.style)}"
-                data-description="${htmlEntities(artist.description)}"
-                data-origin="${htmlEntities(artist.origin)}"
-                onclick="openEditArtistModal(this)">Edit</button>
-              <button class="btn btn-danger btn-sm" onclick="deleteArtist(${
-                artist.artistID
-              })">Delete</button> 
-            </td>
-          </tr>`;
+                  <tr>
+                      <td>${artist.artistID}</td>
+                      <td>${artist.name}</td>
+                      <td>${artist.style}</td>
+                      <td>${artist.description}</td>
+                      <td>${artist.origin}</td>
+                      <td>
+                          ${
+                            artist.picture
+                              ? `<img src="${artist.picture}" alt="Artist Picture" style="max-width:70px;">`
+                              : "No Image"
+                          }
+                      </td>
+                      <td> 
+                          <button 
+                              class="btn btn-warning btn-sm"
+                              data-id="${artist.artistID}"
+                              data-name="${htmlEntities(artist.name)}"
+                              data-style="${htmlEntities(artist.style)}"
+                              data-description="${htmlEntities(
+                                artist.description
+                              )}"
+                              data-origin="${htmlEntities(artist.origin)}"
+                              data-picture="${
+                                artist.picture ? artist.picture : ""
+                              }"
+                              onclick="openEditArtistModal(this)">Edit</button>
+                          <button class="btn btn-danger btn-sm" onclick="deleteArtist(${
+                            artist.artistID
+                          })">Delete</button> 
+                      </td>
+                  </tr>`;
       });
 
       console.log("✅ Artist data loaded successfully.");
@@ -421,23 +433,15 @@ function openAddArtistModal() {
   document.getElementById("artistModalTitle").textContent = "Add Artist";
   document.getElementById("artistID").value = "";
 
-  // Clear all trix-enabled fields
+  // ✅ Only plain inputs now
   document.getElementById("artistName").value = "";
-  document.querySelector("trix-editor[input='artistName']").editor.loadHTML("");
-
   document.getElementById("artistStyle").value = "";
-  document
-    .querySelector("trix-editor[input='artistStyle']")
-    .editor.loadHTML("");
+  document.getElementById("artistOrigin").value = "";
 
+  // ✅ Only keep trix for description
   document.getElementById("artistDescription").value = "";
   document
     .querySelector("trix-editor[input='artistDescription']")
-    .editor.loadHTML("");
-
-  document.getElementById("artistOrigin").value = "";
-  document
-    .querySelector("trix-editor[input='artistOrigin']")
     .editor.loadHTML("");
 
   document
@@ -451,26 +455,21 @@ function openEditArtistModal(button) {
   document.getElementById("artistModalTitle").textContent = "Edit Artist";
   document.getElementById("artistID").value = button.dataset.id;
 
+  // ✅ Plain inputs
   document.getElementById("artistName").value = button.dataset.name;
-  document
-    .querySelector("trix-editor[input='artistName']")
-    .editor.loadHTML(button.dataset.name);
-
   document.getElementById("artistStyle").value = button.dataset.style;
-  document
-    .querySelector("trix-editor[input='artistStyle']")
-    .editor.loadHTML(button.dataset.style);
+  document.getElementById("artistOrigin").value = button.dataset.origin;
 
+  // ✅ Trix editor only for description
   document.getElementById("artistDescription").value =
     button.dataset.description;
   document
     .querySelector("trix-editor[input='artistDescription']")
     .editor.loadHTML(button.dataset.description);
 
-  document.getElementById("artistOrigin").value = button.dataset.origin;
-  document
-    .querySelector("trix-editor[input='artistOrigin']")
-    .editor.loadHTML(button.dataset.origin);
+  document.getElementById("artistPreview").src = button.dataset.picture || "";
+
+  document.getElementById("artistPicture").value = "";
 
   document
     .getElementById("saveArtistButton")
@@ -485,14 +484,21 @@ function saveArtist() {
   let style = document.getElementById("artistStyle").value;
   let description = document.getElementById("artistDescription").value;
   let origin = document.getElementById("artistOrigin").value;
+  let picture = document.getElementById("artistPicture").files[0];
+
+  let formData = new FormData();
+  formData.append("artistID", artistID);
+  formData.append("name", name);
+  formData.append("style", style);
+  formData.append("description", description);
+  formData.append("origin", origin);
+  if (picture) formData.append("picture", picture);
 
   let url = artistID ? "/api/admin/updateArtist" : "/api/admin/addArtist";
-  let method = artistID ? "PUT" : "POST";
 
   fetch(url, {
-    method: method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ artistID, name, style, description, origin }),
+    method: "POST", // Always use POST when uploading files
+    body: formData,
   })
     .then((response) => response.json())
     .then((data) => {
@@ -504,6 +510,20 @@ function saveArtist() {
       }
     })
     .catch((error) => console.error("❌ Error saving artist:", error));
+}
+
+// ✅ Preview the image immediately when selected
+function previewArtistImage(event) {
+  const input = event.target;
+  const preview = document.getElementById("artistPreview");
+
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      preview.src = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
 }
 
 // ✅ Delete Artist
