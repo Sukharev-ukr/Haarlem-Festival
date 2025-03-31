@@ -241,5 +241,57 @@ public function deleteArtist($artistID) {
             return [];
         }
     }
+
+//////////////////////////////////////////////////////////////////////////Order Management
+
+    // Get Paid Orders (summary)
+public function getPaidOrders()
+{
+    $sql = "
+        SELECT 
+            O.orderID, O.userID, U.userName, O.orderDate, O.total, O.status
+        FROM `Order` O
+        INNER JOIN User U ON U.userID = O.userID
+        WHERE O.status = 'paid'
+        ORDER BY O.orderDate DESC;
+    ";
+    $stmt = self::$pdo->query($sql);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Get Order Details
+public function getOrderDetails($orderID)
+{
+    $sql = "
+        SELECT 
+            O.orderID, O.userID, U.userName, O.orderDate, O.total, O.status,
+            OI.orderItemID, OI.price AS itemPrice, OI.bookingType,
+            D.location AS danceLocation, D.day AS danceDay, D.danceDate, 
+            COALESCE(GROUP_CONCAT(DISTINCT A.name ORDER BY A.name ASC SEPARATOR ', '), '') AS artistName,
+            HTR.numParticipants, HTS.startTime AS tourStartTime,
+            R.amountAdults, R.amountChildren, Rest.restaurantName
+        FROM `Order` O
+        INNER JOIN User U ON U.userID = O.userID
+        INNER JOIN OrderItem OI ON OI.orderID = O.orderID
+        LEFT JOIN DanceTicketOrder DTO ON DTO.orderItemID = OI.orderItemID
+        LEFT JOIN DanceTicket DT ON DT.danceTicketID = DTO.danceTicketOrderID
+        LEFT JOIN TicketType TT ON TT.ticketTypeID = DT.ticketTypeID
+        LEFT JOIN Dance D ON D.danceID = TT.danceID
+        LEFT JOIN DanceArtist DA ON DA.danceID = D.danceID
+        LEFT JOIN Artist A ON A.artistID = DA.artistID
+        LEFT JOIN HistoryTourReservation HTR ON HTR.orderItemID = OI.orderItemID
+        LEFT JOIN HistoryTourSession HTS ON HTS.sessionID = HTR.sessionID
+        LEFT JOIN Reservation R ON R.orderItemID = OI.orderItemID
+        LEFT JOIN Restaurant Rest ON Rest.restaurantID = R.restaurantID
+        WHERE O.orderID = ?
+        GROUP BY OI.orderItemID
+    ";
+
+    $stmt = self::$pdo->prepare($sql);
+    $stmt->execute([$orderID]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
 }
 ?>

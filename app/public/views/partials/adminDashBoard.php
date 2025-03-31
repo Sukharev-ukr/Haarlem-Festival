@@ -1,20 +1,28 @@
-<!-- Sidebar Navigation -->
-<nav id="nav" class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand px-3" href="#">Admin Panel</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#adminNav" aria-controls="adminNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="adminNav">
-    <ul class="navbar-nav ml-auto">
-      <li class="nav-item"><a class="nav-link" href="#userSection">Users</a></li>
-      <li class="nav-item"><a class="nav-link" href="#danceSection">Dance Events</a></li>
-      <li class="nav-item"><a class="nav-link" href="#artistSection">Artists</a></li>
-      <li class="nav-item"><a class="nav-link" href="#danceArtistSection">Dance & Artist</a></li>
+<nav id="nav" class="navbar navbar-dark bg-dark d-flex flex-column align-items-start p-2" style="position:fixed; top:0; left:0; height:100vh; width:100px;">
+    <a class="navbar-brand mb-4 fs-5" href="#">Admin</a>
+
+    <ul class="navbar-nav w-100 flex-column">
+        <li class="nav-item mb-2">
+            <a class="nav-link small" href="#userSection"><i class="fas fa-user"></i>Users</a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link small" href="#danceSection"><i class="fas fa-music"></i>Events</a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link small" href="#artistSection"><i class="fas fa-paint-brush"></i>Artists</a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link small" href="#danceArtistSection"><i class="fas fa-users"></i>Assign</a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link small" href="#paidOrderSection"><i class="fas fa-receipt"></i>Orders</a>
+        </li>
     </ul>
-  </div>
 </nav>
 
-<section class="container mt-5">
+
+
+<section id="board" class="container mt-5">
     <h2 class="text-center">Admin Dashboard</h2>
 
     <!-- User Management Section -->
@@ -37,27 +45,94 @@
             </thead>
             <tbody></tbody>
         </table>
+        </div>
     </div>
-</div>
 
 
-<div id="danceSection" class="card mt-4">
-    <div class="card-header bg-warning text-dark d-flex justify-content-between">
-        <h3>Dance Event Management</h3>
-        <button class="btn btn-success" onclick="addDanceEvent()">Add Event</button>
+    <div id="danceSection" class="card mt-4">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between">
+            <h3>Dance Event Management</h3>
+            <button class="btn btn-success" onclick="addDanceEvent()">Add Event</button>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped" id="danceEventTable">
+                <thead class="thead-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Location</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Day</th>
+                        <th>Date</th>
+                        <th>Capacity</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="artistSection" class="card mt-4">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between">
+            <h3>Artist Management</h3>
+            <button class="btn btn-success" onclick="openAddArtistModal()">Add Artist</button>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped" id="artistTable">
+                <thead class="thead-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Style</th>
+                        <th>Description</th>
+                        <th>Origin</th>
+                        <th>Picture</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="danceArtistSection" class="card mt-4">
+        <div class="card-header bg-info text-white d-flex justify-content-between">
+            <h3>Dance-Artist Assignment Management</h3>
+            <button class="btn btn-success" onclick="openAssignModal()">Assign Artist</button>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped" id="assignmentTable">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Dance ID</th>
+                        <th>Location</th>
+                        <th>Artist ID</th>
+                        <th>Artist Name</th>
+                        <th>Time</th>
+                        <th>Date (Day)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="paidOrderSection" class="card mt-4">
+    <div class="card-header bg-success text-white d-flex justify-content-between">
+        <h3>Paid Orders</h3>
+        <button class="btn btn-info" onclick="exportPaidOrders()">Export CSV/Excel</button>
     </div>
     <div class="card-body">
-        <table class="table table-bordered table-striped" id="danceEventTable">
+        <table class="table table-bordered table-striped" id="paidOrderTable">
             <thead class="thead-light">
                 <tr>
-                    <th>ID</th>
-                    <th>Location</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Day</th>
-                    <th>Date</th>
-                    <th>Capacity</th>
-                    <th>Actions</th>
+                    <th>Order ID</th>
+                    <th>User Name</th>
+                    <th>Order Date</th>
+                    <th>Total</th>
+                    <th>Actions</th> <!-- Only View Button -->
                 </tr>
             </thead>
             <tbody></tbody>
@@ -65,51 +140,6 @@
     </div>
 </div>
 
-<div id="artistSection" class="card mt-4">
-    <div class="card-header bg-warning text-dark d-flex justify-content-between">
-        <h3>Artist Management</h3>
-        <button class="btn btn-success" onclick="openAddArtistModal()">Add Artist</button>
-    </div>
-    <div class="card-body">
-        <table class="table table-bordered table-striped" id="artistTable">
-            <thead class="thead-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Style</th>
-                    <th>Description</th>
-                    <th>Origin</th>
-                    <th>Picture</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-</div>
-
-<div id="danceArtistSection" class="card mt-4">
-    <div class="card-header bg-info text-white d-flex justify-content-between">
-        <h3>Dance-Artist Assignment Management</h3>
-        <button class="btn btn-success" onclick="openAssignModal()">Assign Artist</button>
-    </div>
-    <div class="card-body">
-        <table class="table table-bordered table-striped" id="assignmentTable">
-            <thead class="thead-light">
-                <tr>
-                    <th>Dance ID</th>
-                    <th>Location</th>
-                    <th>Artist ID</th>
-                    <th>Artist Name</th>
-                    <th>Time</th>
-                    <th>Date (Day)</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-</div>
 
 </section>
 
@@ -291,11 +321,45 @@
     </div>
 </div>
 
+<!-- Order Detail Modal -->
+<div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content shadow-lg border-0 rounded-3">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">🧾 Order Details</h5>
+        <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Export Buttons -->
+        <div class="mb-3 text-end">
+          <button class="btn btn-success btn-sm me-2" onclick="exportOrderDetailCSV()">⬇️ Export CSV</button>
+          <button class="btn btn-info btn-sm" onclick="exportOrderDetailExcel()">📊 Export Excel</button>
+        </div>
+
+        <!-- Order Table -->
+        <div id="orderDetailContent" class="table-responsive border rounded p-3 bg-light shadow-sm">
+          <!-- Dynamically injected table from JS -->
+        </div>  
+      </div>
+
+      <div class="modal-footer bg-light">
+        <button class="btn btn-secondary"  data-dismiss="modal"  onclick="closeOrderDetailModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script src="../../assets/js/adminDashboard.js"></script>
 <link rel="stylesheet" href="../../assets/css/adminDashboard.css">
 <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- Export Excel -->
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script> 
+
 <!-- Bootstrap JS & jQuery to display a modal -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

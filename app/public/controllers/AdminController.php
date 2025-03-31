@@ -333,5 +333,32 @@ public function getDanceLocationsByDate($date) {
         return ["success" => false, "message" => $e->getMessage()];
     }
 }
+
+//////////////////////////////////////////////////////////////////////////Order Management
+
+public function getPaidOrders()
+{
+    try {
+        $orders = $this->adminModel->getPaidOrders();
+        echo json_encode(["success" => true, "data" => $orders]);
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+public function getOrderDetail()
+{
+    try {
+        $orderID = $_GET['orderID'] ?? null;
+        if (!$orderID) throw new Exception("Order ID is required");
+
+        $data = $this->adminModel->getOrderDetails($orderID);
+        echo json_encode(["success" => true, "data" => $data]);
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+
 }
 ?>
