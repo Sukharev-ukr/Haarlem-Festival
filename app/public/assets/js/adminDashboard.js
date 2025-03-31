@@ -807,3 +807,142 @@ function deleteAssignment(danceID, artistID) {
     })
     .catch((error) => console.error("❌ Error deleting assignment:", error));
 }
+
+//////////////////////////////////////////////////////////Order Management
+
+document.addEventListener("DOMContentLoaded", function () {
+  loadPaidOrders(); // to Display order to front end
+});
+
+function loadPaidOrders() {
+  fetch("/api/admin/paidOrders")
+    .then((res) => res.json())
+    .then((data) => {
+      const tbody = document.querySelector("#paidOrderTable tbody");
+      tbody.innerHTML = "";
+
+      if (!data.success || !data.data || data.data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">No paid orders found.</td></tr>`;
+        return;
+      }
+
+      data.data.forEach((order) => {
+        tbody.innerHTML += `
+                  <tr>
+                      <td>${order.orderID}</td>
+                      <td>${order.userName}</td>
+                      <td>${order.orderDate}</td>
+                      <td>€${Number(order.total).toFixed(2)}</td>
+                      <td>
+                          <button class="btn btn-primary btn-sm" onclick="viewOrderDetail(${
+                            order.orderID
+                          })">
+                              View Order Detail
+                          </button>
+                      </td>
+                  </tr>`;
+      });
+    })
+    .catch((err) => console.error("❌ Error loading paid orders:", err));
+}
+
+function viewOrderDetail(orderID) {
+  fetch(`/api/admin/orderDetail?orderID=${orderID}`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data.success) return alert(data.message);
+
+      if (!data.data || data.data.length === 0) {
+        document.getElementById(
+          "orderDetailContent"
+        ).innerHTML = `<p class="text-danger">No items found for this order.</p>`;
+        $("#orderDetailModal").modal("show");
+        return;
+      }
+
+      let html = `
+          <table class="table table-bordered" id="orderDetailTable">
+              <thead class="thead-light">
+                  <tr>
+                      <th>Type</th>
+                      <th>Details</th>
+                      <th>Price</th>
+                  </tr>
+              </thead>
+              <tbody>`;
+
+      let total = 0;
+
+      data.data.forEach((item) => {
+        let detail = "";
+        if (item.bookingType === "Dance") {
+          detail = `${item.artistName} @ ${item.danceLocation} (${item.danceDate})`;
+        } else if (item.bookingType === "History") {
+          detail = `${item.tourStartTime} | ${item.numParticipants} participants`;
+        } else if (item.bookingType === "Restaurant") {
+          detail = `${item.restaurantName} - ${item.amountAdults} Adults, ${item.amountChildren} Children`;
+        }
+        total += Number(item.itemPrice);
+        html += `<tr><td>${
+          item.bookingType
+        }</td><td>${detail}</td><td>€${Number(item.itemPrice).toFixed(
+          2
+        )}</td></tr>`;
+      });
+
+      html += `<tr class="font-weight-bold bg-light"><td colspan="2">Total</td><td>€${total.toFixed(
+        2
+      )}</td></tr>`;
+      html += `</tbody></table>`;
+
+      document.getElementById("orderDetailContent").innerHTML = html;
+      $("#orderDetailModal").modal("show");
+    })
+    .catch((err) => console.error("❌ Error loading order detail:", err));
+}
+
+function exportOrderDetailCSV() {
+  const table = document.querySelector("#orderDetailContent table");
+  if (!table) return;
+
+  let csv = [];
+  const rows = table.querySelectorAll("tr");
+  rows.forEach((row) => {
+    const cols = row.querySelectorAll("td, th");
+    const rowData = [...cols].map((cell) => `"${cell.innerText}"`).join(",");
+    csv.push(rowData);
+  });
+
+  const blob = new Blob([csv.join("\n")], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "order-details.csv";
+  a.click();
+}
+
+function exportOrderDetailExcel() {
+  const table = document.querySelector("#orderDetailContent table");
+  if (!table) {
+    alert("No order details to export.");
+    return;
+  }
+
+  // ✅ Convert HTML table to SheetJS worksheet properly
+  const worksheet = XLSX.utils.table_to_sheet(table, { raw: true });
+
+  // ✅ Create workbook
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Order Details");
+
+  // ✅ Write to xlsx (force Excel compatibility)
+  XLSX.writeFile(
+    workbook,
+    `order-detail-${new Date().toISOString().slice(0, 10)}.xlsx`,
+    { bookType: "xlsx", type: "binary" }
+  );
+}
+
+function closeOrderDetailModal() {
+  $("#orderDetailModal").modal("hide");
+}

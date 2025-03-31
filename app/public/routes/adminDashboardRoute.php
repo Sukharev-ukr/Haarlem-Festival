@@ -140,4 +140,18 @@ Route::add('/api/admin/danceLocations', function() {
     echo json_encode($controller->getDanceLocationsByDate($_GET['date'] ?? ''));
 }, 'GET');
 
+///////////////////////////////////////////////////////////////////////////////Order Management
+
+Route::add('/api/admin/paidOrders', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->getPaidOrders();
+}, 'GET');
+
+Route::add('/api/admin/orderDetail', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->getOrderDetail();
+}, 'GET');
+
 ?>
