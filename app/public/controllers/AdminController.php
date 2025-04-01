@@ -359,6 +359,144 @@ public function getOrderDetail()
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////////Restaurant
+
+// AdminController.php
+
+// GET
+public function getRestaurants() {
+    try {
+        echo json_encode($this->adminModel->getAllRestaurants());
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+// POST
+public function createRestaurant() {
+    try {
+        // ✅ Validate required fields
+        $requiredFields = ['name', 'address', 'cuisine', 'description', 'pricePerAdult', 'pricePerChild'];
+        foreach ($requiredFields as $field) {
+            if (!isset($_POST[$field]) || trim($_POST[$field]) === '') {
+                throw new Exception("Field '{$field}' is required.");
+            }
+        }
+
+        // ✅ Get form data
+        $name = $_POST['name'];
+        $address = $_POST['address'];
+        $cuisine = $_POST['cuisine'];
+        $description = $_POST['description'];
+        $pricePerAdult = is_numeric($_POST['pricePerAdult']) ? $_POST['pricePerAdult'] : 0;
+        $pricePerChild = is_numeric($_POST['pricePerChild']) ? $_POST['pricePerChild'] : 0;
+
+        $picturePath = null;
+        $diningDetailPath = null;
+
+        // ✅ Upload restaurantPicture
+        if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
+            $ext = pathinfo($_FILES['picture']['name'], PATHINFO_EXTENSION);
+            $filename = uniqid('restaurant_') . '.' . $ext;
+            $uploadDir = __DIR__ . '/../assets/img/dining/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+            move_uploaded_file($_FILES['picture']['tmp_name'], $uploadDir . $filename);
+            $picturePath = '/assets/img/dining/' . $filename;
+        } else {
+            throw new Exception("Main restaurant picture is required.");
+        }
+
+        // ✅ Upload diningDetailPicture (optional)
+        if (isset($_FILES['diningPicture']) && $_FILES['diningPicture']['error'] === UPLOAD_ERR_OK) {
+            $ext = pathinfo($_FILES['diningPicture']['name'], PATHINFO_EXTENSION);
+            $filename = uniqid('dining_detail_') . '.' . $ext;
+            $uploadDir = __DIR__ . '/../assets/img/diningdetails/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+            move_uploaded_file($_FILES['diningPicture']['tmp_name'], $uploadDir . $filename);
+            $diningDetailPath = '/assets/img/diningdetails/' . $filename;
+        }
+
+        // ✅ Save to DB
+        echo json_encode(
+            $this->adminModel->createRestaurant(
+                $name, $address, $cuisine, $description, $pricePerAdult, $pricePerChild, $picturePath, $diningDetailPath
+            )
+        );
+
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+
+
+// PUT
+public function updateRestaurant() {
+    try {
+        $id = $_POST['id'];
+        $name = $_POST['name'];
+        $address = $_POST['address'];
+        $cuisine = $_POST['cuisine'];
+        $description = $_POST['description'];
+        $pricePerAdult = $_POST['pricePerAdult'];
+        $pricePerChild = $_POST['pricePerChild'];
+
+        // ✅ Get current restaurant data
+        $current = $this->adminModel->getRestaurantByID($id);
+        if (!$current) throw new Exception("Restaurant not found!");
+
+        // ✅ Default to old paths
+        $picturePath = $current['restaurantPicture'];
+        $diningDetailPath = $current['restaurantDiningDetailPicture'];
+
+        // ✅ Only replace if new upload happened
+        if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
+            $ext = pathinfo($_FILES['picture']['name'], PATHINFO_EXTENSION);
+            $filename = uniqid('restaurant_') . '.' . $ext;
+            $uploadDir = __DIR__ . '/../assets/img/dining/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+            move_uploaded_file($_FILES['picture']['tmp_name'], $uploadDir . $filename);
+            $picturePath = '/assets/img/dining/' . $filename;
+        }
+
+        if (isset($_FILES['diningPicture']) && $_FILES['diningPicture']['error'] === UPLOAD_ERR_OK) {
+            $ext = pathinfo($_FILES['diningPicture']['name'], PATHINFO_EXTENSION);
+            $filename = uniqid('dining_detail_') . '.' . $ext;
+            $uploadDir = __DIR__ . '/../assets/img/diningdetails/';
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+            move_uploaded_file($_FILES['diningPicture']['tmp_name'], $uploadDir . $filename);
+            $diningDetailPath = '/assets/img/diningdetails/' . $filename;
+        }
+
+        // ✅ Safe update, no path will be removed if not re-uploaded
+        echo json_encode(
+            $this->adminModel->updateRestaurant(
+                $id, $name, $address, $cuisine, $description, $pricePerAdult, $pricePerChild, $picturePath, $diningDetailPath
+            )
+        );
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+
+
+// DELETE
+public function deleteRestaurant() {
+    try {
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($data['restaurantID'])) {
+            throw new Exception("Restaurant ID is required.");
+        }
+
+        echo json_encode($this->adminModel->deleteRestaurant($data['restaurantID']));
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+
 
 }
 ?>

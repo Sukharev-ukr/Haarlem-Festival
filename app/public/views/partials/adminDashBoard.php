@@ -17,101 +17,125 @@
         <li class="nav-item mb-2">
             <a class="nav-link small" href="#paidOrderSection"><i class="fas fa-receipt"></i>Orders</a>
         </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link small" href="#restaurantSection"><i class="fas fa-receipt"></i>Restaurants</a>
+        </li>
     </ul>
 </nav>
 
 
 
 <section id="board" class="container mt-5">
-    <h2 class="text-center">Admin Dashboard</h2>
+        <h2 class="text-center">Admin Dashboard</h2>
 
-    <!-- User Management Section -->
-    <div id="userSection" class="card mt-4">
-    <div id="userSection" class="card mt-4">
-    <div class="card-header bg-primary text-white d-flex justify-content-between">
-        <h3>User Management</h3>
-        <button class="btn btn-success" onclick="openAddUserModal()">Add User</button>
-    </div>
-    <div class="card-body">
-        <input type="text" class="form-control mb-3" id="searchUser" placeholder="Search user..." onkeyup="loadUsers()">
-        <table class="table table-bordered table-striped" id="userTable">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        </div>
-    </div>
-
-
-    <div id="danceSection" class="card mt-4">
-        <div class="card-header bg-warning text-dark d-flex justify-content-between">
-            <h3>Dance Event Management</h3>
-            <button class="btn btn-success" onclick="addDanceEvent()">Add Event</button>
+        <!-- User Management Section -->
+        <div id="userSection" class="card mt-4">
+        <div id="userSection" class="card mt-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between">
+            <h3>User Management</h3>
+            <button class="btn btn-success" onclick="openAddUserModal()">Add User</button>
         </div>
         <div class="card-body">
-            <table class="table table-bordered table-striped" id="danceEventTable">
-                <thead class="thead-light">
+            <input type="text" class="form-control mb-3" id="searchUser" placeholder="Search user..." onkeyup="loadUsers()">
+            <table class="table table-bordered table-striped" id="userTable">
+                <thead class="thead-dark">
                     <tr>
-                        <th>ID</th>
-                        <th>Location</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
-                        <th>Day</th>
-                        <th>Date</th>
-                        <th>Capacity</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="artistSection" class="card mt-4">
-        <div class="card-header bg-warning text-dark d-flex justify-content-between">
-            <h3>Artist Management</h3>
-            <button class="btn btn-success" onclick="openAddArtistModal()">Add Artist</button>
-        </div>
-        <div class="card-body">
-            <table class="table table-bordered table-striped" id="artistTable">
-                <thead class="thead-light">
-                    <tr>
-                        <th>ID</th>
                         <th>Name</th>
-                        <th>Style</th>
-                        <th>Description</th>
-                        <th>Origin</th>
-                        <th>Picture</th>
+                        <th>Email</th>
+                        <th>Role</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
+            </div>
         </div>
-    </div>
 
-    <div id="danceArtistSection" class="card mt-4">
-        <div class="card-header bg-info text-white d-flex justify-content-between">
-            <h3>Dance-Artist Assignment Management</h3>
-            <button class="btn btn-success" onclick="openAssignModal()">Assign Artist</button>
+
+        <div id="danceSection" class="card mt-4">
+            <div class="card-header bg-warning text-dark d-flex justify-content-between">
+                <h3>Dance Event Management</h3>
+                <button class="btn btn-success" onclick="addDanceEvent()">Add Event</button>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped" id="danceEventTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Location</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Day</th>
+                            <th>Date</th>
+                            <th>Capacity</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="artistSection" class="card mt-4">
+            <div class="card-header bg-warning text-dark d-flex justify-content-between">
+                <h3>Artist Management</h3>
+                <button class="btn btn-success" onclick="openAddArtistModal()">Add Artist</button>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped" id="artistTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Style</th>
+                            <th>Description</th>
+                            <th>Origin</th>
+                            <th>Picture</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="danceArtistSection" class="card mt-4">
+            <div class="card-header bg-info text-white d-flex justify-content-between">
+                <h3>Dance-Artist Assignment Management</h3>
+                <button class="btn btn-success" onclick="openAssignModal()">Assign Artist</button>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped" id="assignmentTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Dance ID</th>
+                            <th>Location</th>
+                            <th>Artist ID</th>
+                            <th>Artist Name</th>
+                            <th>Time</th>
+                            <th>Date (Day)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="paidOrderSection" class="card mt-4">
+        <div class="card-header bg-success text-white d-flex justify-content-between">
+            <h3>Paid Orders</h3>
+            <button class="btn btn-info" onclick="exportPaidOrders()">Export CSV/Excel</button>
         </div>
         <div class="card-body">
-            <table class="table table-bordered table-striped" id="assignmentTable">
+            <table class="table table-bordered table-striped" id="paidOrderTable">
                 <thead class="thead-light">
                     <tr>
-                        <th>Dance ID</th>
-                        <th>Location</th>
-                        <th>Artist ID</th>
-                        <th>Artist Name</th>
-                        <th>Time</th>
-                        <th>Date (Day)</th>
-                        <th>Actions</th>
+                        <th>Order ID</th>
+                        <th>User Name</th>
+                        <th>Order Date</th>
+                        <th>Total</th>
+                        <th>Actions</th> <!-- Only View Button -->
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -119,27 +143,31 @@
         </div>
     </div>
 
-    <div id="paidOrderSection" class="card mt-4">
-    <div class="card-header bg-success text-white d-flex justify-content-between">
-        <h3>Paid Orders</h3>
-        <button class="btn btn-info" onclick="exportPaidOrders()">Export CSV/Excel</button>
+    <div id="restaurantSection" class="card mt-4">
+    <div class="card-header bg-info text-white d-flex justify-content-between">
+        <h3>Restaurant Management</h3>
+        <button class="btn btn-success" onclick="openAddRestaurantModal()">Add Restaurant</button>
     </div>
     <div class="card-body">
-        <table class="table table-bordered table-striped" id="paidOrderTable">
+        <table class="table table-bordered table-striped" id="restaurantTable">
             <thead class="thead-light">
                 <tr>
-                    <th>Order ID</th>
-                    <th>User Name</th>
-                    <th>Order Date</th>
-                    <th>Total</th>
-                    <th>Actions</th> <!-- Only View Button -->
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Cuisine</th>
+                    <th>Description</th>
+                    <th>Price Adult</th>
+                    <th>Price Child</th>
+                    <th>Picture</th>
+                    <th>Dining Detail Picture</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
     </div>
 </div>
-
 
 </section>
 
@@ -267,7 +295,6 @@
                 </div>
 
                 <!-- Picture Upload -->
-                <!-- Picture Upload -->
                 <div class="form-group">
                     <label for="artistPicture">Picture</label>
                     <!-- ✅ Show preview of the old or new selected image -->
@@ -349,6 +376,72 @@
     </div>
   </div>
 </div>
+
+<!-- Restaurant Modal -->
+<div class="modal fade" id="restaurantModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="restaurantModalTitle">Add Restaurant</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+
+                <input type="hidden" id="restaurantID">
+
+                <div class="form-group">
+                    <label for="restaurantName">Name</label>
+                    <input type="text" class="form-control" id="restaurantName">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" class="form-control" id="address">
+                </div>
+
+                <div class="form-group">
+                    <label for="cuisine">Cuisine</label>
+                    <input type="text" class="form-control" id="cuisine">
+                </div>
+
+                <!-- ✅ WYSIWYG Description -->
+                <div class="form-group">
+                    <label for="restaurantDescription">Description</label>
+                    <input id="restaurantDescription" type="hidden">
+                    <trix-editor input="restaurantDescription"></trix-editor>
+                </div>
+
+                <div class="form-group">
+                    <label for="pricePerAdult">Price Per Adult (€)</label>
+                    <input type="number" class="form-control" id="pricePerAdult">
+                </div>
+
+                <div class="form-group">
+                    <label for="pricePerChild">Price Per Child (€)</label>
+                    <input type="number" class="form-control" id="pricePerChild">
+                </div>
+
+                <!-- Main Picture -->
+                <div class="form-group">
+                    <label for="restaurantPicture">Main Picture</label>
+                    <img id="previewRestaurant" src="" style="max-width: 200px; display: block; margin-bottom: 10px;">
+                    <input type="file" class="form-control" id="restaurantPicture" name="picture" accept="image/*">
+                </div>
+
+                <!-- Dining Detail Picture -->
+                <div class="form-group">
+                    <label for="diningDetailPicture">Dining Detail Picture</label>
+                    <img id="previewDiningDetail" src="" style="max-width: 200px; display: block; margin-bottom: 10px;">
+                    <input type="file" class="form-control" id="diningDetailPicture" name="diningPicture" accept="image/*">
+                </div>
+
+                <button class="btn btn-primary" id="saveRestaurantButton" onclick="saveRestaurant()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 
 <script src="../../assets/js/adminDashboard.js"></script>
