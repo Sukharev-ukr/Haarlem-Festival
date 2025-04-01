@@ -154,4 +154,34 @@ Route::add('/api/admin/orderDetail', function() {
     $controller->getOrderDetail();
 }, 'GET');
 
+////////////////////////////////////////////////////////////////////////////////Restaurant
+
+// GET - Fetch All Restaurants
+Route::add('/api/admin/restaurants', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->getRestaurants();
+}, 'GET');
+
+// POST - Create Restaurant
+Route::add('/api/admin/addRestaurant', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->createRestaurant();
+}, 'POST');
+
+// POST - Update Restaurant
+Route::add('/api/admin/updateRestaurant', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->updateRestaurant();
+}, 'POST');
+
+// DELETE - Delete Restaurant
+Route::add('/api/admin/deleteRestaurant', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->deleteRestaurant();
+}, 'DELETE'); // ✅ keep POST because you upload file
+
 ?>

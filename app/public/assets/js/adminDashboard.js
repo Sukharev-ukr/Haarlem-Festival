@@ -946,3 +946,218 @@ function exportOrderDetailExcel() {
 function closeOrderDetailModal() {
   $("#orderDetailModal").modal("hide");
 }
+
+////////////////////////////////////////////////////////////Restaurent
+
+document.addEventListener("DOMContentLoaded", function () {
+  loadRestaurants(); // to Display order to front end
+});
+
+// ✅ Load Restaurants
+function loadRestaurants() {
+  console.log("🍽️ Fetching restaurant data...");
+
+  fetch("/api/admin/restaurants")
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("✅ Restaurants API Response:", data);
+
+      const tbody = document.querySelector("#restaurantTable tbody");
+      tbody.innerHTML = "";
+
+      if (!data || !data.success || !Array.isArray(data.data)) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger">Error loading restaurants.</td></tr>`;
+        return;
+      }
+
+      if (data.data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center text-warning">No restaurants available.</td></tr>`;
+        return;
+      }
+
+      data.data.forEach((restaurant) => {
+        tbody.innerHTML += `
+              <tr>
+                  <td>${restaurant.restaurantID}</td>
+                  <td>${restaurant.restaurantName}</td>
+                  <td>${restaurant.address}</td>
+                  <td>${restaurant.cuisine}</td>
+                  <td>${restaurant.description}</td>
+                  <td>€${restaurant.pricePerAdult}</td>
+                  <td>€${restaurant.pricePerChild}</td>
+                  <td>${
+                    restaurant.restaurantPicture
+                      ? `<img src="${restaurant.restaurantPicture}" style="max-width:70px;">`
+                      : "No Image"
+                  }</td>
+                  <td>${
+                    restaurant.restaurantDiningDetailPicture
+                      ? `<img src="${restaurant.restaurantDiningDetailPicture}" style="max-width:70px;">`
+                      : "No Image"
+                  }</td>
+                  <td>
+                      <button class="btn btn-warning btn-sm" onclick="openEditRestaurantModal(this)"
+                          data-id="${restaurant.restaurantID}"
+                          data-name="${restaurant.restaurantName}"
+                          data-address="${restaurant.address}"
+                          data-cuisine="${restaurant.cuisine}"
+                          data-description="${restaurant.description}"
+                          data-priceperadult="${restaurant.pricePerAdult}"
+                          data-priceperchild="${restaurant.pricePerChild}"
+                          data-picture="${restaurant.restaurantPicture}"
+                          data-dining="${
+                            restaurant.restaurantDiningDetailPicture
+                          }">
+                          Edit
+                      </button>
+                      <button class="btn btn-danger btn-sm" onclick="deleteRestaurant(${
+                        restaurant.restaurantID
+                      })">Delete</button>
+                  </td>
+              </tr>`;
+      });
+    })
+    .catch((error) => console.error("❌ Error loading restaurants:", error));
+}
+
+// ✅ Open Add Modal
+function openAddRestaurantModal() {
+  document.getElementById("restaurantModalTitle").textContent =
+    "Add Restaurant";
+  document.getElementById("restaurantID").value = "";
+  document.getElementById("restaurantName").value = "";
+  document.getElementById("address").value = "";
+  document.getElementById("cuisine").value = "";
+  document.getElementById("restaurantDescription").value = "";
+  document
+    .querySelector("trix-editor[input='restaurantDescription']")
+    .editor.loadHTML("");
+  document.getElementById("pricePerAdult").value = "";
+  document.getElementById("pricePerChild").value = "";
+  document.getElementById("previewRestaurant").src = "";
+  document.getElementById("previewDiningDetail").src = "";
+  document.getElementById("restaurantPicture").value = "";
+  document.getElementById("diningDetailPicture").value = "";
+  $("#restaurantModal").modal("show");
+}
+
+// ✅ Open Edit Model
+function openEditRestaurantModal(button) {
+  document.getElementById("restaurantModalTitle").textContent =
+    "Edit Restaurant";
+  document.getElementById("restaurantID").value = button.dataset.id;
+
+  document.getElementById("restaurantName").value = button.dataset.name;
+  document.getElementById("address").value = button.dataset.address;
+  document.getElementById("cuisine").value = button.dataset.cuisine;
+
+  document.getElementById("restaurantDescription").value =
+    button.dataset.description;
+  document
+    .querySelector("trix-editor[input='restaurantDescription']")
+    .editor.loadHTML(button.dataset.description);
+
+  document.getElementById("pricePerAdult").value =
+    button.dataset.priceperadult || 0;
+  document.getElementById("pricePerChild").value =
+    button.dataset.priceperchild || 0;
+
+  document.getElementById("previewRestaurant").src =
+    button.dataset.picture || "";
+  document.getElementById("previewDiningDetail").src =
+    button.dataset.dining || "";
+
+  document.getElementById("restaurantPicture").value = "";
+  document.getElementById("diningDetailPicture").value = "";
+
+  $("#restaurantModal").modal("show");
+}
+
+// ✅ Save Restaurant
+function saveRestaurant() {
+  const id = document.getElementById("restaurantID").value;
+  const name = document.getElementById("restaurantName").value;
+  const address = document.getElementById("address").value;
+  const cuisine = document.getElementById("cuisine").value;
+
+  // ✅ Get Trix content correctly
+  const description = document.getElementById("restaurantDescription").value;
+
+  const pricePerAdult = document.getElementById("pricePerAdult").value || 0;
+  const pricePerChild = document.getElementById("pricePerChild").value || 0;
+
+  const restaurantPicture =
+    document.getElementById("restaurantPicture").files[0];
+  const diningDetailPicture = document.getElementById("diningDetailPicture")
+    .files[0];
+
+  const formData = new FormData();
+  if (id) formData.append("id", id);
+  formData.append("name", name);
+  formData.append("address", address);
+  formData.append("cuisine", cuisine);
+  formData.append("description", description);
+  formData.append("pricePerAdult", pricePerAdult);
+  formData.append("pricePerChild", pricePerChild);
+  if (restaurantPicture) formData.append("picture", restaurantPicture);
+  if (diningDetailPicture)
+    formData.append("diningPicture", diningDetailPicture); // ✅ correct name
+
+  const url = id ? "/api/admin/updateRestaurant" : "/api/admin/addRestaurant";
+
+  fetch(url, {
+    method: "POST",
+    body: formData,
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        $("#restaurantModal").modal("hide");
+        loadRestaurants();
+      } else {
+        alert("Error: " + data.message);
+      }
+    })
+    .catch((err) => console.error("❌ Error:", err));
+}
+
+// ✅ Delete Restaurant
+function deleteRestaurant(id) {
+  if (!confirm("Are you sure you want to delete this restaurant?")) return;
+
+  fetch("/api/admin/deleteRestaurant", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ restaurantID: id }), // make sure your controller expects restaurantID
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        loadRestaurants();
+      } else {
+        alert("Delete failed: " + data.message);
+      }
+    })
+    .catch((error) => console.error("❌ Error deleting restaurant:", error));
+}
+
+// ✅ Image Previewers
+function previewRestaurantImage(event) {
+  const input = event.target;
+  const preview = document.getElementById("previewRestaurant");
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => (preview.src = e.target.result);
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function previewDiningImage(event) {
+  const input = event.target;
+  const preview = document.getElementById("previewDiningDetail");
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => (preview.src = e.target.result);
+    reader.readAsDataURL(input.files[0]);
+  }
+}

@@ -291,6 +291,65 @@ public function getOrderDetails($orderID)
     $stmt->execute([$orderID]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+///////////////////////////////////////////////////////////////////////Restaurant
+
+// Get All Restaurants
+public function getAllRestaurants() {
+    try {
+        $sql = "SELECT restaurantID, restaurantName, address, cuisine, description, pricePerAdult, pricePerChild, restaurantPicture, restaurantDiningDetailPicture FROM Restaurant";
+        $stmt = self::$pdo->query($sql);
+        return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+// Create Restaurant
+public function createRestaurant($name, $address, $cuisine, $description, $pricePerAdult, $pricePerChild, $picture, $diningPicture) {
+    try {
+        $sql = "INSERT INTO Restaurant (restaurantName, address, cuisine, description, pricePerAdult, pricePerChild, restaurantPicture, restaurantDiningDetailPicture) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$name, $address, $cuisine, $description, $pricePerAdult, $pricePerChild, $picture, $diningPicture]);
+        return ["success" => true, "message" => "Restaurant created successfully"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+// Update Restaurant
+public function updateRestaurant($id, $name, $address, $cuisine, $description, $pricePerAdult, $pricePerChild, $picture, $diningPicture) {
+    try {
+        $sql = "UPDATE Restaurant SET restaurantName=?, address=?, cuisine=?, description=?, pricePerAdult=?, pricePerChild=?, restaurantPicture=?, restaurantDiningDetailPicture=? WHERE restaurantID=?";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$name, $address, $cuisine, $description, $pricePerAdult, $pricePerChild, $picture, $diningPicture, $id]);
+        return ["success" => true, "message" => "Restaurant updated successfully"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+// Delete Restaurant
+public function deleteRestaurant($id) {
+    try {
+        $sql = "DELETE FROM Restaurant WHERE restaurantID = ?";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$id]);
+        return ["success" => true, "message" => "Restaurant deleted successfully"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+public function getRestaurantByID($id) {
+    try {
+        $sql = "SELECT * FROM Restaurant WHERE restaurantID = ?";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return false; // You could also throw exception if you want
+    }
+}
 
 
 }
