@@ -496,7 +496,68 @@ public function deleteRestaurant() {
     }
 }
 
+///////////////////////////////////////////////////////////////////////Restaurant Slot
 
+    // Get All Slots
+    public function getRestaurantSlots() {
+        try {
+            echo json_encode($this->adminModel->getRestaurantSlots());
+        } catch (Exception $e) {
+            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+        }
+    }
 
+    public function simpleRestaurants() {
+        try {
+            echo json_encode($this->adminModel->getAllRestaurantsSimple());
+        } catch (Exception $e) {
+            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+        }
+    }
+
+    // Create
+public function createRestaurantSlot() {
+    try {
+        $data = $_POST;
+        if (empty($data['restaurantID']) || empty($data['startTime']) || empty($data['endTime']) || empty($data['capacity'])) {
+            throw new Exception("All fields are required.");
+        }
+        echo json_encode($this->adminModel->createRestaurantSlot(
+            $data['restaurantID'],
+            $data['startTime'],
+            $data['endTime'],
+            $data['capacity']
+        ));
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+// Update
+public function updateRestaurantSlot() {
+    try {
+        $data = $_POST;
+        if (empty($data['slotID'])) throw new Exception("Slot ID is required.");
+        echo json_encode($this->adminModel->updateRestaurantSlot(
+            $data['slotID'],
+            $data['startTime'],
+            $data['endTime'],
+            $data['capacity']
+        ));
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+// Delete
+public function deleteRestaurantSlot() {
+    try {
+        $data = json_decode(file_get_contents("php://input"), true);
+        if (!isset($data['slotID'])) throw new Exception("Slot ID is required.");
+        echo json_encode($this->adminModel->deleteRestaurantSlot($data['slotID']));
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
 }
 ?>

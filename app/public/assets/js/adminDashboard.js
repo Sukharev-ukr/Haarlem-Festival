@@ -1161,3 +1161,197 @@ function previewDiningImage(event) {
     reader.readAsDataURL(input.files[0]);
   }
 }
+
+///////////////////////////////////////////////////////////////////Restaurant
+document.addEventListener("DOMContentLoaded", function () {
+  loadRestaurantSlots();
+});
+
+// Load Slot Data
+function loadRestaurantSlots() {
+  fetch("/api/admin/restaurantSlots")
+    .then((res) => res.json())
+    .then((data) => {
+      const tbody = document.querySelector("#restaurantSlotTable tbody");
+      tbody.innerHTML = "";
+
+      if (!data.success || !data.data || data.data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">No slots found.</td></tr>`;
+        return;
+      }
+
+      data.data.forEach((slot) => {
+        tbody.innerHTML += `
+                  <tr>
+                      <td>${slot.slotID}</td>
+                      <td>${slot.restaurantName} (#${slot.restaurantID})</td>
+                      <td>${slot.startTime}</td>
+                      <td>${slot.endTime}</td>
+                      <td>${slot.capacity}</td>
+                      <td>
+                          <button class="btn btn-warning btn-sm" onclick='openEditRestaurantSlotModal(${JSON.stringify(
+                            slot
+                          )})'>Edit</button>
+                          <button class="btn btn-danger btn-sm" onclick="deleteRestaurantSlot(${
+                            slot.slotID
+                          })">Delete</button>
+                      </td>
+                  </tr>`;
+      });
+    })
+    .catch((err) => console.error("❌ Error loading slots", err));
+}
+
+// ========== Load Restaurant Options ==========
+function populateRestaurants() {
+  console.log("🍽 Fetching restaurants...");
+
+  const select = document.getElementById("restaurantID");
+  select.innerHTML = '<option value="">Select Restaurant</option>';
+
+  return fetch("/api/admin/simpleRestaurants")
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data.success || !Array.isArray(data.data)) {
+        select.innerHTML += "<option disabled>No restaurants found</option>";
+        return;
+      }
+
+      data.data.forEach((restaurant) => {
+        const option = document.createElement("option");
+        option.value = restaurant.restaurantID;
+        option.textContent = restaurant.restaurantName;
+        select.appendChild(option);
+      });
+
+      select.disabled = false;
+      console.log("✅ Restaurants populated successfully");
+    })
+    .catch((error) => {
+      console.error("❌ Error loading restaurants:", error);
+      select.innerHTML +=
+        "<option disabled>Error fetching restaurants</option>";
+      // FIXED: still resolve to allow .then() after
+      return;
+    });
+}
+
+// ========== Open Add Slot Modal ==========
+/** 🍽 Open Add Restaurant Slot Modal */
+function openAddRestaurantSlotModal() {
+  console.log("🍽 Opening Add Restaurant Slot Modal...");
+
+  // Reset Form
+  document.getElementById("slotID").value = "";
+  document.getElementById("startTime").value = "";
+  document.getElementById("endTime").value = "";
+  document.getElementById("capacity").value = "";
+
+  // ✅ Reset dropdown FIRST
+  const restaurantDropdown = document.getElementById("restaurantID");
+  restaurantDropdown.innerHTML = '<option value="">Select Restaurant</option>';
+  restaurantDropdown.disabled = false;
+
+  // ✅ Call populateRestaurants()
+  populateRestaurants();
+
+  // ✅ Open Modal AFTER everything is reset
+  $("#restaurantSlotModal").modal("show");
+
+  // ✅ Update save button (optional)
+  document.getElementById("saveRestaurantSlotButton").textContent = "Add Slot";
+  document
+    .getElementById("saveRestaurantSlotButton")
+    .setAttribute("onclick", "saveRestaurantSlot()");
+}
+
+// ========== Open Edit Slot Modal ==========
+function openEditRestaurantSlotModal(slot) {
+  console.log("✏️ Opening Edit Slot Modal...");
+
+  document.getElementById("restaurantSlotModalTitle").textContent =
+    "Edit Restaurant Slot";
+  document.getElementById("slotID").value = slot.slotID;
+  document.getElementById("startTime").value = slot.startTime;
+  document.getElementById("endTime").value = slot.endTime;
+  document.getElementById("capacity").value = slot.capacity;
+
+  // ✅ Disable restaurant selection during EDIT
+  const restaurantSelect = document.getElementById("restaurantID");
+  restaurantSelect.innerHTML = `<option value="${slot.restaurantID}">${slot.restaurantName}</option>`;
+  restaurantSelect.disabled = true;
+
+  document.getElementById("saveRestaurantSlotButton").textContent =
+    "Update Slot";
+  document
+    .getElementById("saveRestaurantSlotButton")
+    .setAttribute("onclick", "saveRestaurantSlot()");
+
+  $("#restaurantSlotModal").modal("show");
+}
+
+// ========== Save Slot (Create or Update) ==========
+function saveRestaurantSlot() {
+  const slotID = document.getElementById("slotID").value;
+  const restaurantID = document.getElementById("restaurantID").value;
+  const startTime = document.getElementById("startTime").value;
+  const endTime = document.getElementById("endTime").value;
+  const capacity = document.getElementById("capacity").value;
+
+  // Basic validation
+  if (!startTime || !endTime || !capacity || (!slotID && !restaurantID)) {
+    alert("❌ Please fill in all required fields.");
+    return;
+  }
+
+  const formData = new FormData();
+  if (slotID) {
+    // Update
+    formData.append("slotID", slotID);
+    formData.append("startTime", startTime);
+    formData.append("endTime", endTime);
+    formData.append("capacity", capacity);
+  } else {
+    // Create
+    formData.append("restaurantID", restaurantID);
+    formData.append("startTime", startTime);
+    formData.append("endTime", endTime);
+    formData.append("capacity", capacity);
+  }
+
+  const url = slotID
+    ? "/api/admin/updateRestaurantSlot"
+    : "/api/admin/addRestaurantSlot";
+
+  fetch(url, { method: "POST", body: formData })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        $("#restaurantSlotModal").modal("hide");
+        loadRestaurantSlots();
+      } else {
+        alert("❌ Error: " + data.message);
+      }
+    })
+    .catch((err) => console.error("❌ Error saving slot:", err));
+}
+
+// Delete Slot
+function deleteRestaurantSlot(slotID) {
+  if (!confirm("Are you sure you want to delete this slot?")) return;
+
+  fetch("/api/admin/deleteRestaurantSlot", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ slotID }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        loadRestaurantSlots();
+      } else {
+        alert("Error deleting slot: " + data.message);
+      }
+    })
+    .catch((err) => console.error("❌ Error deleting slot", err));
+}
