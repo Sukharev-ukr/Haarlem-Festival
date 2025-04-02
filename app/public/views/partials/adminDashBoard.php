@@ -18,7 +18,14 @@
             <a class="nav-link small" href="#paidOrderSection"><i class="fas fa-receipt"></i>Orders</a>
         </li>
         <li class="nav-item mb-2">
-            <a class="nav-link small" href="#restaurantSection"><i class="fas fa-receipt"></i>Restaurants</a>
+            <a class="nav-link small" href="#restaurantSection">
+                <i class="fas fa-utensils"></i> Dining
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link small" href="#restaurantSlotSection">
+                <i class="fas fa-clock"></i> Slots
+            </a>
         </li>
     </ul>
 </nav>
@@ -168,6 +175,30 @@
         </table>
     </div>
 </div>
+
+<!-- Restaurant Slot Section -->
+<div id="restaurantSlotSection" class="card mt-4">
+    <div class="card-header bg-warning text-dark d-flex justify-content-between">
+        <h3>Restaurant Slot Management</h3>
+        <button class="btn btn-success" onclick="openAddRestaurantSlotModal()">Add Slot</button>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-striped" id="restaurantSlotTable">
+            <thead class="thead-light">
+                <tr>
+                    <th>Slot ID</th>
+                    <th>Restaurant</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Capacity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
 
 </section>
 
@@ -440,6 +471,49 @@
         </div>
     </div>
 </div>
+
+<!-- Restaurant Slot Modal -->
+<div class="modal fade" id="restaurantSlotModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="restaurantSlotModalTitle">Add Restaurant Slot</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+
+                <input type="hidden" id="slotID">
+
+                <div class="form-group">
+                    <label for="restaurantID">Restaurant</label>
+                    <select class="form-control" id="restaurantID">
+                        <option value="">Select Restaurant</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="startTime">Start Time</label>
+                    <input type="time" class="form-control" id="startTime">
+                </div>
+
+                <div class="form-group">
+                    <label for="endTime">End Time</label>
+                    <input type="time" class="form-control" id="endTime">
+                </div>
+
+                <div class="form-group">
+                    <label for="capacity">Capacity</label>
+                    <input type="number" class="form-control" id="capacity" placeholder="Capacity">
+                </div>
+
+                <button class="btn btn-primary" id="saveRestaurantSlotButton" onclick="saveRestaurantSlot()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 
 

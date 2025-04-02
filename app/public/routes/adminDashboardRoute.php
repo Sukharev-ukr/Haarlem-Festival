@@ -184,4 +184,34 @@ Route::add('/api/admin/deleteRestaurant', function() {
     $controller->deleteRestaurant();
 }, 'DELETE'); // ✅ keep POST because you upload file
 
+//////////////////////////////////////////////////////////////////Restaurant Slot
+Route::add('/api/admin/restaurantSlots', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->getRestaurantSlots();
+}, 'GET');
+
+Route::add('/api/admin/addRestaurantSlot', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->createRestaurantSlot();
+}, 'POST');
+
+Route::add('/api/admin/updateRestaurantSlot', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->updateRestaurantSlot();
+}, 'POST');
+
+Route::add('/api/admin/simpleRestaurants', function () {
+    (new AdminController())->simpleRestaurants();
+}, 'GET');
+
+Route::add('/api/admin/deleteRestaurantSlot', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->deleteRestaurantSlot();
+}, 'DELETE');
+
+
 ?>

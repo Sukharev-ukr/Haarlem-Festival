@@ -351,6 +351,65 @@ public function getRestaurantByID($id) {
     }
 }
 
+///////////////////////////////////////////////////////////////////Restaurant Slot
+// Get all Restaurant Slots with Restaurant Name
+public function getRestaurantSlots() {
+    try {
+        $sql = "SELECT RS.slotID, RS.restaurantID, R.restaurantName, RS.startTime, RS.endTime, RS.capacity 
+                FROM RestaurantSlot RS
+                INNER JOIN Restaurant R ON RS.restaurantID = R.restaurantID";
+        $stmt = self::$pdo->query($sql);
+        return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+public function getAllRestaurantsSimple() {
+    try {
+        $stmt = self::$pdo->query("SELECT restaurantID, restaurantName FROM Restaurant");
+        return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+// Create
+public function createRestaurantSlot($restaurantID, $startTime, $endTime, $capacity) {
+    try {
+        $sql = "INSERT INTO RestaurantSlot (restaurantID, startTime, endTime, capacity) VALUES (?, ?, ?, ?)";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$restaurantID, $startTime, $endTime, $capacity]);
+        return ["success" => true];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+// Update
+public function updateRestaurantSlot($slotID, $startTime, $endTime, $capacity) {
+    try {
+        $sql = "UPDATE RestaurantSlot SET startTime=?, endTime=?, capacity=? WHERE slotID=?";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$startTime, $endTime, $capacity, $slotID]);
+        return ["success" => true, "message" => "Slot updated successfully"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+// Delete
+public function deleteRestaurantSlot($slotID) {
+    try {
+        $sql = "DELETE FROM RestaurantSlot WHERE slotID=?";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$slotID]);
+        return ["success" => true];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
 
 }
 ?>
