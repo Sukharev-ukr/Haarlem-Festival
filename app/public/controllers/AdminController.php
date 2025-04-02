@@ -8,15 +8,21 @@ class AdminController {
         $this->adminModel = new AdminModel();
     }
 
-    // Fetch users for dashboard
+        // Get Users API
     public function getUsers() {
-        $search = $_GET['search'] ?? "";
-        $sortColumn = $_GET['sort'] ?? "userID";
-        $sortOrder = $_GET['order'] ?? "ASC";
-        return $this->adminModel->getUsers($search, $sortColumn, $sortOrder);
+        try {
+            $search = $_GET['search'] ?? "";
+            $sortColumn = $_GET['sort'] ?? "userID";
+            $sortOrder = $_GET['order'] ?? "ASC";
+            $result = $this->adminModel->getUsers($search, $sortColumn, $sortOrder);
+
+            echo json_encode(["success" => true, "data" => $result]);
+        } catch (Exception $e) {
+            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+        }
     }
 
-    // Handle User CRUD
+    // Add User API
     public function createUser() {
         try {
             $data = json_decode(file_get_contents("php://input"), true);
@@ -30,7 +36,7 @@ class AdminController {
             }
 
             if (strlen($data['password']) < 6) {
-                throw new Exception("Password must be at least 6 characters long.");
+                throw new Exception("Password must be at least 6 characters.");
             }
 
             $result = $this->adminModel->addUser(
@@ -46,12 +52,23 @@ class AdminController {
         }
     }
 
+    // Update User API
     public function updateUser() {
-        $data = json_decode(file_get_contents("php://input"), true);
-        if ($this->adminModel->updateUser($data['userID'], $data['userName'], $data['Email'], $data['role'])) {
-            echo json_encode(["status" => "success"]);
-        } else {
-            echo json_encode(["status" => "error"]);
+        try {
+            $data = json_decode(file_get_contents("php://input"), true);
+
+            if (!isset($data['userID'], $data['userName'], $data['email'], $data['role'])) {
+                throw new Exception("All fields are required.");
+            }
+
+            if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("Invalid email format.");
+            }
+
+            $result = $this->adminModel->updateUser($data['userID'], $data['userName'], $data['email'], $data['role']);
+            echo json_encode($result);
+        } catch (Exception $e) {
+            echo json_encode(["success" => false, "message" => $e->getMessage()]);
         }
     }
 
