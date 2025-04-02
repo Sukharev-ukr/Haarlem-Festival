@@ -7,47 +7,77 @@ class AdminModel extends BaseModel {
         parent::__construct();
     }    
 
-    // Fetch all users with sorting, filtering, and search
-    public function getUsers($search = "", $sortColumn = "userID", $sortOrder = "ASC") {
-        $sql = "SELECT userName, Email, role 
+    // Fetch all users with search, sort, and registered_day
+public function getUsers($search = "", $sortColumn = "userID", $sortOrder = "ASC") {
+    try {
+        // Whitelist sort columns to prevent SQL Injection
+        $allowedSortColumns = ['userID', 'userName', 'Email', 'role', 'registered_day'];
+        if (!in_array($sortColumn, $allowedSortColumns)) {
+            $sortColumn = 'userID';
+        }
+        
+        $sortOrder = strtoupper($sortOrder) === 'DESC' ? 'DESC' : 'ASC'; // only allow ASC or DESC
+        
+        $sql = "SELECT userID, userName, Email, role, registered_day 
                 FROM User 
                 WHERE userName LIKE ? OR Email LIKE ? OR role LIKE ?
                 ORDER BY $sortColumn $sortOrder";
     
         $stmt = self::$pdo->prepare($sql);
-        $stmt->execute(["%$search%", "%$search%", "%$search%"]); // Now correctly binds three values
+        $stmt->execute(["%$search%", "%$search%", "%$search%"]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } 
-
-    // Add new user
-    public function addUser($userName, $email, $password, $role) {
-        try {
-            // Hash the password securely
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-            $sql = "INSERT INTO User (userName, Email, password, role, registration_date) VALUES (?, ?, ?, ?, NOW())";
-            $stmt = self::$pdo->prepare($sql);
-            $stmt->execute([$userName, $email, $hashedPassword, $role]);
-
-            return ["success" => true, "message" => "User added successfully"];
-        } catch (Exception $e) {
-            return ["success" => false, "message" => "Error adding user: " . $e->getMessage()];
-        }
+    } catch (Exception $e) {
+        return ["error" => $e->getMessage()];
     }
+}
 
-    // Update user details
-    public function updateUser($userID, $userName, $email, $role) {
+// Add new user
+public function addUser($userName, $email, $password, $role) {
+    try {
+        if (!in_array($role, ['Admin', 'Employee'])) {
+            throw new Exception("Invalid role value.");
+        }
+
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        $sql = "INSERT INTO User (userName, Email, password, role, registered_day) VALUES (?, ?, ?, ?, NOW())";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$userName, $email, $hashedPassword, $role]);
+
+        return ["success" => true, "message" => "User added successfully."];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error adding user: " . $e->getMessage()];
+    }
+}
+
+// Update user
+public function updateUser($userID, $userName, $email, $role) {
+    try {
+        if (!in_array($role, ['Admin', 'Employee'])) {
+            throw new Exception("Invalid role value.");
+        }
+
         $sql = "UPDATE User SET userName = ?, Email = ?, role = ? WHERE userID = ?";
         $stmt = self::$pdo->prepare($sql);
-        return $stmt->execute([$userName, $email, $role, $userID]);
-    }
+        $stmt->execute([$userName, $email, $role, $userID]);
 
-    // Delete user
-    public function deleteUser($userID) {
+        return ["success" => true, "message" => "User updated successfully."];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error updating user: " . $e->getMessage()];
+    }
+}
+
+// Delete user
+public function deleteUser($userID) {
+    try {
         $sql = "DELETE FROM User WHERE userID = ?";
         $stmt = self::$pdo->prepare($sql);
-        return $stmt->execute([$userID]);
+        $stmt->execute([$userID]);
+        return ["success" => true, "message" => "User deleted successfully."];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error deleting user: " . $e->getMessage()];
     }
+}
 
     ///////////////////////////////////////////////////////////////Dance
 // Fetch only Dance events

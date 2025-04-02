@@ -11,7 +11,8 @@ Route::add('/adminDashBoard', function() {
 // API: Fetch users with search, sorting, and filtering
 Route::add('/api/admin/users', function() use ($adminController) {
     header('Content-Type: application/json');
-    echo json_encode($adminController->getUsers());
+    $controller = new AdminController();
+    $controller->getUsers();
 }, 'GET');
 
 // API: Add a new user

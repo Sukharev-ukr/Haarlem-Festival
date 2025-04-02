@@ -30,20 +30,28 @@ function loadUsers() {
   let search = document.getElementById("searchUser").value;
   fetch(`/api/admin/users?search=${search}`)
     .then((response) => response.json())
-    .then((data) => {
+    .then((result) => {
+      if (!result.success) {
+        alert(result.message || "Failed to load users");
+        return;
+      }
+
+      let users = result.data; // ✅ Extract the array correctly
+
       let tableBody = document.querySelector("#userTable tbody");
       tableBody.innerHTML = "";
-      data.forEach((user) => {
+      users.forEach((user) => {
         tableBody.innerHTML += `
-            <tr>
-              <td>${user.userName}</td>
-              <td>${user.Email}</td>
-              <td>${user.role}</td>
-              <td>
-                <button class="btn btn-warning btn-sm" onclick="editUser('${user.userID}', '${user.userName}', '${user.email}', '${user.role}')">Edit</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.userID}')">Delete</button>
-              </td>
-            </tr>`;
+              <tr>
+                  <td>${user.userName}</td>
+                  <td>${user.Email}</td>
+                  <td>${user.role}</td>
+                  <td>${user.registered_day}</td>
+                  <td>
+                      <button class="btn btn-warning btn-sm" onclick="editUser('${user.userID}', '${user.userName}', '${user.Email}', '${user.role}')">Edit</button>
+                      <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.userID}')">Delete</button>
+                  </td>
+              </tr>`;
       });
     });
 }
@@ -85,29 +93,72 @@ function deleteUser(userID) {
 }
 
 function editUser(userID, userName, email, role) {
-  document.getElementById("editUserID").value = userID;
-  document.getElementById("editUserName").value = userName;
-  document.getElementById("editUserEmail").value = email;
-  document.getElementById("editUserRole").value = role;
-  $("#editUserModal").modal("show");
+  // Open the same modal as addUser, but now for editing
+  document.getElementById("userID").value = userID;
+  document.getElementById("userName").value = userName;
+  document.getElementById("userEmail").value = email;
+  document.getElementById("userPassword").value = ""; // leave password empty
+  document.getElementById("userRole").value = role;
+
+  // Change button text & action
+  let saveButton = document.getElementById("saveUserButton");
+  saveButton.textContent = "Update User";
+  saveButton.setAttribute("onclick", "saveUser()");
+
+  $("#addUserModal").modal("show");
 }
 
 function saveUser() {
-  let userID = document.getElementById("editUserID").value;
-  let userName = document.getElementById("editUserName").value;
-  let email = document.getElementById("editUserEmail").value;
-  let role = document.getElementById("editUserRole").value;
+  let userID = document.getElementById("userID").value;
+  let userName = document.getElementById("userName").value;
+  let email = document.getElementById("userEmail").value;
+  let password = document.getElementById("userPassword").value;
+  let role = document.getElementById("userRole").value;
 
-  fetch("/api/admin/users/update", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userID, userName, email, role }),
-  })
-    .then((response) => response.json())
-    .then(() => {
-      $("#editUserModal").modal("hide");
-      loadUsers();
-    });
+  // Basic validation
+  if (!userName || !email || !role) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+
+  // If userID is empty -> ADD, else -> UPDATE
+  if (userID === "") {
+    if (!password || password.length < 6) {
+      alert("Password must be at least 6 characters for new users.");
+      return;
+    }
+
+    fetch("/api/admin/users/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userName, email, password, role }),
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.success) {
+          $("#addUserModal").modal("hide");
+          loadUsers();
+        } else {
+          alert(res.message);
+        }
+      });
+  } else {
+    // Update does not require password
+    fetch("/api/admin/users/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userID, userName, email, role }),
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.success) {
+          $("#addUserModal").modal("hide");
+          loadUsers();
+        } else {
+          alert(res.message);
+        }
+      });
+  }
 }
 
 //////////////////////////////////////////////////////////////Dance
@@ -1224,7 +1275,7 @@ function populateRestaurants() {
         select.appendChild(option);
       });
 
-      select.disabled = false;
+      //select.disabled = false;
       console.log("✅ Restaurants populated successfully");
     })
     .catch((error) => {
@@ -1247,22 +1298,18 @@ function openAddRestaurantSlotModal() {
   document.getElementById("endTime").value = "";
   document.getElementById("capacity").value = "";
 
-  // ✅ Reset dropdown FIRST
+  // Reset dropdown
   const restaurantDropdown = document.getElementById("restaurantID");
   restaurantDropdown.innerHTML = '<option value="">Select Restaurant</option>';
   restaurantDropdown.disabled = false;
 
-  // ✅ Call populateRestaurants()
-  populateRestaurants();
-
-  // ✅ Open Modal AFTER everything is reset
+  // Open modal first
   $("#restaurantSlotModal").modal("show");
 
-  // ✅ Update save button (optional)
-  document.getElementById("saveRestaurantSlotButton").textContent = "Add Slot";
-  document
-    .getElementById("saveRestaurantSlotButton")
-    .setAttribute("onclick", "saveRestaurantSlot()");
+  // ✅ Listen for when the modal is fully visible THEN populate
+  $("#restaurantSlotModal").on("shown.bs.modal", function () {
+    populateRestaurants();
+  });
 }
 
 // ========== Open Edit Slot Modal ==========

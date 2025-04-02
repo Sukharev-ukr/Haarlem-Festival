@@ -50,6 +50,7 @@
                         <th>Name</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>Registered Day</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -225,13 +226,14 @@
                     <label for="userPassword">Password: </label>
                     <input type="password" class="form-control" id="userPassword">
                 </div>
+                <!-- Role Dropdown -->
                 <div class="form-group">
                     <label for="userRole">Role: </label>
                     <select class="form-control" id="userRole">
                         <option value="Admin">Admin</option>
                         <option value="Employee">Employee</option>
                     </select>
-                </div
+                </div>
                 <button class="btn btn-primary" id="saveUserButton" onclick="saveUser()">Add User</button>
             </div>
         </div>
