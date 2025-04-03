@@ -12,6 +12,9 @@
             <a class="nav-link small" href="#artistSection"><i class="fas fa-paint-brush"></i>Artists</a>
         </li>
         <li class="nav-item mb-2">
+            <a class="nav-link small" href="#ticketTypeSection"><i class="fas fa-ticket"></i>Ticket</a>
+        </li>
+        <li class="nav-item mb-2">
             <a class="nav-link small" href="#danceArtistSection"><i class="fas fa-users"></i>Assign</a>
         </li>
         <li class="nav-item mb-2">
@@ -107,6 +110,28 @@
             </div>
         </div>
 
+                <!-- Ticket Type Section -->
+        <div id="ticketTypeSection" class="card mt-4">
+            <div class="card-header bg-warning text-dark d-flex justify-content-between">
+                <h3>Ticket Type Management</h3>
+                <button class="btn btn-success" onclick="openTicketTypeModal()">Add Ticket Type</button>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped" id="ticketTypeTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Location</th>
+                            <th>Type</th>
+                            <th>Price (€)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
         <div id="danceArtistSection" class="card mt-4">
             <div class="card-header bg-info text-white d-flex justify-content-between">
                 <h3>Dance-Artist Assignment Management</h3>
@@ -179,25 +204,25 @@
 
 <!-- Restaurant Slot Section -->
 <div id="restaurantSlotSection" class="card mt-4">
-    <div class="card-header bg-warning text-dark d-flex justify-content-between">
-        <h3>Restaurant Slot Management</h3>
-        <button class="btn btn-success" onclick="openAddRestaurantSlotModal()">Add Slot</button>
-    </div>
-    <div class="card-body">
-        <table class="table table-bordered table-striped" id="restaurantSlotTable">
-            <thead class="thead-light">
-                <tr>
-                    <th>Slot ID</th>
-                    <th>Restaurant</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Capacity</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+  <div class="card-header bg-warning text-dark d-flex justify-content-between">
+    <h3>Restaurant Slot Management</h3>
+    <button class="btn btn-success" onclick="openAddRestaurantSlotModal()">Add Slot</button>
+  </div>
+  <div class="card-body">
+    <table class="table table-bordered table-striped" id="restaurantSlotTable">
+      <thead class="thead-light">
+        <tr>
+          <th>Slot ID</th>
+          <th>Restaurant</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+          <th>Capacity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 </div>
 
 
@@ -343,6 +368,41 @@
     </div>
 </div>
 
+<!-- Ticket Type Modal -->
+<div class="modal fade" id="ticketTypeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Ticket Type</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+
+                <input type="hidden" id="ticketTypeID">
+
+                <div class="form-group">
+                    <label for="danceID">Location</label>
+                    <select class="form-control" id="danceID">
+                        <option value="">Select Location</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="type">Type</label>
+                    <input type="text" class="form-control" id="type" placeholder="Type">
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price (€)</label>
+                    <input type="number" step="0.01" class="form-control" id="price" placeholder="Price">
+                </div>
+
+                <button class="btn btn-primary" onclick="saveTicketType()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <!-- Assign Artist Modal -->
@@ -474,44 +534,44 @@
     </div>
 </div>
 
-<!-- Restaurant Slot Modal -->
+
+<!-- Modal -->
 <div class="modal fade" id="restaurantSlotModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="restaurantSlotModalTitle">Add Restaurant Slot</h5>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">Add/Edit Restaurant Slot</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="slotID">
 
-                <input type="hidden" id="slotID">
-
-                <div class="form-group">
-                    <label for="restaurantID">Restaurant</label>
-                    <select class="form-control" id="restaurantID">
-                        <option value="">Select Restaurant</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="startTime">Start Time</label>
-                    <input type="time" class="form-control" id="startTime">
-                </div>
-
-                <div class="form-group">
-                    <label for="endTime">End Time</label>
-                    <input type="time" class="form-control" id="endTime">
-                </div>
-
-                <div class="form-group">
-                    <label for="capacity">Capacity</label>
-                    <input type="number" class="form-control" id="capacity" placeholder="Capacity">
-                </div>
-
-                <button class="btn btn-primary" id="saveRestaurantSlotButton" onclick="saveRestaurantSlot()">Save</button>
-            </div>
+        <div class="form-group">
+          <label for="restaurantID">Restaurant</label>
+          <select class="form-control" id="restaurantSlotRestaurantID">
+                <option value="">Select Restaurant</option>
+            </select>
         </div>
+
+        <div class="form-group">
+          <label for="startTime">Start Time</label>
+          <input type="time" class="form-control" id="startTime">
+        </div>
+
+        <div class="form-group">
+          <label for="endTime">End Time</label>
+          <input type="time" class="form-control" id="endTime">
+        </div>
+
+        <div class="form-group">
+          <label for="capacity">Capacity</label>
+          <input type="number" class="form-control" id="capacity" placeholder="Capacity">
+        </div>
+
+        <button class="btn btn-primary" onclick="saveRestaurantSlot()">Save</button>
+      </div>
     </div>
+  </div>
 </div>
 
 
