@@ -1214,57 +1214,43 @@ function previewDiningImage(event) {
 }
 
 ///////////////////////////////////////////////////////////////////Restaurant
-document.addEventListener("DOMContentLoaded", function () {
-  loadRestaurantSlots();
-});
-
-// Load Slot Data
 function loadRestaurantSlots() {
-  fetch("/api/admin/restaurantSlots")
+  fetch("/api/admin/restaurant-slots")
     .then((res) => res.json())
     .then((data) => {
       const tbody = document.querySelector("#restaurantSlotTable tbody");
       tbody.innerHTML = "";
-
-      if (!data.success || !data.data || data.data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">No slots found.</td></tr>`;
-        return;
+      if (data.success) {
+        data.data.forEach((slot) => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${slot.slotID}</td>
+              <td>${slot.restaurantName}</td>
+              <td>${slot.startTime}</td>
+              <td>${slot.endTime}</td>
+              <td>${slot.capacity}</td>
+              <td>
+                <button class="btn btn-warning btn-sm" onclick="openAddRestaurantSlotModal(${slot.slotID}, '${slot.restaurantName}', '${slot.startTime}', '${slot.endTime}', ${slot.capacity})">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteRestaurantSlot(${slot.slotID})">Delete</button>
+              </td>
+            </tr>`;
+        });
+      } else {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-danger text-center">No slots found.</td></tr>`;
       }
-
-      data.data.forEach((slot) => {
-        tbody.innerHTML += `
-                  <tr>
-                      <td>${slot.slotID}</td>
-                      <td>${slot.restaurantName} (#${slot.restaurantID})</td>
-                      <td>${slot.startTime}</td>
-                      <td>${slot.endTime}</td>
-                      <td>${slot.capacity}</td>
-                      <td>
-                          <button class="btn btn-warning btn-sm" onclick='openEditRestaurantSlotModal(${JSON.stringify(
-                            slot
-                          )})'>Edit</button>
-                          <button class="btn btn-danger btn-sm" onclick="deleteRestaurantSlot(${
-                            slot.slotID
-                          })">Delete</button>
-                      </td>
-                  </tr>`;
-      });
     })
-    .catch((err) => console.error("❌ Error loading slots", err));
+    .catch((err) => console.error("❌ Slot load error:", err));
 }
 
-// ========== Load Restaurant Options ==========
-function populateRestaurants() {
-  console.log("🍽 Fetching restaurants...");
+function populateSlotRestaurants() {
+  const dropdown = document.getElementById("restaurantSlotRestaurantID");
+  dropdown.innerHTML = '<option value="">Select Restaurant</option>';
 
-  const select = document.getElementById("restaurantID");
-  select.innerHTML = '<option value="">Select Restaurant</option>';
-
-  return fetch("/api/admin/simpleRestaurants")
+  fetch("/api/admin/restaurant-slots/restaurants")
     .then((res) => res.json())
     .then((data) => {
       if (!data.success || !Array.isArray(data.data)) {
-        select.innerHTML += "<option disabled>No restaurants found</option>";
+        dropdown.innerHTML += "<option disabled>No restaurants found</option>";
         return;
       }
 
@@ -1272,123 +1258,83 @@ function populateRestaurants() {
         const option = document.createElement("option");
         option.value = restaurant.restaurantID;
         option.textContent = restaurant.restaurantName;
-        select.appendChild(option);
+        dropdown.appendChild(option);
       });
 
-      //select.disabled = false;
-      console.log("✅ Restaurants populated successfully");
+      dropdown.disabled = false;
     })
     .catch((error) => {
-      console.error("❌ Error loading restaurants:", error);
-      select.innerHTML +=
+      console.error("❌ Error loading slot restaurants:", error);
+      dropdown.innerHTML +=
         "<option disabled>Error fetching restaurants</option>";
-      // FIXED: still resolve to allow .then() after
-      return;
     });
 }
 
-// ========== Open Add Slot Modal ==========
-/** 🍽 Open Add Restaurant Slot Modal */
-function openAddRestaurantSlotModal() {
-  console.log("🍽 Opening Add Restaurant Slot Modal...");
+function openAddRestaurantSlotModal(
+  slotID = "",
+  restaurantName = "",
+  startTime = "",
+  endTime = "",
+  capacity = ""
+) {
+  document.getElementById("slotID").value = slotID;
+  document.getElementById("startTime").value = startTime;
+  document.getElementById("endTime").value = endTime;
+  document.getElementById("capacity").value = capacity;
 
-  // Reset Form
-  document.getElementById("slotID").value = "";
-  document.getElementById("startTime").value = "";
-  document.getElementById("endTime").value = "";
-  document.getElementById("capacity").value = "";
+  const dropdown = document.getElementById("restaurantSlotRestaurantID");
 
-  // Reset dropdown
-  const restaurantDropdown = document.getElementById("restaurantID");
-  restaurantDropdown.innerHTML = '<option value="">Select Restaurant</option>';
-  restaurantDropdown.disabled = false;
-
-  // Open modal first
-  $("#restaurantSlotModal").modal("show");
-
-  // ✅ Listen for when the modal is fully visible THEN populate
-  $("#restaurantSlotModal").on("shown.bs.modal", function () {
-    populateRestaurants();
-  });
-}
-
-// ========== Open Edit Slot Modal ==========
-function openEditRestaurantSlotModal(slot) {
-  console.log("✏️ Opening Edit Slot Modal...");
-
-  document.getElementById("restaurantSlotModalTitle").textContent =
-    "Edit Restaurant Slot";
-  document.getElementById("slotID").value = slot.slotID;
-  document.getElementById("startTime").value = slot.startTime;
-  document.getElementById("endTime").value = slot.endTime;
-  document.getElementById("capacity").value = slot.capacity;
-
-  // ✅ Disable restaurant selection during EDIT
-  const restaurantSelect = document.getElementById("restaurantID");
-  restaurantSelect.innerHTML = `<option value="${slot.restaurantID}">${slot.restaurantName}</option>`;
-  restaurantSelect.disabled = true;
-
-  document.getElementById("saveRestaurantSlotButton").textContent =
-    "Update Slot";
-  document
-    .getElementById("saveRestaurantSlotButton")
-    .setAttribute("onclick", "saveRestaurantSlot()");
+  if (slotID) {
+    dropdown.innerHTML = `<option selected disabled>${restaurantName}</option>`;
+    dropdown.disabled = true;
+  } else {
+    dropdown.disabled = false;
+    populateSlotRestaurants(); // Call the renamed dropdown loader
+  }
 
   $("#restaurantSlotModal").modal("show");
 }
 
-// ========== Save Slot (Create or Update) ==========
 function saveRestaurantSlot() {
   const slotID = document.getElementById("slotID").value;
-  const restaurantID = document.getElementById("restaurantID").value;
+  const restaurantID = document.getElementById(
+    "restaurantSlotRestaurantID"
+  ).value;
   const startTime = document.getElementById("startTime").value;
   const endTime = document.getElementById("endTime").value;
   const capacity = document.getElementById("capacity").value;
 
-  // Basic validation
-  if (!startTime || !endTime || !capacity || (!slotID && !restaurantID)) {
-    alert("❌ Please fill in all required fields.");
-    return;
+  if (!restaurantID || !startTime || !endTime || !capacity) {
+    return alert("Please fill in all fields!");
   }
 
-  const formData = new FormData();
-  if (slotID) {
-    // Update
-    formData.append("slotID", slotID);
-    formData.append("startTime", startTime);
-    formData.append("endTime", endTime);
-    formData.append("capacity", capacity);
-  } else {
-    // Create
-    formData.append("restaurantID", restaurantID);
-    formData.append("startTime", startTime);
-    formData.append("endTime", endTime);
-    formData.append("capacity", capacity);
-  }
-
-  const url = slotID
-    ? "/api/admin/updateRestaurantSlot"
-    : "/api/admin/addRestaurantSlot";
-
-  fetch(url, { method: "POST", body: formData })
+  fetch("/api/admin/restaurant-slots/save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      slotID,
+      restaurantID,
+      startTime,
+      endTime,
+      capacity,
+    }),
+  })
     .then((res) => res.json())
     .then((data) => {
       if (data.success) {
         $("#restaurantSlotModal").modal("hide");
         loadRestaurantSlots();
       } else {
-        alert("❌ Error: " + data.message);
+        alert(data.message || "Error saving slot.");
       }
     })
-    .catch((err) => console.error("❌ Error saving slot:", err));
+    .catch((err) => console.error("❌ Save error:", err));
 }
 
-// Delete Slot
 function deleteRestaurantSlot(slotID) {
   if (!confirm("Are you sure you want to delete this slot?")) return;
-
-  fetch("/api/admin/deleteRestaurantSlot", {
-    method: "DELETE",
+  fetch("/api/admin/restaurant-slots/delete", {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ slotID }),
   })
@@ -1397,8 +1343,132 @@ function deleteRestaurantSlot(slotID) {
       if (data.success) {
         loadRestaurantSlots();
       } else {
-        alert("Error deleting slot: " + data.message);
+        alert(data.message || "Delete failed");
       }
     })
-    .catch((err) => console.error("❌ Error deleting slot", err));
+    .catch((err) => console.error("❌ Delete error:", err));
 }
+
+document.addEventListener("DOMContentLoaded", loadRestaurantSlots);
+
+/////////////////////////////////////////////////////////////////////////Ticket Type
+// ====== Load all Ticket Types ======
+
+document.addEventListener("DOMContentLoaded", function () {
+  loadTicketTypes();
+});
+function loadTicketTypes() {
+  fetch("/api/admin/tickettypes")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("🎯 TicketTypes loaded:", data);
+      const tbody = document.querySelector("#ticketTypeTable tbody");
+      tbody.innerHTML = "";
+      if (data.success) {
+        data.data.forEach((ticket) => {
+          tbody.innerHTML += `
+                      <tr>
+                          <td>${ticket.ticketTypeID}</td>
+                          <td>${ticket.location}</td>
+                          <td>${ticket.type}</td>
+                          <td>${ticket.price}</td>
+                          <td>
+                              <button class="btn btn-warning btn-sm" onclick="openTicketTypeModal(${ticket.ticketTypeID}, '${ticket.type}', ${ticket.price}, '${ticket.location}')">Edit</button>
+                              <button class="btn btn-danger btn-sm" onclick="deleteTicketType(${ticket.ticketTypeID})">Delete</button>
+                          </td>
+                      </tr>`;
+        });
+      } else {
+        tbody.innerHTML = `<tr><td colspan="5">Error loading ticket types.</td></tr>`;
+      }
+    })
+    .catch((err) => console.error("❌ Error:", err));
+}
+
+// ====== Populate Dance Dropdown ======
+function loadDanceOptions(selectedLocation = "") {
+  fetch("/api/admin/dances")
+    .then((res) => res.json())
+    .then((data) => {
+      const select = document.getElementById("danceID");
+      select.innerHTML = '<option value="">Select Location</option>';
+      if (data.success) {
+        data.data.forEach((dance) => {
+          const option = document.createElement("option");
+          option.value = dance.danceID;
+          option.textContent = dance.location;
+          if (dance.location === selectedLocation) option.selected = true;
+          select.appendChild(option);
+        });
+      } else {
+        select.innerHTML = "<option disabled>Error loading dances</option>";
+      }
+    })
+    .catch((err) => console.error("❌ Error:", err));
+}
+
+// ====== Open Modal (for both Add & Edit) ======
+function openTicketTypeModal(
+  ticketTypeID = "",
+  type = "",
+  price = "",
+  location = ""
+) {
+  document.getElementById("ticketTypeID").value = ticketTypeID;
+  document.getElementById("type").value = type;
+  document.getElementById("price").value = price;
+
+  loadDanceOptions(location); // Load dropdown and optionally select location
+
+  $("#ticketTypeModal").modal("show");
+}
+
+// ====== Save (Add or Update Automatically) ======
+function saveTicketType() {
+  const ticketTypeID = document.getElementById("ticketTypeID").value;
+  const danceID = document.getElementById("danceID").value;
+  const type = document.getElementById("type").value;
+  const price = document.getElementById("price").value;
+
+  if (!danceID || !type || !price) return alert("All fields are required!");
+
+  fetch("/api/admin/tickettypes/addOrUpdate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ticketTypeID, danceID, type, price }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("✅ Save Response:", data);
+      if (data.success) {
+        $("#ticketTypeModal").modal("hide");
+        loadTicketTypes();
+      } else {
+        alert(data.message || "Error occurred");
+      }
+    })
+    .catch((err) => console.error("❌ Error:", err));
+}
+
+// ====== Delete ======
+function deleteTicketType(ticketTypeID) {
+  if (!confirm("Are you sure you want to delete this ticket type?")) return;
+  fetch("/api/admin/tickettypes/delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ticketTypeID }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("🗑 Delete Response:", data);
+      if (data.success) {
+        loadTicketTypes();
+      } else {
+        alert(data.message || "Error occurred");
+      }
+    })
+    .catch((err) => console.error("❌ Error:", err));
+}
+
+// Auto load on page ready
+document.addEventListener("DOMContentLoaded", loadTicketTypes);

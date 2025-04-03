@@ -515,66 +515,92 @@ public function deleteRestaurant() {
 
 ///////////////////////////////////////////////////////////////////////Restaurant Slot
 
-    // Get All Slots
-    public function getRestaurantSlots() {
-        try {
-            echo json_encode($this->adminModel->getRestaurantSlots());
-        } catch (Exception $e) {
-            echo json_encode(["success" => false, "message" => $e->getMessage()]);
-        }
-    }
+public function getRestaurantSlots() {
+    return $this->adminModel->getRestaurantSlots();
+}
 
-    public function simpleRestaurants() {
-        try {
-            echo json_encode($this->adminModel->getAllRestaurantsSimple());
-        } catch (Exception $e) {
-            echo json_encode(["success" => false, "message" => $e->getMessage()]);
-        }
-    }
+public function getAllDropDownRestaurants() {
+    return $this->adminModel->getAllDropDownRestaurants();
+}
 
-    // Create
-public function createRestaurantSlot() {
+public function addOrUpdateRestaurantSlot() {
     try {
-        $data = $_POST;
-        if (empty($data['restaurantID']) || empty($data['startTime']) || empty($data['endTime']) || empty($data['capacity'])) {
-            throw new Exception("All fields are required.");
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (empty($data['slotID'])) {
+            // ADD MODE: Require all fields
+            if (!isset($data['restaurantID'], $data['startTime'], $data['endTime'], $data['capacity'])) {
+                throw new Exception("Missing required fields");
+            }
+
+            echo json_encode($this->adminModel->addRestaurantSlot(
+                $data['restaurantID'], $data['startTime'], $data['endTime'], $data['capacity']
+            ));
+        } else {
+            // EDIT MODE: Only allow updating time + capacity
+            if (!isset($data['slotID'], $data['startTime'], $data['endTime'], $data['capacity'])) {
+                throw new Exception("Missing fields for update");
+            }
+
+            echo json_encode($this->adminModel->updateRestaurantSlot(
+                $data['slotID'], $data['startTime'], $data['endTime'], $data['capacity']
+            ));
         }
-        echo json_encode($this->adminModel->createRestaurantSlot(
-            $data['restaurantID'],
-            $data['startTime'],
-            $data['endTime'],
-            $data['capacity']
-        ));
     } catch (Exception $e) {
         echo json_encode(["success" => false, "message" => $e->getMessage()]);
     }
 }
 
-// Update
-public function updateRestaurantSlot() {
-    try {
-        $data = $_POST;
-        if (empty($data['slotID'])) throw new Exception("Slot ID is required.");
-        echo json_encode($this->adminModel->updateRestaurantSlot(
-            $data['slotID'],
-            $data['startTime'],
-            $data['endTime'],
-            $data['capacity']
-        ));
-    } catch (Exception $e) {
-        echo json_encode(["success" => false, "message" => $e->getMessage()]);
-    }
-}
-
-// Delete
 public function deleteRestaurantSlot() {
     try {
         $data = json_decode(file_get_contents("php://input"), true);
-        if (!isset($data['slotID'])) throw new Exception("Slot ID is required.");
+        if (!isset($data['slotID'])) throw new Exception("Slot ID required");
         echo json_encode($this->adminModel->deleteRestaurantSlot($data['slotID']));
     } catch (Exception $e) {
         echo json_encode(["success" => false, "message" => $e->getMessage()]);
     }
+}
+
+//////////////////////////////////////////////////////////////Ticket Type
+
+// GET all ticket types
+public function getTicketTypes() {
+    echo json_encode($this->adminModel->getTicketTypes());
+}
+
+// ADD or UPDATE ticket type
+public function addOrUpdateTicketType() {
+    try {
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($data['danceID'], $data['type'], $data['price'])) {
+            throw new Exception("Missing required fields");
+        }
+
+        if (empty($data['ticketTypeID'])) {
+            echo json_encode($this->adminModel->addTicketType($data['danceID'], $data['type'], $data['price']));
+        } else {
+            echo json_encode($this->adminModel->updateTicketType($data['ticketTypeID'], $data['danceID'], $data['type'], $data['price']));
+        }
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+// DELETE ticket type
+public function deleteTicketType() {
+    try {
+        $data = json_decode(file_get_contents("php://input"), true);
+        if (!isset($data['ticketTypeID'])) throw new Exception("TicketTypeID is required");
+        echo json_encode($this->adminModel->deleteTicketType($data['ticketTypeID']));
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+}
+
+// GET all dances
+public function getDances() {
+    echo json_encode($this->adminModel->getDances());
 }
 }
 ?>

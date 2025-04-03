@@ -382,63 +382,113 @@ public function getRestaurantByID($id) {
 }
 
 ///////////////////////////////////////////////////////////////////Restaurant Slot
-// Get all Restaurant Slots with Restaurant Name
 public function getRestaurantSlots() {
     try {
-        $sql = "SELECT RS.slotID, RS.restaurantID, R.restaurantName, RS.startTime, RS.endTime, RS.capacity 
-                FROM RestaurantSlot RS
-                INNER JOIN Restaurant R ON RS.restaurantID = R.restaurantID";
-        $stmt = self::$pdo->query($sql);
+        $stmt = self::$pdo->query("SELECT rs.slotID, rs.startTime, rs.endTime, rs.capacity, r.restaurantName FROM RestaurantSlot rs JOIN Restaurant r ON rs.restaurantID = r.restaurantID");
         return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)];
     } catch (Exception $e) {
-        return ["success" => false, "message" => $e->getMessage()];
+        return ["success" => false, "message" => "Error fetching slots: " . $e->getMessage()];
     }
 }
 
-public function getAllRestaurantsSimple() {
+public function addRestaurantSlot($restaurantID, $startTime, $endTime, $capacity) {
+    try {
+        $stmt = self::$pdo->prepare("INSERT INTO RestaurantSlot (restaurantID, startTime, endTime, capacity) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$restaurantID, $startTime, $endTime, $capacity]);
+        return ["success" => true, "message" => "Slot added"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error adding slot: " . $e->getMessage()];
+    }
+}
+
+public function updateRestaurantSlot($slotID, $startTime, $endTime, $capacity) {
+    try {
+        $stmt = self::$pdo->prepare("UPDATE RestaurantSlot SET startTime = ?, endTime = ?, capacity = ? WHERE slotID = ?");
+        $stmt->execute([$startTime, $endTime, $capacity, $slotID]);
+        return ["success" => true, "message" => "Slot updated"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error updating slot: " . $e->getMessage()];
+    }
+}
+
+public function deleteRestaurantSlot($slotID) {
+    try {
+        $stmt = self::$pdo->prepare("DELETE FROM RestaurantSlot WHERE slotID = ?");
+        $stmt->execute([$slotID]);
+        return ["success" => true, "message" => "Slot deleted"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error deleting slot: " . $e->getMessage()];
+    }
+}
+
+public function getAllDropDownRestaurants() {
     try {
         $stmt = self::$pdo->query("SELECT restaurantID, restaurantName FROM Restaurant");
         return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)];
     } catch (Exception $e) {
-        return ["success" => false, "message" => $e->getMessage()];
+        return ["success" => false, "message" => "Error fetching restaurants: " . $e->getMessage()];
     }
 }
 
-// Create
-public function createRestaurantSlot($restaurantID, $startTime, $endTime, $capacity) {
+////////////////////////////////////////////////////////////////////Ticket Type
+
+// ----------- TICKET TYPE FUNCTIONS ------------
+
+// Get all ticket types with location (dance)
+public function getTicketTypes() {
     try {
-        $sql = "INSERT INTO RestaurantSlot (restaurantID, startTime, endTime, capacity) VALUES (?, ?, ?, ?)";
-        $stmt = self::$pdo->prepare($sql);
-        $stmt->execute([$restaurantID, $startTime, $endTime, $capacity]);
-        return ["success" => true];
+        $stmt = self::$pdo->query("SELECT t.ticketTypeID, d.location, t.type, t.price 
+                                   FROM TicketType t 
+                                   JOIN Dance d ON t.danceID = d.danceID");
+        return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)];
     } catch (Exception $e) {
-        return ["success" => false, "message" => $e->getMessage()];
+        return ["success" => false, "message" => "Error fetching ticket types: " . $e->getMessage()];
     }
 }
 
-// Update
-public function updateRestaurantSlot($slotID, $startTime, $endTime, $capacity) {
+// Add ticket type
+public function addTicketType($danceID, $type, $price) {
     try {
-        $sql = "UPDATE RestaurantSlot SET startTime=?, endTime=?, capacity=? WHERE slotID=?";
-        $stmt = self::$pdo->prepare($sql);
-        $stmt->execute([$startTime, $endTime, $capacity, $slotID]);
-        return ["success" => true, "message" => "Slot updated successfully"];
+        $stmt = self::$pdo->prepare("INSERT INTO TicketType (danceID, type, price) VALUES (?, ?, ?)");
+        $stmt->execute([$danceID, $type, $price]);
+        return ["success" => true, "message" => "Ticket type added"];
     } catch (Exception $e) {
-        return ["success" => false, "message" => $e->getMessage()];
+        return ["success" => false, "message" => "Error adding ticket type: " . $e->getMessage()];
     }
 }
 
-// Delete
-public function deleteRestaurantSlot($slotID) {
+// Update ticket type
+public function updateTicketType($ticketTypeID, $danceID, $type, $price) {
     try {
-        $sql = "DELETE FROM RestaurantSlot WHERE slotID=?";
-        $stmt = self::$pdo->prepare($sql);
-        $stmt->execute([$slotID]);
-        return ["success" => true];
+        $stmt = self::$pdo->prepare("UPDATE TicketType SET danceID = ?, type = ?, price = ? WHERE ticketTypeID = ?");
+        $stmt->execute([$danceID, $type, $price, $ticketTypeID]);
+        return ["success" => true, "message" => "Ticket type updated"];
     } catch (Exception $e) {
-        return ["success" => false, "message" => $e->getMessage()];
+        return ["success" => false, "message" => "Error updating ticket type: " . $e->getMessage()];
     }
 }
+
+// Delete ticket type
+public function deleteTicketType($ticketTypeID) {
+    try {
+        $stmt = self::$pdo->prepare("DELETE FROM TicketType WHERE ticketTypeID = ?");
+        $stmt->execute([$ticketTypeID]);
+        return ["success" => true, "message" => "Ticket type deleted"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error deleting ticket type: " . $e->getMessage()];
+    }
+}
+
+// Get all dances (for dropdown)
+public function getDances() {
+    try {
+        $stmt = self::$pdo->query("SELECT danceID, location FROM Dance");
+        return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error fetching dances: " . $e->getMessage()];
+    }
+}
+
 
 
 }

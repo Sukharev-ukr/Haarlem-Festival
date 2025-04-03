@@ -186,33 +186,44 @@ Route::add('/api/admin/deleteRestaurant', function() {
 }, 'DELETE'); // ✅ keep POST because you upload file
 
 //////////////////////////////////////////////////////////////////Restaurant Slot
-Route::add('/api/admin/restaurantSlots', function() {
+
+
+Route::add('/api/admin/restaurant-slots', function () use ($adminController) {
     header('Content-Type: application/json');
-    $controller = new AdminController();
-    $controller->getRestaurantSlots();
+    echo json_encode($adminController->getRestaurantSlots());
 }, 'GET');
 
-Route::add('/api/admin/addRestaurantSlot', function() {
+Route::add('/api/admin/restaurant-slots/restaurants', function () use ($adminController) {
     header('Content-Type: application/json');
-    $controller = new AdminController();
-    $controller->createRestaurantSlot();
-}, 'POST');
-
-Route::add('/api/admin/updateRestaurantSlot', function() {
-    header('Content-Type: application/json');
-    $controller = new AdminController();
-    $controller->updateRestaurantSlot();
-}, 'POST');
-
-Route::add('/api/admin/simpleRestaurants', function () {
-    (new AdminController())->simpleRestaurants();
+    echo json_encode($adminController->getAllDropDownRestaurants());
 }, 'GET');
 
-Route::add('/api/admin/deleteRestaurantSlot', function() {
+Route::add('/api/admin/restaurant-slots/save', function () use ($adminController) {
     header('Content-Type: application/json');
-    $controller = new AdminController();
-    $controller->deleteRestaurantSlot();
-}, 'DELETE');
+    $adminController->addOrUpdateRestaurantSlot();
+}, 'POST');
+
+Route::add('/api/admin/restaurant-slots/delete', function () use ($adminController) {
+    header('Content-Type: application/json');
+    $adminController->deleteRestaurantSlot();
+}, 'POST');
+
+//////////////////////////////////////////////////////////Ticket Type
+Route::add('/api/admin/tickettypes', function() {
+    (new AdminController())->getTicketTypes();
+}, 'GET');
+
+Route::add('/api/admin/tickettypes/addOrUpdate', function() {
+    (new AdminController())->addOrUpdateTicketType();
+}, 'POST');
+
+Route::add('/api/admin/tickettypes/delete', function() {
+    (new AdminController())->deleteTicketType();
+}, 'POST');
+
+Route::add('/api/admin/dances', function() {
+    (new AdminController())->getDances();
+}, 'GET');
 
 
 ?>
