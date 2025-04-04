@@ -10,7 +10,8 @@ class IndexController
 
     $restaurantController = new RestaurantController();
     $danceController = new DanceController();
-
+    
+    $artists = $danceController->getAllDanceArtists(); 
     $restaurants = $restaurantController->getAllRestaurants();
     $danceFriday = $danceController->getDanceAtFriday();
     $danceSaturday = $danceController->getDanceAtSaturday();

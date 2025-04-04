@@ -127,7 +127,7 @@ require(__DIR__ . '/../partials/header.php'); ?>
             </div>
         </div>
     </section>
-<<!-- DISCOVER DANCE SECTION -->
+<!-- DISCOVER DANCE SECTION -->
 <section class="discover-dance" style="background-color: #fff; color: #8B0000; padding: 60px 0;">
   <div class="container">
     <h2 style="font-size: 2rem; margin-bottom: 1rem;">
@@ -152,33 +152,29 @@ require(__DIR__ . '/../partials/header.php'); ?>
         </a>
       </div>
 
-      <!-- Right Image Grid -->
+      <!-- Right Image Grid (3 columns always) -->
       <div class="col-12 col-md-8">
-        <!-- 
-          Bootstrap row with auto-responsive columns:
-          row-cols-2 => 2 columns on XS,
-          row-cols-sm-3 => 3 columns on SM,
-          row-cols-md-4 => 4 columns on MD+ screens 
-        -->
-        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3">
-        <?php if (!empty($artists)): ?>
-  <?php foreach ($artists as $artist): ?>
-    <div class="col">
-      <div class="text-center">
-        <img class="img-fluid" 
-             src="/<?= htmlspecialchars($artist['artistImage']) ?>" 
-             alt="<?= htmlspecialchars($artist['artistName']) ?>">
-        <h5 class="mt-2" style="font-size: 1rem;">
-          <?= htmlspecialchars($artist['artistName']) ?>
-        </h5>
-      </div>
-    </div>
-  <?php endforeach; ?>
-<?php else: ?>
-  <div class="col-12">
-    <p>No artist images available.</p>
-  </div>
-<?php endif; ?>
+        <div class="row row-cols-3 g-3">
+          <?php if (!empty($artists)): ?>
+            <?php foreach ($artists as $artist): ?>
+              <div class="col">
+                <div class="text-center">
+                  <img 
+                    class="img-fluid" 
+                    src="/<?= htmlspecialchars($artist['artistImage']) ?>" 
+                    alt="<?= htmlspecialchars($artist['artistName']) ?>"
+                  >
+                  <h5 class="mt-2" style="font-size: 1rem;">
+                    <?= htmlspecialchars($artist['artistName']) ?>
+                  </h5>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="col-12">
+              <p>No artist images available.</p>
+            </div>
+          <?php endif; ?>
         </div>
       </div>
     </div>
