@@ -74,4 +74,54 @@ class PersonalProgramModel extends BaseModel
         $stmt->execute([$userID]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }      
+
+    // Create a new personal program for a user
+    public function createPersonalProgram($userID, $programName) {
+        $sql = "INSERT INTO PersonalProgram (userID, programName) VALUES (?, ?)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userID, $programName]);
+        
+        return $this->db->lastInsertId(); // Return the programID of the newly created personal program
+    }
+    public function createPersonalProgramItem($programID, $orderItem, $itemType) {
+        // Ensure sessionTime is valid
+        $validSessionTimes = ['Morning', 'Afternoon', 'Evening'];
+        $sessionTime = isset($orderItem['sessionTime']) && in_array($orderItem['sessionTime'], $validSessionTimes) 
+                        ? $orderItem['sessionTime'] 
+                        : null; // or 'Morning' as a default if applicable
+    
+        $sql = "INSERT INTO PersonalProgramItem (programID, orderItemID, itemType, sessionTime) 
+                VALUES (?, ?, ?, ?)";
+    
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            $programID,               // Personal program reference
+            $orderItem['orderItemID'], // The unique order item ID
+            $itemType,                // The type of item (Restaurant, Dance, History)
+            $sessionTime              // The session time for the item
+        ]);
+    }
+    
+    
+    
+
+    public function showPersonalProgram() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    
+        $userID = $_SESSION['user']['userID'] ?? null;
+        
+        if (!$userID) {
+            header("Location: /user/login");
+            exit;
+        }
+    
+        // Fetch program items for the logged-in user
+        $programItems = $this->getProgramItemsByUser($userID);
+    
+        // Pass the data to the view
+        require_once __DIR__ . '/../views/pages/personal-program.php';
+    }
+    
 }

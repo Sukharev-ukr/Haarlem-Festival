@@ -1,7 +1,7 @@
 <?php
 // routes/personalProgramRoute.php
 
-require_once __DIR__ . '/../controllers/PersonalProgramController.php';
+require_once __DIR__ . '/../controllers/personalProgramController.php';
 
 $controller = new PersonalProgramController();
 
