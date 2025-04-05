@@ -17,6 +17,10 @@ $userId = $_SESSION['user']['userID'];
 
 $cartController = new CartController();
 $cartItems = $cartController->getCartItems($userId);
+$unpaidOrderId = null;
+if (!empty($cartItems)) {
+    $unpaidOrderId = $cartItems[0]['orderID'] ?? null; // All items belong to the same unpaid order
+}
 $totalPrice = 0;
 ?>
 
@@ -98,7 +102,10 @@ $totalPrice = 0;
 
         <div class="total-section text-end mt-3">
             <h5>Total: <span id="total-price">€<?= number_format($totalPrice, 2) ?></span></h5>
-            <button class="btn btn-success">Pay for selected event</button>
+            <?php if ($unpaidOrderId): ?>
+                <a href="/payment?orderID=<?= $unpaidOrderId ?>" class="btn btn-success">Pay for selected event</a>
+            <?php endif; ?>
+
         </div>
     </div>
 </section>

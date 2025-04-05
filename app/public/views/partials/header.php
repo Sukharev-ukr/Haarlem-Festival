@@ -21,11 +21,13 @@
         "dance" => "dancePage.css",
         "history" => "historyPage.css",
         "magic" => "magicPage.css",
+        "payment" => "payment.css",
     ];
 
     // Get the current route (everything after the first `/`)
-    $currentRoute = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+    $currentRoute = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '.php');
 
+    echo "<!-- currentRoute = $currentRoute -->";
     // Find the right CSS file based on route mapping
     foreach ($cssMap as $route => $cssFile) {
         if (strpos($currentRoute, $route) !== false) {

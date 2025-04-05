@@ -1,0 +1,11 @@
+{
+    "require": {
+      "stripe/stripe-php": "16.6.0",
+      "phpmailer/phpmailer": "6.9.3"
+    },
+    "autoload": {
+      "psr-4": {
+        "App\\": "app/"
+      }
+    }
+  }
