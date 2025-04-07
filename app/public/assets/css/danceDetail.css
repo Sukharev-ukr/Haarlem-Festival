@@ -36,96 +36,158 @@
   color: #fff;
 }
 
-/* Ticket Info Section */
+/* ========== Ticket Info Section ========== */
 .ticket-info {
-  background-color: #f9f9f9;
-  border-left: 5px solid #ff8200; /* Orange Accent Line */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+  background: linear-gradient(145deg, #ffffff, #f5f5f5); /* subtle gradient */
+  border-left: 5px solid #ff8200; /* orange accent */
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+  color: #333;
+  font-size: 15px;
+}
+
+.ticket-info:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* ========== Headings ========== */
+.ticket-info h4 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #002d72;
+  margin-bottom: 16px;
+}
+
+/* ========== Ticket Info Text ========== */
+.ticket-info p {
+  margin-bottom: 10px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ========== Icons ========== */
+.ticket-info i {
+  margin-right: 8px;
+  font-size: 15px;
+}
+
+/* ========== Ticket Price Highlight ========== */
+.ticket-info h5 {
+  color: #198754; /* green */
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 18px;
+}
+
+/* ========== CTA Button (Unchanged HTML) ========== */
+.ticket-info .btn-warning {
+  background-color: #ff8200;
+  border: none;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 25px;
+  transition: background-color 0.3s;
+}
+
+.ticket-info .btn-warning:hover {
+  background-color: #e67300;
+  color: #fff;
 }
 
 /* Artist Card Section */
+/* ========== Artist Card Section ========== */
 .artist-card {
-  background-color: #fff;
-  border-left: 5px solid #002d72; /* Dark Blue Accent Line */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+  background-color: #ffffff;
+  border-left: 5px solid #002d72;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin-bottom: 30px;
 }
 
-/* Artist Image Styling */
+.artist-card:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* ========== Artist Image Styling ========== */
 .artist-image {
   max-width: 100%;
-  max-height: 300px;
+  max-height: 280px;
   object-fit: cover;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
-/* Style Frame */
-.style-frame {
-  background-color: #002d72; /* Dark Blue Background for Style */
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: #fff;
-  display: inline-block;
-  margin-bottom: 10px;
+/* ========== Flag Styling ========== */
+.flag-icon {
+  width: 28px;
+  height: 18px;
+  margin-left: 10px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* Country Badge */
-.country-badge {
-  background-color: #ff8200; /* Orange Background */
-  color: #fff;
-  border-radius: 20px;
-  padding: 2px 10px;
-  display: inline-block;
-  margin-left: 5px;
+/* ========== Description Styling ========== */
+.artist-description {
+  line-height: 1.6;
+  color: #444;
+  margin-top: 5px;
 }
 
-/* Headings and Text Colors */
+/* ========== Album List ========== */
+ul {
+  list-style-type: disc;
+  padding-left: 22px;
+  color: #002d72;
+  margin-bottom: 0;
+  font-size: 15px;
+}
+
+ul li {
+  margin-bottom: 5px;
+}
+
+/* ========== Headings and Text Colors ========== */
 h3.text-warning,
 .ticket-info h4 {
-  color: #ff8200; /* Orange */
+  color: #ff8200;
 }
 
 h2.text-center.mb-4 {
-  color: #002d72; /* Dark Blue */
+  color: #002d72;
 }
 
-h5 {
-  color: #002d72; /* Dark Blue */
-}
-
+h5,
 strong {
-  color: #002d72; /* Dark Blue */
+  color: #002d72;
 }
 
-/* Button Styling */
-.btn-warning {
-  background-color: #ff8200;
-  border: none;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.text-warning {
+  color: #ff8200;
 }
 
-.btn-warning:hover {
-  background-color: #e67300;
+.text-darkblue {
+  color: darkblue;
 }
 
-.btn-outline-danger,
-.btn-outline-success {
-  border-radius: 20px;
-  padding: 5px 15px;
+/* ========== Social Icons & Buttons ========== */
+.social-icons .btn {
+  border-radius: 25px;
+  padding: 6px 20px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.social-icons i {
   margin-right: 5px;
-  transition: background-color 0.3s, color 0.3s;
 }
 
 .btn-outline-danger {
-  border-color: #e63946; /* Red */
+  border-color: #e63946;
   color: #e63946;
 }
 
@@ -135,7 +197,7 @@ strong {
 }
 
 .btn-outline-success {
-  border-color: #2a9d8f; /* Dark Green */
+  border-color: #2a9d8f;
   color: #2a9d8f;
 }
 
@@ -144,69 +206,24 @@ strong {
   color: #fff;
 }
 
-/* YouTube and Spotify Icons */
-.social-icons i {
-  margin-right: 5px;
-}
-
-/* List and Link Styles */
-ul {
-  list-style-type: disc;
-  padding-left: 20px;
-  color: #002d72; /* Dark Blue */
-}
-
-a {
-  text-decoration: none;
-  color: #002d72;
-}
-
-a:hover {
-  color: #ff8200; /* Orange */
-}
-
-/* Box Shadow for Panels */
-.ticket-info,
-.artist-card {
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-}
-
-/* Accent Line Under Headings */
+/* ========== Accent Under Headings ========== */
 h2.text-center.mb-4:after {
   content: "";
   display: block;
   width: 50px;
   height: 3px;
-  background-color: #ff8200; /* Orange */
+  background-color: #ff8200;
   margin: 10px auto;
 }
 
-/* Box Shadow for Panels -------------------------------*/
-.artist-card {
-  background-color: #f9f9f9;
-  border: 2px solid darkblue;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+/* ========== Responsive Layout ========== */
+@media (max-width: 768px) {
+  .artist-card .row {
+    flex-direction: column;
+    text-align: center;
+  }
 
-.artist-image {
-  border: 3px solid darkblue;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.btn-warning {
-  background-color: #ff8200;
-  border: none;
-}
-
-.btn-warning:hover {
-  background-color: #e67300;
-}
-
-.text-warning {
-  color: #ff8200;
-}
-
-.text-darkblue {
-  color: darkblue;
+  .artist-card .col-md-8 {
+    margin-top: 20px;
+  }
 }
