@@ -9,54 +9,20 @@ class DanceController {
         $this->danceModel = new DanceModel();
     }
 
-    public function getDanceAtFriday() {
+    public function getDancesByDate($date) {
         try {
-            $details = $this->danceModel->getDanceAtFriday();
-              if ($details) {
-                  return $details;
-             } else {
-                    echo "No details found for dance at Friday";
-             }
-            } catch (PDOException $e) {
-                // Log the error if needed and show a user-friendly message
-                error_log("Database Error: " . $e->getMessage());
-                echo "An error occurred while fetching dance details. Please try again later.";
+            $details = $this->danceModel->getDanceByDate($date);
+            if ($details) {
+                return $details;
+            } else {
+                echo "No dance events found for: $date";
             }
-        
-    }
-
-
-    public function getDanceAtSaturday() {
-        try {
-         $details = $this->danceModel->getDanceAtSaturday();
-         if ($details) {
-            return $details;    
-         }else {
-            echo "No details found for dance at Friday";
-         }
-        }
-        catch (PDOException $ex) {
-             // Log the error if needed and show a user-friendly message
-             error_log("Database Error: " . $ex->getMessage());
-             echo "An error occurred while fetching dance details. Please try again later.";
-        }
-    }
-
-    public function getDanceAtSunday() {
-        try {
-           $detail = $this-> danceModel -> getDanceAtSunday();
-           if ($detail) {
-            return $detail;
-           } else {
-            echo "No details found for dance at Sunday";
-           }
-        }
-        catch (PDOException $ex) {
-            // Log the error if needed and show a user-friendly message
-            error_log("Database Error: " . $ex->getMessage());
+        } catch (PDOException $e) {
+            error_log("Database Error: " . $e->getMessage());
             echo "An error occurred while fetching dance details. Please try again later.";
         }
     }
+    
 
     public function getDanceAndArtistByArtistID($danceID) {
         try {
