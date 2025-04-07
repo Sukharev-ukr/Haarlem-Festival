@@ -127,9 +127,10 @@
         $stmt = self::$pdo->prepare($sql);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-        var_dump($results); // Debug
-        die();
+        
+        // Debug: output the results
+        
+        // die();  // Remove or comment this out after debugging
     
         return $results;
     }

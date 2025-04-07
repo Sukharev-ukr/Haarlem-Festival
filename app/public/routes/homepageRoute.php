@@ -5,7 +5,8 @@ require_once __DIR__ . '/../controllers/DanceController.php';
 $restaurantController = new RestaurantController();
 $danceController = new DanceController();
 
-$restaurants = $restaurantController->getAllRestaurants(); // Make sure this works
+$diningRestaurants = $restaurantController->getAllDiningRestaurants();
+$restaurants = $restaurantController->getAllRestaurants();
 $artists = $danceController->getAllDanceArtists();
 $danceFriday = $danceController->getDanceAtFriday();
 $danceSaturday = $danceController->getDanceAtSaturday();
