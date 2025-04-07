@@ -37,6 +37,11 @@ class RestaurantController {
     public function showRestaurantDetails($restaurantID) {
         return $this->model->getRestaurantByID($restaurantID);
     }
+    public function getAllDiningRestaurants()
+{
+    // Assuming $this->model is an instance of RestaurantModel
+    return $this->model->getRestaurantsWithPicture();
+}
     
     
 }

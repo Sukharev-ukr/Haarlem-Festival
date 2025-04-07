@@ -14,67 +14,112 @@ if (!isset($_SESSION['user'])) {
 $userId = $_SESSION['user']['userID'];
 
 require(__DIR__ . '/../partials/header.php'); ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Haarlem Festival</title>
+  
 
-<main>
-    <!-- =========================
-         HERO / TIMER SECTION
-    ========================== -->
-    <section class="hero-section">
-        <div class="hero-container">
-            <h1 class="hero-title">THE FESTIVAL IS COMING!</h1>
-            <!-- Real Countdown Timer -->
-            <div id="countdown-container">
-                <span id="days">245</span> :
-                <span id="hours">06</span> :
-                <span id="minutes">38</span> :
-                <span id="seconds">59</span>
-            </div>
-            <div id="timer-labels">
-                Days &nbsp;&nbsp;|&nbsp;&nbsp; hours &nbsp;&nbsp;|&nbsp;&nbsp; minutes &nbsp;&nbsp;|&nbsp;&nbsp; seconds
-            </div>
-            <p class="hero-description">
-                Experience the vibrant spirit of Haarlem in an unforgettable 4-day celebration 
-                of music, culture, food, and history.
-            </p>
-            <a href="#" class="btn-primary">Join waiting list</a>
-        </div>
-    </section>
+  <!-- Defer ensures JS runs after the DOM is loaded -->
+  <script src="/assets/js/homepage.js" defer></script>
+</head>
+<body>
 
-    <!-- =========================
-         DISCOVER DINING SECTION
-         (Unchanged for now)
-    ========================== -->
-    <section style="background-color: #fff; color: #000; padding: 60px 0;">
-        <div style="max-width: 1200px; margin: 0 auto;">
-            <h2 style="color: #8B0000; font-size: 2rem; margin-bottom: 1rem;">
-                Discover dining
-            </h2>
-            <h3 style="margin-bottom: 1rem;">"Indulge in Haarlem’s Culinary Delights"</h3>
-            <p style="max-width: 800px; margin-bottom: 1rem;">
-                Dive into a world of flavor at the Haarlem Festival, where food brings the city’s vibrant culture to life. 
-                From traditional Dutch delicacies to international cuisines, our dining experiences showcase the best Haarlem has to offer.
-            </p>
-            <p style="max-width: 800px; margin-bottom: 1rem;">
-                Explore cozy cafes, bustling markets, and family-owned eateries, each with its own story to tell. 
-                Designed for everyone—whether you’re a passionate foodie, a family looking for a great meal, 
-                or someone with dietary preferences—our festival ensures an inclusive and unforgettable dining journey.
-            </p>
-            <p style="max-width: 800px; margin-bottom: 2rem;">
-                Taste the spirit of Haarlem.
-            </p>
-            <a href="#" style="background-color: #8B0000; color: #fff; padding: 0.5rem 1rem; text-decoration: none;">
-                Learn more
-            </a>
-            <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 2rem;">
-                <img src="/assets/images/dining1.jpg" alt="Dish 1" style="width: 200px;">
-                <img src="/assets/images/dining2.jpg" alt="Dish 2" style="width: 200px;">
-                <img src="/assets/images/dining3.jpg" alt="Dish 3" style="width: 200px;">
-                <img src="/assets/images/dining4.jpg" alt="Dish 4" style="width: 200px;">
-                <img src="/assets/images/dining5.jpg" alt="Dish 5" style="width: 200px;">
-                <img src="/assets/images/dining6.jpg" alt="Dish 6" style="width: 200px;">
+  <!-- HERO / TIMER SECTION -->
+  <section class="hero-section" style="background-color: #8B0000; color: #fff; text-align: center; padding: 100px 0;">
+    <div class="hero-container" style="max-width: 1200px; margin: 0 auto; padding: 0 15px;">
+      <h1 class="hero-title" style="font-size: 3rem; font-weight: bold; margin-bottom: 1rem;">
+        THE FESTIVAL IS COMING!
+      </h1>
+
+      <!-- The container that your JS updates if the festival has started -->
+      <div id="countdown" style="font-size: 2.5rem; margin-bottom: 0.5rem;">
+        <span id="days">245</span> :
+        <span id="hours">06</span> :
+        <span id="minutes">38</span> :
+        <span id="seconds">59</span>
+      </div>
+      <div id="timer-labels" style="font-size: 1.2rem; margin-bottom: 2rem;">
+        Days &nbsp;|&nbsp; hours &nbsp;|&nbsp; minutes &nbsp;|&nbsp; seconds
+      </div>
+
+      <p class="hero-description" style="font-size: 1.2rem; max-width: 600px; margin: 0 auto 2rem; line-height: 1.5;">
+        Experience the vibrant spirit of Haarlem in an unforgettable 4-day celebration 
+        of music, culture, food, and history.
+      </p>
+      <a href="#" class="btn-primary" 
+         style="display: inline-block; padding: 0.75rem 1.5rem; background-color: #fff; color: #8B0000; text-decoration: none; font-weight: bold; border-radius: 4px;">
+        Join waiting list
+      </a>
+    </div>
+  </section>
+
+</body>
+</html>
+
+    <!-- DISCOVER DINING SECTION -->
+    <!-- DISCOVER DINING SECTION -->
+<!-- DISCOVER DINING SECTION -->
+<section class="discover-dining" style="background-color: #fff; color: #000; padding: 60px 0;">
+  <div class="container">
+    <div class="row">
+      
+      <!-- Left column (Text) -->
+      <div class="col-md-6">
+        <h2 style="color: #8B0000; font-size: 2rem; margin-bottom: 1rem;">
+          Discover dining
+        </h2>
+        <h3 style="margin-bottom: 1rem;">"Indulge in Haarlem’s Culinary Delights"</h3>
+        <p style="max-width: 800px; margin-bottom: 1rem;">
+          Dive into a world of flavor at the Haarlem Festival, where food brings the city’s vibrant culture to life.
+          From traditional Dutch delicacies to international cuisines, our dining experiences showcase the best Haarlem has to offer.
+        </p>
+        <p style="max-width: 800px; margin-bottom: 2rem;">
+          Explore cozy cafes, bustling markets, and family-owned eateries, each with its own story to tell. 
+          Designed for everyone—whether you’re a passionate foodie, a family looking for a great meal, 
+          or someone with dietary preferences—our festival ensures an inclusive and unforgettable dining journey.
+        </p>
+        <p style="max-width: 800px; margin-bottom: 2rem;">
+          Taste the spirit of Haarlem.
+        </p>
+        <a href="#" style="background-color: #8B0000; color: #fff; padding: 0.5rem 1rem; text-decoration: none;">
+          Learn more
+        </a>
+      </div>
+      
+      <!-- Right column (3×3 image grid, no text under images) -->
+      <div class="col-md-6">
+        <?php
+          // If you want EXACTLY 9 images, slice the array:
+          $diningPics = array_slice($diningRestaurants ?? [], 0, 6);
+        ?>
+        <div class="row row-cols-3 g-3 mt-4">
+          <?php if (!empty($diningPics)): ?>
+            <?php foreach ($diningPics as $r): ?>
+              <div class="col text-center">
+                <div style="width: 200px; height: 200px; margin: 0 auto; overflow: hidden;">
+                  <img 
+                    src="<?= htmlspecialchars($r['restaurantPicture'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
+                    alt="Dining picture"
+                    style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                  >
+                </div>
+              </div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="col-12">
+              <p>No dining images available.</p>
             </div>
+          <?php endif; ?>
         </div>
-    </section>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
 
     <!-- =========================
          MAP OF THE RESTAURANTS SECTION
@@ -282,68 +327,68 @@ require(__DIR__ . '/../partials/header.php'); ?>
 
     
 
-    <!-- =========================
-         MAP OF THE DANCE SECTION (Additional)
-         (if any more sections needed, add here)
-    ========================== -->
+    <!-- DISCOVER THE SECRET SECTION -->
+<!-- DISCOVER THE SECRET SECTION -->
+<section style="background-color: #fff; color: #000; padding: 60px 0;">
+  <div class="container" 
+       style="max-width: 1200px; 
+              margin: 0 auto; 
+              display: flex; 
+              align-items: center; 
+              gap: 40px; 
+              flex-wrap: wrap;">
 
-    <!-- =========================
-         DISCOVER THE SECRET SECTION
-         (Unchanged)
-    ========================== -->
-    <section style="background-color: #fff; color: #000; padding: 60px 0;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 40px; flex-wrap: wrap;">
-            <div style="flex: 1 1 400px; text-align: center;">
-                <img src="/assets/images/professor-teyler-app.png" alt="Professor Teyler App" style="max-width: 200px;">
-            </div>
-            <div style="flex: 1 1 400px;">
-                <h2 style="color: #8B0000; margin-bottom: 1rem;">Discover the secret <br>of professor Teyler</h2>
-                <p>
-                    An exciting app that brings a world of creativity and entertainment to kids. 
-                    Dive into interactive games, explore creative workshops, and embark on thrilling challenges. 
-                    The Festival app is designed to ignite the imagination and keep kids engaged for hours.
-                </p>
-                <p>
-                    <strong>The Lorentz Formula</strong><br>
-                    A Theatrical Tour of the Lorentz Lab
-                </p>
-                <a href="#" style="background-color: #8B0000; color: #fff; padding: 0.5rem 1rem; text-decoration: none;">Check the date</a>
-            </div>
-        </div>
-    </section>
+    <!-- Left Column: Big image -->
+    <div style="flex: 1 1 400px; text-align: center;">
+      <!-- Update the path to the actual DB field or direct path 
+           If your DB has, e.g., /assets/img/lorentz/phone.jpg, then use that here -->
+      <img src="/assets/img/lorentz/phone.jpg" 
+           alt="Professor Teyler App" 
+           style="max-width: 300px; 
+                  width: 100%; 
+                  height: auto;">
+    </div>
+
+    <!-- Right Column: Text and buttons -->
+    <div style="flex: 1 1 400px;">
+      <h2 style="color: #8B0000; margin-bottom: 1rem; font-size: 2rem;">
+        Discover the secret 
+        <br>
+        of professor Teyler
+      </h2>
+      <p style="margin-bottom: 1.5rem; font-size: 1rem; line-height: 1.5;">
+        An exciting app that brings a world of creativity and entertainment to kids.
+        Dive into interactive games, explore creative workshops, and embark on thrilling challenges. 
+        The Festival app is designed to ignite the imagination and keep kids engaged for hours.
+      </p>
+
+      <p style="font-weight: bold; margin-bottom: 0.5rem; font-size: 1.2rem;">
+        The Lorentz Formula
+      </p>
+      <p style="font-style: italic; margin-bottom: 2rem;">A Theatrical Tour of the Lorentz Lab</p>
+
+      <!-- App Store icons (optional) -->
+      <div style="margin-bottom: 1.5rem;">
+        <!-- <img src="/assets/img/appstore.png" alt="App Store" style="width: 120px; margin-right: 1rem;">
+        <img src="/assets/img/googleplay.png" alt="Google Play" style="width: 120px;"> -->
+      </div>
+
+      <a href="#" style="background-color: #8B0000; 
+                         color: #fff; 
+                         padding: 0.5rem 1rem; 
+                         text-decoration: none; 
+                         border-radius: 4px;">
+        Check the date
+      </a>
+    </div>
+
+  </div>
+</section>
+
 
 </main>
 
 
-<!-- Real-time countdown script -->
-<script>
-  // Adjust the festival date/time below:
-  const festivalDate = new Date("July 24, 2025 10:00:00").getTime();
 
-  // Update every second
-  const timer = setInterval(function() {
-    const now = new Date().getTime();
-    const distance = festivalDate - now;
-
-    if (distance < 0) {
-      clearInterval(timer);
-      document.getElementById("countdown-container").textContent = "The festival has started!";
-      document.getElementById("timer-labels").textContent = "";
-      return;
-    }
-
-    // Calculate days, hours, minutes, seconds
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    // Update the page
-    document.getElementById("days").textContent = days;
-    document.getElementById("hours").textContent = hours;
-    document.getElementById("minutes").textContent = minutes;
-    document.getElementById("seconds").textContent = seconds;
-  }, 1000);
-</script>
 
 <?php require(__DIR__ . '/../partials/footer.php'); ?>

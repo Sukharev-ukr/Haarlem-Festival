@@ -2,7 +2,7 @@
 // app/controllers/UserController.php
 
 require_once __DIR__ . '/../models/UserModel.php';
-require_once __DIR__ . '/../lib/mailer.php'; // Include our mailer helper
+require_once __DIR__ . '/../lib/mailer.php'; 
 
 class UserController
 {
