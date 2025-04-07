@@ -228,11 +228,16 @@ public function loginPost()
     $userModel = new UserModel();
     $user = $userModel->findByEmail($email);
     if ($user && password_verify($password, $user['password'])) {
-        // Login successful: set session variables
+        // Login successful: store user in session
         $_SESSION['user'] = $user;
-        // Redirect to homepage after login
-        header("Location: /");
-        exit;
+        // Check the user role: if Admin, redirect to admin dashboard
+        if (isset($user['role']) && $user['role'] === 'Admin') {
+            header("Location: /adminDashBoard");
+            exit;
+        } else {
+            header("Location: /");  // Redirect regular user to home page
+            exit;
+        }
     } else {
         $error = "Invalid credentials.";
         require_once __DIR__ . '/../views/user/login.php';
