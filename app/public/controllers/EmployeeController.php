@@ -23,4 +23,13 @@ class EmployeeController {
         return ['success' => true, 'message' => 'Ticket validated successfully.'];
     }
 
+    public function getDanceTickets($username = null) {
+        return $this->employeeModel->getDanceTickets($username);
+    }
+    
+    public function updateTicketStatus($danceTicketID, $status) {
+        return $this->employeeModel->updateTicketStatus($danceTicketID, $status);
+    }
+    
+
 }
