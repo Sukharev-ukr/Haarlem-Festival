@@ -16,9 +16,10 @@ class IndexController
     $artists = $danceController->getAllDanceArtists(); 
     $diningRestaurants = $restaurantController->getAllDiningRestaurants();
     $restaurants = $restaurantController->getAllRestaurants();
-    $danceFriday = $danceController->getDanceAtFriday();
-    $danceSaturday = $danceController->getDanceAtSaturday();
-    $danceSunday = $danceController->getDanceAtSunday();
+    $danceFriday   = $danceController->getDancesByDate('2025-07-25');
+    $danceSaturday = $danceController->getDancesByDate('2025-07-26');
+    $danceSunday   = $danceController->getDancesByDate('2025-07-27');
+
 
     require_once __DIR__ . '/../views/pages/home.php';
 }
