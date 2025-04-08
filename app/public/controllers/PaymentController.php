@@ -73,7 +73,7 @@ class PaymentController {
                             'product_data' => [
                                 'name' => 'Order #' . $order['orderID'],
                             ],
-                            'unit_amount' => $totalWithVat * 100, // Convert to cents
+                            'unit_amount' => intval(round($totalWithVat * 100)), // Convert to cents
                         ],
                         'quantity' => 1,
                     ],
