@@ -98,67 +98,116 @@ class PaymentController {
         $this->handlePaymentSuccess();
     }
     
-    public function handlePaymentSuccess() {
-        // Fetch user data from session
+    private function getAuthenticatedUserID() {
         $userID = $_SESSION['user']['userID'] ?? null;
-    
         if (!$userID) {
             die("User not logged in.");
         }
+        return $userID;
+    }
     
-        // Fetch order data and items
-        $orderID = $_SESSION['order']['orderID']; // Assuming it's stored in session
+    private function createPersonalProgram($userID, $orderID) {
+        $programName = "Order #$orderID";
+        return $this->personalProgramModel->createPersonalProgram($userID, $programName);
+    }
+    
+    private function processOrderItems($orderItems, $programID) {
+        foreach ($orderItems as $item) {
+            $itemType = $this->determineItemType($item['bookingType']);
+            $this->personalProgramModel->createPersonalProgramItem($programID, $item, $itemType);
+    
+            if ($itemType === 'Restaurant') {
+                $this->adjustSlotCapacity($item);
+            }
+        }
+    }
+    
+    private function determineItemType($bookingType) {
+        switch ($bookingType) {
+            case 'Restaurant': return 'Restaurant';
+            case 'Dance': return 'Dance';
+            case 'History': return 'History';
+            default: return 'Unknown';
+        }
+    }
+    
+    private function adjustSlotCapacity($item) {
+        $totalGuests = (int)$item['amountAdults'] + (int)$item['amountChildren'];
+        $slotID = $item['slotID'] ?? null;
+    
+        if ($slotID && $totalGuests > 0) {
+            $stmt = $this->model->getDB()->prepare("
+                UPDATE RestaurantSlot
+                SET capacity = capacity - :guests
+                WHERE slotID = :slotID AND capacity >= :guests
+            ");
+            $stmt->execute([
+                'guests' => $totalGuests,
+                'slotID' => $slotID
+            ]);
+        }
+    }
+
+    private function sendInvoiceAndTickets($userID, $orderID, $orderItems) {
+        require_once __DIR__ . '/../lib/pdfGenerator.php';
+        require_once __DIR__ . '/../lib/mailer.php';
+    
+        // You might have a user model or method to fetch user info
+        $userInfo = $this->model->getUserByID($userID); // You may need to implement this in PaymentModel
+    
+        $invoicePath = __DIR__ . "/../assets/invoice/invoice_$orderID.pdf";
+
+        $invoiceItems = [];
+
+        foreach ($orderItems as $item) {
+            $description = $item['bookingType'] . ' - ';
+
+            if ($item['bookingType'] === 'Restaurant') {
+                $description .= $item['restaurantName'] ?? 'Restaurant Reservation';
+            } elseif ($item['bookingType'] === 'Dance') {
+                $description .= $item['artistName'] ?? 'Dance Event';
+            } elseif ($item['bookingType'] === 'History') {
+                $description .= 'History Tour';
+            } else {
+                $description .= 'Item';
+            }
+
+            $invoiceItems[] = [
+                'description' => $description,
+                'price' => $item['itemPrice'] ?? 0
+            ];
+        }
+        generateInvoicePDF($orderID, $userInfo['username'], $invoiceItems, $invoicePath);
+
+        // You can also generate ticket PDFs here if needed
+        $ticketPaths = []; // Optional for now
+    
+        sendEmailAndTickets($userInfo['username'], $userInfo['email'], $invoicePath, $ticketPaths);
+    }
+    
+
+    public function handlePaymentSuccess() {
+        $userID = $this->getAuthenticatedUserID();
+        $orderID = $_SESSION['order']['orderID'] ?? null;
+    
+        if (!$orderID) {
+            die("Order ID not found.");
+        }
+    
         $cartModel = new CartModel();
-        $orderItems = $cartModel->getCartItemsByOrderID($orderID); // Get all order items for this order
+        $orderItems = $cartModel->getCartItemsByOrderID($orderID);
     
         if (!$orderItems) {
             die("No order items found for this order.");
         }
     
-        // Step 1: Create a new entry in PersonalProgram table
-        $programName = "Order #$orderID"; // Program name can be based on the order ID
-        $programID = $this->personalProgramModel->createPersonalProgram($userID, $programName); // Save it and get the program ID
-    
-        // Step 2: Loop through order items and insert into PersonalProgramItem table
-        foreach ($orderItems as $item) {
-            // Determine itemType based on bookingType
-            $itemType = '';
-            if ($item['bookingType'] === 'Restaurant') {
-                $itemType = 'Restaurant';
-            } elseif ($item['bookingType'] === 'Dance') {
-                $itemType = 'Dance';
-            } elseif ($item['bookingType'] === 'History') {
-                $itemType = 'History';
-            }
-    
-            // Save the program item with the correct itemType
-            $this->personalProgramModel->createPersonalProgramItem($programID, $item, $itemType);
-
-            // CHANGE CAPACITY
-            if ($item['bookingType'] === 'Restaurant') {
-                // Get how many seats were reserved
-                $totalGuests = (int)$item['amountAdults'] + (int)$item['amountChildren'];
-                $slotID = $item['slotID'] ?? null; // You need to make sure this is available in $item
-            
-                if ($slotID && $totalGuests > 0) {
-                    $stmt = $this->model->getDB()->prepare("
-                        UPDATE RestaurantSlot
-                        SET capacity = capacity - :guests
-                        WHERE slotID = :slotID AND capacity >= :guests
-                    ");
-                    $stmt->execute([
-                        'guests' => $totalGuests,
-                        'slotID' => $slotID
-                    ]);
-                }
-            }
-        }
-        
-        // Optional Step 3: Update order status to "paid" if necessary
+        $programID = $this->createPersonalProgram($userID, $orderID);
+        $this->processOrderItems($orderItems, $programID);
         $this->model->updateOrderStatusToPaid($orderID);
+        $this->sendInvoiceAndTickets($userID, $orderID, $orderItems);
     
-        // Step 4: Redirect to the personal program page
-        header("Location: /personal-program"); // Redirect to the user's personal program page
+        header("Location: /personal-program");
         exit();
-    }    
+    }
+    
 }

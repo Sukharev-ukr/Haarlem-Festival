@@ -117,7 +117,7 @@ class CartModel extends BaseModel {
 
                 -- Dance Ticket Joins
                 LEFT JOIN DanceTicketOrder DTO ON DTO.orderItemID = OI.orderItemID
-                LEFT JOIN DanceTicket DT ON DT.danceTicketID = DTO.danceTicketOrderID
+                LEFT JOIN DanceTicket DT ON DT.danceTicketOrderID = DTO.danceTicketOrderID
                 LEFT JOIN TicketType TT ON TT.ticketTypeID = DT.ticketTypeID
                 LEFT JOIN Dance D ON D.danceID = TT.danceID
                 LEFT JOIN DanceArtist DA ON DA.danceID = D.danceID
@@ -162,7 +162,7 @@ class CartModel extends BaseModel {
     
             -- Dance Ticket Joins
             LEFT JOIN DanceTicketOrder DTO ON DTO.orderItemID = OI.orderItemID
-            LEFT JOIN DanceTicket DT ON DT.danceTicketID = DTO.danceTicketOrderID
+            LEFT JOIN DanceTicket DT ON DT.danceTicketOrderID = DTO.danceTicketOrderID
             LEFT JOIN TicketType TT ON TT.ticketTypeID = DT.ticketTypeID
             LEFT JOIN Dance D ON D.danceID = TT.danceID
             LEFT JOIN DanceArtist DA ON DA.danceID = D.danceID

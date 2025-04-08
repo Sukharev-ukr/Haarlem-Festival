@@ -57,8 +57,17 @@ require_once(__DIR__ . ("../../models/CartModel.php"));
 
     //Get order in shopping cart
     public function getCartItems($userId) {
-        return $this->cartModel->getCartItems($userId);
+        $cartItems = $this->cartModel->getCartItems($userId);
+    
+        foreach ($cartItems as &$item) {
+            if (empty($item['danceDate']) && empty($item['sessionDate']) && empty($item['reservationDate'])) {
+                $item['reservationDate'] = date('Y-m-d');
+            }
+        }
+        unset($item); // clear reference
+        return $cartItems;
     }
+    
     
     //Remove order in shopping cart
     public function removeItem($orderItemId) {
