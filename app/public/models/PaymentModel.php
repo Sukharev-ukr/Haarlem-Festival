@@ -37,4 +37,10 @@ class PaymentModel extends BaseModel {
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$orderID]);
     }
+
+    public function getUserByID($userID) {
+        $stmt = $this->getDB()->prepare("SELECT username, email FROM User WHERE userID = ?");
+        $stmt->execute([$userID]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }

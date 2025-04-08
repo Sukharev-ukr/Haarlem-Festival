@@ -16,14 +16,24 @@
               <strong>Location:</strong> <?= htmlspecialchars($item['restaurantAddress'] ?? 'N/A') ?><br>
               <strong>Date:</strong> <?= htmlspecialchars($item['reservationDate'] ?? 'N/A') ?><br>
               <strong>Time:</strong> <?= htmlspecialchars($item['restaurantStartTime'] ?? 'N/A') ?> - <?= htmlspecialchars($item['restaurantEndTime'] ?? 'N/A') ?>
-              <br><strong>Reservation Fee:</strong> €<?= number_format($item['reservationFee'] ?? 0, 2) ?>
-            <?php elseif ($item['itemType'] === 'Dance'): ?>
-              <strong>Dance Location:</strong> <?= htmlspecialchars($item['danceLocation'] ?? 'N/A') ?><br>
-              <strong>Session Time:</strong> <?= htmlspecialchars($item['sessionTime'] ?? 'N/A') ?>
-            <?php elseif ($item['itemType'] === 'History'): ?>
-              <strong>Tour Location:</strong> <?= htmlspecialchars($item['historyLocation'] ?? 'N/A') ?><br>
-              <strong>Session Time:</strong> <?= htmlspecialchars($item['sessionTime'] ?? 'N/A') ?>
+              <br><strong>Reservation Fee:</strong> €<?= number_format($item['reservationFee'] ?? 0, 2) ?><br>
+            <?php if (!empty($item['restaurantImage'])): ?>
+              <img src="<?= htmlspecialchars($item['restaurantImage']) ?>" alt="<?= htmlspecialchars($item['restaurantName']) ?>" style="width: 200px;">
             <?php endif; ?>
+            <?php elseif ($item['itemType'] === 'Dance'): ?>
+              <strong>Artist:</strong> <?= htmlspecialchars($item['artistName'] ?? 'N/A') ?><br>
+               <strong>Style:</strong> <?= htmlspecialchars($item['artistStyle'] ?? 'N/A') ?><br>
+               <strong>Dance Location:</strong> <?= htmlspecialchars($item['danceLocation'] ?? 'N/A') ?><br>
+               <strong>Date:</strong> <?= htmlspecialchars($item['danceDate'] ?? 'N/A') ?><br>
+               <strong>Time:</strong> <?= htmlspecialchars($item['danceStart'] ?? 'N/A') ?> - <?= htmlspecialchars($item['danceEnd'] ?? 'N/A') ?><br>
+               <strong>Duration:</strong> <?= htmlspecialchars($item['duration'] ?? 'N/A') ?><br>
+             <?php if (!empty($item['artistImage'])): ?>
+               <img src="<?= htmlspecialchars($item['artistImage']) ?>" alt="Artist Image" style="max-width: 150px; margin-top: 10px;">
+                <?php endif; ?>
+              <?php elseif ($item['itemType'] === 'History'): ?>
+                <strong>Tour Location:</strong> <?= htmlspecialchars($item['historyLocation'] ?? 'N/A') ?><br>
+                <strong>Session Time:</strong> <?= htmlspecialchars($item['sessionTime'] ?? 'N/A') ?>
+              <?php endif; ?>
           </p>
         </div>
       </div>
