@@ -115,7 +115,7 @@ $userId = $_SESSION['user']['userID'];
     <div class="event-links">
         <a href="/restaurants" class="event-button">
             <div class="event-icon">
-                <img src="/assets/icons/historybutton.svg" alt="History">
+                <img src="/assets/Icon/Restaurant.jpeg" alt="History">
             </div>
             <span>Restaurant</span>
             <div class="event-arrow">➜</div>
@@ -123,7 +123,7 @@ $userId = $_SESSION['user']['userID'];
 
         <a href="/dancePage" class="event-button">
             <div class="event-icon">
-                <img src="/assets/icons/dancebutton.svg" alt="Dance">
+                <img src="/assets/Icon/dance.jpg" alt="Dance">
             </div>
             <span>Dance!</span>
             <div class="event-arrow">➜</div>
@@ -131,7 +131,7 @@ $userId = $_SESSION['user']['userID'];
 
         <a href="/MagicTeylors" class="event-button">
             <div class="event-icon">
-                <img src="/assets/icons/magicbutton.svg" alt="Magic">
+                <img src="/assets/Icon/Kid.jpeg" alt="Magic">
             </div>
             <span>Magic @ Teylers</span>
             <div class="event-arrow">➜</div>
