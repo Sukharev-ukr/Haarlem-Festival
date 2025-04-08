@@ -7,47 +7,77 @@ class AdminModel extends BaseModel {
         parent::__construct();
     }    
 
-    // Fetch all users with sorting, filtering, and search
-    public function getUsers($search = "", $sortColumn = "userID", $sortOrder = "ASC") {
-        $sql = "SELECT userName, Email, role 
+    // Fetch all users with search, sort, and registered_day
+public function getUsers($search = "", $sortColumn = "userID", $sortOrder = "ASC") {
+    try {
+        // Whitelist sort columns to prevent SQL Injection
+        $allowedSortColumns = ['userID', 'userName', 'Email', 'role', 'registered_day'];
+        if (!in_array($sortColumn, $allowedSortColumns)) {
+            $sortColumn = 'userID';
+        }
+        
+        $sortOrder = strtoupper($sortOrder) === 'DESC' ? 'DESC' : 'ASC'; // only allow ASC or DESC
+        
+        $sql = "SELECT userID, userName, Email, role, registered_day 
                 FROM User 
                 WHERE userName LIKE ? OR Email LIKE ? OR role LIKE ?
                 ORDER BY $sortColumn $sortOrder";
     
         $stmt = self::$pdo->prepare($sql);
-        $stmt->execute(["%$search%", "%$search%", "%$search%"]); // Now correctly binds three values
+        $stmt->execute(["%$search%", "%$search%", "%$search%"]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } 
-
-    // Add new user
-    public function addUser($userName, $email, $password, $role) {
-        try {
-            // Hash the password securely
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-            $sql = "INSERT INTO User (userName, Email, password, role, registration_date) VALUES (?, ?, ?, ?, NOW())";
-            $stmt = self::$pdo->prepare($sql);
-            $stmt->execute([$userName, $email, $hashedPassword, $role]);
-
-            return ["success" => true, "message" => "User added successfully"];
-        } catch (Exception $e) {
-            return ["success" => false, "message" => "Error adding user: " . $e->getMessage()];
-        }
+    } catch (Exception $e) {
+        return ["error" => $e->getMessage()];
     }
+}
 
-    // Update user details
-    public function updateUser($userID, $userName, $email, $role) {
+// Add new user
+public function addUser($userName, $email, $password, $role) {
+    try {
+        if (!in_array($role, ['Admin', 'Employee'])) {
+            throw new Exception("Invalid role value.");
+        }
+
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+        $sql = "INSERT INTO User (userName, Email, password, role, registered_day) VALUES (?, ?, ?, ?, NOW())";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$userName, $email, $hashedPassword, $role]);
+
+        return ["success" => true, "message" => "User added successfully."];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error adding user: " . $e->getMessage()];
+    }
+}
+
+// Update user
+public function updateUser($userID, $userName, $email, $role) {
+    try {
+        if (!in_array($role, ['Admin', 'Employee'])) {
+            throw new Exception("Invalid role value.");
+        }
+
         $sql = "UPDATE User SET userName = ?, Email = ?, role = ? WHERE userID = ?";
         $stmt = self::$pdo->prepare($sql);
-        return $stmt->execute([$userName, $email, $role, $userID]);
-    }
+        $stmt->execute([$userName, $email, $role, $userID]);
 
-    // Delete user
-    public function deleteUser($userID) {
+        return ["success" => true, "message" => "User updated successfully."];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error updating user: " . $e->getMessage()];
+    }
+}
+
+// Delete user
+public function deleteUser($userID) {
+    try {
         $sql = "DELETE FROM User WHERE userID = ?";
         $stmt = self::$pdo->prepare($sql);
-        return $stmt->execute([$userID]);
+        $stmt->execute([$userID]);
+        return ["success" => true, "message" => "User deleted successfully."];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error deleting user: " . $e->getMessage()];
     }
+}
 
     ///////////////////////////////////////////////////////////////Dance
 // Fetch only Dance events
@@ -111,7 +141,7 @@ public function deleteDanceEvent($danceID) {
 ///////////////////////////////////////////////////////////////////////////////Artistttttttttttttttttttttttttt
 public function getArtists() {
     try {
-        $sql = "SELECT artistID, name, style, description, origin FROM Artist";
+        $sql = "SELECT artistID, name, style, description, origin, picture FROM Artist";
         $stmt = self::$pdo->query($sql);
         $artists = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -127,11 +157,11 @@ public function getArtists() {
 }
 
 // Add a new artist
-public function addArtist($name, $style, $description, $origin) {
+public function addArtist($name, $style, $description, $origin, $picturePath = null) {
     try {
-        $sql = "INSERT INTO Artist (name, style, description, origin) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO Artist (name, style, description, origin, picture) VALUES (?, ?, ?, ?, ?)";
         $stmt = self::$pdo->prepare($sql);
-        $stmt->execute([$name, $style, $description, $origin]);
+        $stmt->execute([$name, $style, $description, $origin, $picturePath]);
 
         return ["success" => true, "message" => "Artist added successfully"];
     } catch (Exception $e) {
@@ -139,18 +169,27 @@ public function addArtist($name, $style, $description, $origin) {
     }
 }
 
+
 // Update an artist
-public function updateArtist($artistID, $name, $style, $description, $origin) {
+public function updateArtist($artistID, $name, $style, $description, $origin, $picturePath = null) {
     try {
-        $sql = "UPDATE Artist SET name = ?, style = ?, description = ?, origin = ? WHERE artistID = ?";
-        $stmt = self::$pdo->prepare($sql);
-        $stmt->execute([$name, $style, $description, $origin, $artistID]);
+        if ($picturePath) {
+            $sql = "UPDATE Artist SET name = ?, style = ?, description = ?, origin = ?, picture = ? WHERE artistID = ?";
+            $stmt = self::$pdo->prepare($sql);
+            $stmt->execute([$name, $style, $description, $origin, $picturePath, $artistID]);
+        } else {
+            // If no new picture, don't touch old picture
+            $sql = "UPDATE Artist SET name = ?, style = ?, description = ?, origin = ? WHERE artistID = ?";
+            $stmt = self::$pdo->prepare($sql);
+            $stmt->execute([$name, $style, $description, $origin, $artistID]);
+        }
 
         return ["success" => true, "message" => "Artist updated successfully"];
     } catch (Exception $e) {
         return ["success" => false, "message" => "Error updating artist: " . $e->getMessage()];
     }
 }
+
 
 // Delete an artist
 public function deleteArtist($artistID) {
@@ -232,5 +271,225 @@ public function deleteArtist($artistID) {
             return [];
         }
     }
+
+//////////////////////////////////////////////////////////////////////////Order Management
+
+    // Get Paid Orders (summary)
+public function getPaidOrders()
+{
+    $sql = "
+        SELECT 
+            O.orderID, O.userID, U.userName, O.orderDate, O.total, O.status
+        FROM `Order` O
+        INNER JOIN User U ON U.userID = O.userID
+        WHERE O.status = 'paid'
+        ORDER BY O.orderDate DESC;
+    ";
+    $stmt = self::$pdo->query($sql);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Get Order Details
+public function getOrderDetails($orderID)
+{
+    $sql = "
+        SELECT 
+            O.orderID, O.userID, U.userName, O.orderDate, O.total, O.status,
+            OI.orderItemID, OI.price AS itemPrice, OI.bookingType,
+            D.location AS danceLocation, D.day AS danceDay, D.danceDate, 
+            COALESCE(GROUP_CONCAT(DISTINCT A.name ORDER BY A.name ASC SEPARATOR ', '), '') AS artistName,
+            HTR.numParticipants, HTS.startTime AS tourStartTime,
+            R.amountAdults, R.amountChildren, Rest.restaurantName
+        FROM `Order` O
+        INNER JOIN User U ON U.userID = O.userID
+        INNER JOIN OrderItem OI ON OI.orderID = O.orderID
+        LEFT JOIN DanceTicketOrder DTO ON DTO.orderItemID = OI.orderItemID
+        LEFT JOIN DanceTicket DT ON DT.danceTicketID = DTO.danceTicketOrderID
+        LEFT JOIN TicketType TT ON TT.ticketTypeID = DT.ticketTypeID
+        LEFT JOIN Dance D ON D.danceID = TT.danceID
+        LEFT JOIN DanceArtist DA ON DA.danceID = D.danceID
+        LEFT JOIN Artist A ON A.artistID = DA.artistID
+        LEFT JOIN HistoryTourReservation HTR ON HTR.orderItemID = OI.orderItemID
+        LEFT JOIN HistoryTourSession HTS ON HTS.sessionID = HTR.sessionID
+        LEFT JOIN Reservation R ON R.orderItemID = OI.orderItemID
+        LEFT JOIN Restaurant Rest ON Rest.restaurantID = R.restaurantID
+        WHERE O.orderID = ?
+        GROUP BY OI.orderItemID
+    ";
+
+    $stmt = self::$pdo->prepare($sql);
+    $stmt->execute([$orderID]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+///////////////////////////////////////////////////////////////////////Restaurant
+
+// Get All Restaurants
+public function getAllRestaurants() {
+    try {
+        $sql = "SELECT restaurantID, restaurantName, address, cuisine, description, pricePerAdult, pricePerChild, restaurantPicture, restaurantDiningDetailPicture FROM Restaurant";
+        $stmt = self::$pdo->query($sql);
+        return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+// Create Restaurant
+public function createRestaurant($name, $address, $cuisine, $description, $pricePerAdult, $pricePerChild, $picture, $diningPicture) {
+    try {
+        $sql = "INSERT INTO Restaurant (restaurantName, address, cuisine, description, pricePerAdult, pricePerChild, restaurantPicture, restaurantDiningDetailPicture) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$name, $address, $cuisine, $description, $pricePerAdult, $pricePerChild, $picture, $diningPicture]);
+        return ["success" => true, "message" => "Restaurant created successfully"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+// Update Restaurant
+public function updateRestaurant($id, $name, $address, $cuisine, $description, $pricePerAdult, $pricePerChild, $picture, $diningPicture) {
+    try {
+        $sql = "UPDATE Restaurant SET restaurantName=?, address=?, cuisine=?, description=?, pricePerAdult=?, pricePerChild=?, restaurantPicture=?, restaurantDiningDetailPicture=? WHERE restaurantID=?";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$name, $address, $cuisine, $description, $pricePerAdult, $pricePerChild, $picture, $diningPicture, $id]);
+        return ["success" => true, "message" => "Restaurant updated successfully"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+// Delete Restaurant
+public function deleteRestaurant($id) {
+    try {
+        $sql = "DELETE FROM Restaurant WHERE restaurantID = ?";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$id]);
+        return ["success" => true, "message" => "Restaurant deleted successfully"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => $e->getMessage()];
+    }
+}
+
+public function getRestaurantByID($id) {
+    try {
+        $sql = "SELECT * FROM Restaurant WHERE restaurantID = ?";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return false; // You could also throw exception if you want
+    }
+}
+
+///////////////////////////////////////////////////////////////////Restaurant Slot
+public function getRestaurantSlots() {
+    try {
+        $stmt = self::$pdo->query("SELECT rs.slotID, rs.startTime, rs.endTime, rs.capacity, r.restaurantName FROM RestaurantSlot rs JOIN Restaurant r ON rs.restaurantID = r.restaurantID");
+        return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error fetching slots: " . $e->getMessage()];
+    }
+}
+
+public function addRestaurantSlot($restaurantID, $startTime, $endTime, $capacity) {
+    try {
+        $stmt = self::$pdo->prepare("INSERT INTO RestaurantSlot (restaurantID, startTime, endTime, capacity) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$restaurantID, $startTime, $endTime, $capacity]);
+        return ["success" => true, "message" => "Slot added"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error adding slot: " . $e->getMessage()];
+    }
+}
+
+public function updateRestaurantSlot($slotID, $startTime, $endTime, $capacity) {
+    try {
+        $stmt = self::$pdo->prepare("UPDATE RestaurantSlot SET startTime = ?, endTime = ?, capacity = ? WHERE slotID = ?");
+        $stmt->execute([$startTime, $endTime, $capacity, $slotID]);
+        return ["success" => true, "message" => "Slot updated"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error updating slot: " . $e->getMessage()];
+    }
+}
+
+public function deleteRestaurantSlot($slotID) {
+    try {
+        $stmt = self::$pdo->prepare("DELETE FROM RestaurantSlot WHERE slotID = ?");
+        $stmt->execute([$slotID]);
+        return ["success" => true, "message" => "Slot deleted"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error deleting slot: " . $e->getMessage()];
+    }
+}
+
+public function getAllDropDownRestaurants() {
+    try {
+        $stmt = self::$pdo->query("SELECT restaurantID, restaurantName FROM Restaurant");
+        return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error fetching restaurants: " . $e->getMessage()];
+    }
+}
+
+////////////////////////////////////////////////////////////////////Ticket Type
+
+// ----------- TICKET TYPE FUNCTIONS ------------
+
+// Get all ticket types with location (dance)
+public function getTicketTypes() {
+    try {
+        $stmt = self::$pdo->query("SELECT t.ticketTypeID, d.location, t.type, t.price 
+                                   FROM TicketType t 
+                                   JOIN Dance d ON t.danceID = d.danceID");
+        return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error fetching ticket types: " . $e->getMessage()];
+    }
+}
+
+// Add ticket type
+public function addTicketType($danceID, $type, $price) {
+    try {
+        $stmt = self::$pdo->prepare("INSERT INTO TicketType (danceID, type, price) VALUES (?, ?, ?)");
+        $stmt->execute([$danceID, $type, $price]);
+        return ["success" => true, "message" => "Ticket type added"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error adding ticket type: " . $e->getMessage()];
+    }
+}
+
+// Update ticket type
+public function updateTicketType($ticketTypeID, $danceID, $type, $price) {
+    try {
+        $stmt = self::$pdo->prepare("UPDATE TicketType SET danceID = ?, type = ?, price = ? WHERE ticketTypeID = ?");
+        $stmt->execute([$danceID, $type, $price, $ticketTypeID]);
+        return ["success" => true, "message" => "Ticket type updated"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error updating ticket type: " . $e->getMessage()];
+    }
+}
+
+// Delete ticket type
+public function deleteTicketType($ticketTypeID) {
+    try {
+        $stmt = self::$pdo->prepare("DELETE FROM TicketType WHERE ticketTypeID = ?");
+        $stmt->execute([$ticketTypeID]);
+        return ["success" => true, "message" => "Ticket type deleted"];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error deleting ticket type: " . $e->getMessage()];
+    }
+}
+
+// Get all dances (for dropdown)
+public function getDances() {
+    try {
+        $stmt = self::$pdo->query("SELECT danceID, location FROM Dance");
+        return ["success" => true, "data" => $stmt->fetchAll(PDO::FETCH_ASSOC)];
+    } catch (Exception $e) {
+        return ["success" => false, "message" => "Error fetching dances: " . $e->getMessage()];
+    }
+}
+
+
+
 }
 ?>

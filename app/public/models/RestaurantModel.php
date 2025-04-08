@@ -24,6 +24,16 @@ class RestaurantModel extends BaseModel {
     public function getRestaurantByID($restaurantID) {
         $sql = "SELECT * FROM Restaurant WHERE restaurantID = ?";
         return $this->query($sql, [$restaurantID])->fetch();
-    }    
+    }   
+    
+    public function getRestaurantsWithPicture()
+{
+    $sql = "SELECT restaurantName, restaurantPicture 
+            FROM Restaurant";
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 }
 ?>

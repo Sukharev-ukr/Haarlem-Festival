@@ -30,24 +30,24 @@ $userId = $_SESSION['user']['userID'];
 
 <body>
 
-<div class="position-relative" style="height: 400px; overflow: hidden;">
-    <!-- Video Background -->
-    <video autoplay loop muted playsinline class="w-100 h-100 position-absolute top-0 start-0" style="object-fit: cover;">
-        <source src="../../assets/imageArtits/2022396-hd_1920_1080_30fps.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+    <div class="position-relative" style="height: 400px; overflow: hidden;">
+        <!-- Video Background -->
+        <video autoplay loop muted playsinline class="w-100 h-100 position-absolute top-0 start-0" style="object-fit: cover;">
+            <source src="../../assets/imageArtits/2022396-hd_1920_1080_30fps.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
 
-    <!-- Text Over the Video -->
-    <div class="position-absolute top-50 start-50 translate-middle text-center text-white">
-        <h1 class="fw-bold">Welcome to the Haarlem Festival!</h1>
-        <p>Experience the vibe of music and dance</p>
+        <!-- Text Over the Video -->
+        <div class="position-absolute top-50 start-50 translate-middle text-center text-white">
+            <h1 class="fw-bold">Welcome to the Haarlem Festival!</h1>
+            <p>Experience the vibe of music and dance</p>
+        </div>
     </div>
-</div>
 
 
 
-<div class="container">
-    <h2>Upcoming Event Around Haarlem</h2>
+<div class="container" style="margin-bottom: 50px; ">
+    <h2 style="margin-top: 10px;">Upcoming Event Around Haarlem</h2>
     <ul class="nav nav-tabs" id="danceTabs">
         <li class="nav-item">
             <a class="nav-link active" data-day="friday" href="#">Friday, Jul 2025</a>
@@ -71,7 +71,7 @@ $userId = $_SESSION['user']['userID'];
                             <?php foreach ($dances as $dance): ?>
                                 <article class="col-sm-6 col-md-4 d-flex justify-content-center align-items-stretch">
                                    <figure class="card h-100 shadow-sm">
-                                   <img class="card-img-top" src="/<?= $dance['artistImage'] ?>" alt="<?= $dance['artistName'] ?>">
+                                   <img class="card-img-top" src="<?= $dance['artistImage'] ?>" alt="<?= $dance['artistName'] ?>">
                                      <figcaption class="card-body text-center">
                                        <p class="text-muted mb-1">
                                          <time datetime="<?= $dance['danceDate'] ?>">
@@ -107,6 +107,38 @@ $userId = $_SESSION['user']['userID'];
         </aside>
     </section>
 </section>
+</div>
+
+<!-- Navigation to Other Events -->
+<div class="event-navigation">
+    <h2>Looking for more?</h2>
+    <div class="event-links">
+        <a href="/restaurants" class="event-button">
+            <div class="event-icon">
+                <img src="/assets/icons/historybutton.svg" alt="History">
+            </div>
+            <span>Restaurant</span>
+            <div class="event-arrow">➜</div>
+        </a>
+
+        <a href="/dancePage" class="event-button">
+            <div class="event-icon">
+                <img src="/assets/icons/dancebutton.svg" alt="Dance">
+            </div>
+            <span>Dance!</span>
+            <div class="event-arrow">➜</div>
+        </a>
+
+        <a href="/MagicTeylors" class="event-button">
+            <div class="event-icon">
+                <img src="/assets/icons/magicbutton.svg" alt="Magic">
+            </div>
+            <span>Magic @ Teylers</span>
+            <div class="event-arrow">➜</div>
+        </a>
+    </div>
+</div>
+
 
 
 

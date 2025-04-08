@@ -78,6 +78,15 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'] . $imgPathJpg)) {
         <?php endforeach; ?>
     </div>
 
+    <?php if (!empty($_SESSION['reservation_error'])): ?>
+        <div id="reservation-error-message" class="alert alert-danger">
+            <?= htmlspecialchars($_SESSION['reservation_error']) ?>
+        </div>
+        <?php unset($_SESSION['reservation_error']); ?>
+    <?php else: ?>
+        <div id="reservation-error-message" class="alert alert-danger" style="display: none;"></div>
+    <?php endif; ?>
+
 <!-- Reservation Form -->
 <form id="reservationForm" action="/reservation/make" method="POST">
     <input type="hidden" name="restaurantID" value="<?= $restaurantID ?>">
@@ -192,7 +201,11 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'] . $imgPathJpg)) {
             const selectedSlot = $("#selectedSlot").val();
             if (!selectedSlot) {
                 e.preventDefault();
-                alert("Please select a time slot before submitting your reservation.");
+                const errorDiv = document.getElementById("reservation-error-message");
+                errorDiv.textContent = "Please select a time slot before submitting your reservation.";
+                errorDiv.style.display = "block";
+                errorDiv.scrollIntoView({ behavior: "smooth", block: "center" });
+                return;
             }
         });
 

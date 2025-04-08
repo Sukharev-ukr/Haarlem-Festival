@@ -1,85 +1,60 @@
-/****************************************
-  DISCOVER HISTORY SECTION (3x2 Grid)
-*****************************************/
+/* Hero Section Styling */
+.hero-section {
+  background-color: #8B0000;  /* Deep red */
+  color: #fff;
+  text-align: center;
+  padding: 100px 0;
+}
 
-.discover-history-section {
-    background-color: #fff;    /* White background */
-    color: #8B0000;            /* Dark red text */
-    padding: 60px 0;           /* Top/bottom spacing */
-  }
-  
-  .discover-history-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1.5fr; /* Left column narrower, right column wider */
-    column-gap: 40px;                /* Space between text and cards grid */
-    row-gap: 20px;                   /* Space if it wraps on smaller screens */
-    padding: 0 20px;                 /* Optional horizontal padding */
-  }
-  
-  /* Left side: text */
-  .history-text h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
-  
-  .history-text h2 span {
-    font-size: 1.2rem;
-    font-weight: normal;
-    display: inline-block;
-    margin-top: 0.5rem;
-  }
-  
-  .history-text p {
-    margin-bottom: 1rem;
-    line-height: 1.6;
-  }
-  
-  .learn-more-btn {
-    display: inline-block;
-    background-color: #8B0000;
-    color: #fff;
-    text-decoration: none;
-    padding: 0.75rem 1.5rem;
-    font-weight: bold;
-    transition: background 0.3s ease;
-  }
-  
-  .learn-more-btn:hover {
-    background-color: #660000; /* Darker red on hover */
-  }
-  
-  /* Right side: 3x2 grid of red cards */
-  .history-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns */
-    grid-template-rows: repeat(2, 1fr);    /* 2 rows for 6 cards */
-    gap: 20px;                             /* spacing between cards */
-  }
-  
-  /* Each card */
-  .info-card {
-    background-color: #8B0000;   /* Red background */
-    color: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-    display: flex;               /* So we can center content vertically */
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .info-card h4 {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;  /* optional style */
-  }
-  
-  .info-card p {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: normal;
-  }
-  
+.hero-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+#countdown-container {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+#countdown-container span {
+  font-weight: bold;
+}
+
+#timer-labels {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.hero-description {
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  line-height: 1.5;
+}
+
+.btn-primary {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: #fff;
+  color: #8B0000;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #f0f0f0;
+}
+#map {
+  width: 100%;
+  height: 500px; /* or whatever height you want */
+  /* background: #ccc; (use this or a border to see if it’s really showing up) */
+}

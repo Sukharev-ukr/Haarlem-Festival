@@ -11,7 +11,8 @@ Route::add('/adminDashBoard', function() {
 // API: Fetch users with search, sorting, and filtering
 Route::add('/api/admin/users', function() use ($adminController) {
     header('Content-Type: application/json');
-    echo json_encode($adminController->getUsers());
+    $controller = new AdminController();
+    $controller->getUsers();
 }, 'GET');
 
 // API: Add a new user
@@ -101,7 +102,7 @@ Route::add('/api/admin/updateArtist', function() {
     header('Content-Type: application/json');
     $controller = new AdminController();
     $controller->updateArtist();
-}, 'PUT');
+}, 'POST');
 
 Route::add('/api/admin/deleteArtist', function() {
     header('Content-Type: application/json');
@@ -139,5 +140,90 @@ Route::add('/api/admin/danceLocations', function() {
     $controller = new AdminController();
     echo json_encode($controller->getDanceLocationsByDate($_GET['date'] ?? ''));
 }, 'GET');
+
+///////////////////////////////////////////////////////////////////////////////Order Management
+
+Route::add('/api/admin/paidOrders', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->getPaidOrders();
+}, 'GET');
+
+Route::add('/api/admin/orderDetail', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->getOrderDetail();
+}, 'GET');
+
+////////////////////////////////////////////////////////////////////////////////Restaurant
+
+// GET - Fetch All Restaurants
+Route::add('/api/admin/restaurants', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->getRestaurants();
+}, 'GET');
+
+// POST - Create Restaurant
+Route::add('/api/admin/addRestaurant', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->createRestaurant();
+}, 'POST');
+
+// POST - Update Restaurant
+Route::add('/api/admin/updateRestaurant', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->updateRestaurant();
+}, 'POST');
+
+// DELETE - Delete Restaurant
+Route::add('/api/admin/deleteRestaurant', function() {
+    header('Content-Type: application/json');
+    $controller = new AdminController();
+    $controller->deleteRestaurant();
+}, 'DELETE'); // ✅ keep POST because you upload file
+
+//////////////////////////////////////////////////////////////////Restaurant Slot
+
+
+Route::add('/api/admin/restaurant-slots', function () use ($adminController) {
+    header('Content-Type: application/json');
+    echo json_encode($adminController->getRestaurantSlots());
+}, 'GET');
+
+Route::add('/api/admin/restaurant-slots/restaurants', function () use ($adminController) {
+    header('Content-Type: application/json');
+    echo json_encode($adminController->getAllDropDownRestaurants());
+}, 'GET');
+
+Route::add('/api/admin/restaurant-slots/save', function () use ($adminController) {
+    header('Content-Type: application/json');
+    $adminController->addOrUpdateRestaurantSlot();
+}, 'POST');
+
+Route::add('/api/admin/restaurant-slots/delete', function () use ($adminController) {
+    header('Content-Type: application/json');
+    $adminController->deleteRestaurantSlot();
+}, 'POST');
+
+//////////////////////////////////////////////////////////Ticket Type
+Route::add('/api/admin/tickettypes', function() {
+    (new AdminController())->getTicketTypes();
+}, 'GET');
+
+Route::add('/api/admin/tickettypes/addOrUpdate', function() {
+    (new AdminController())->addOrUpdateTicketType();
+}, 'POST');
+
+Route::add('/api/admin/tickettypes/delete', function() {
+    (new AdminController())->deleteTicketType();
+}, 'POST');
+
+Route::add('/api/admin/dances', function() {
+    (new AdminController())->getDances();
+}, 'GET');
+
 
 ?>

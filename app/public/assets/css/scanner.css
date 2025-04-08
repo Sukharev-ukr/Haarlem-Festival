@@ -1,0 +1,59 @@
+body {
+  background: linear-gradient(145deg, #f5f7fa, #c3cfe2);
+  font-family: "Segoe UI", sans-serif;
+  padding: 20px;
+}
+
+.scanner-wrapper {
+  max-width: 450px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.scanner-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #002d72;
+  margin-bottom: 1rem;
+}
+
+#reader {
+  width: 100%;
+  border: 3px solid #ff8200;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+#statusMessage {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+  display: none;
+}
+
+.status-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-error {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.footer-note {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 10px;
+}

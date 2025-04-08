@@ -7,21 +7,38 @@ namespace Composer\Autoload;
 class ComposerStaticInit2185d2f99bcd56787481d9357a5972d3
 {
     public static $prefixLengthsPsr4 = array (
+        'S' => 
+        array (
+            'Stripe\\' => 7,
+        ),
         'P' => 
         array (
             'PHPMailer\\PHPMailer\\' => 20,
         ),
+        'A' => 
+        array (
+            'App\\' => 4,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'Stripe\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
+        ),
         'PHPMailer\\PHPMailer\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
+        'App\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/app',
         ),
     );
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'FPDF' => __DIR__ . '/..' . '/setasign/fpdf/fpdf.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

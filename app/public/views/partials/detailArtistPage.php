@@ -74,10 +74,10 @@ if (!$artistDetails) {
                 <p><strong><i class="fa fa-ticket-alt text-warning me-2"></i>Tickets Left: </strong><?= $artistDetails[0]['totalSeats'] ?></p>
                 <h5 class="text-success">Ticket Price: €<?= $artistDetails[0]['ticketPrice'] ?></h5>
                 <?php if (isset($artistDetails[0]['danceID'])): ?>
-    <a href="/ticketSelection?danceID=<?php echo $artistDetails[0]['danceID']; ?>" class="btn btn-warning text-white mt-2">Get Concert Ticket</a>
-<?php else: ?>
-    <p>Dance ID not found.</p>
-<?php endif; ?>
+                <a href="/ticketSelection?danceID=<?php echo $artistDetails[0]['danceID']; ?>" class="btn btn-warning text-white mt-2">Get Concert Ticket</a>
+                <?php else: ?>
+                    <p>Dance ID not found.</p>
+                <?php endif; ?>
             </section>
         </aside>
 
@@ -87,13 +87,13 @@ if (!$artistDetails) {
                 <article class="artist-card shadow rounded p-4 mb-4 bg-white">
                     <section class="row align-items-center">
                         <figure class="col-md-5 text-center">
-                            <img src="/<?= $artist['artistPicture'] ?>" alt="<?= $artist['artistName'] ?>" class="img-fluid rounded mb-3 artist-image border">
+                            <img src="<?= $artist['artistPicture'] ?>" alt="<?= $artist['artistName'] ?>" class="img-fluid rounded mb-3 artist-image border">
                         </figure>
                         <section class="col-md-7">
                             <h3 class="text-warning"><?= $artist['artistName'] ?></h3>
                             <p><strong><i class="fa fa-music text-danger me-2"></i>Style:</strong> <?= $artist['artistStyle'] ?></p>
                             <p><strong><i class="fa fa-flag text-warning me-2"></i>Country of Origin:</strong> <?= $artist['artistOrigin'] ?> <img src="../../assets/imageArtits/Netherlan flag.jpeg" alt="Netherlands" class="flag-icon"></p>
-                            <p><strong><i class="fa fa-info-circle text-warning me-2"></i>Description:</strong> <?= $artist['artistDescription'] ?></p>
+                            <p><strong><i class="artist-description"></i>Description:</strong> <?= $artist['artistDescription'] ?></p>
                             <h5 class="text-darkblue">Albums:</h5>
                             <ul>
                                 <?php if ($artist['artistAlbums']): ?>

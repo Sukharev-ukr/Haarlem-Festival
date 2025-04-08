@@ -19,6 +19,8 @@ require_once(__DIR__ . "/routes/shoppingCartRoute.php");
 //require_once __DIR__ . '/routes/homepageRoute.php';
 require_once(__DIR__ . "/routes/adminDashboardRoute.php");
 require_once(__DIR__ . "/routes/personalProgramRoute.php");
+require_once(__DIR__ . "/routes/PaymentRoute.php");
+require_once(__DIR__ . "/routes/EmployeeRoute.php");
 
 // Set a default path-not-found handler for debugging
 Route::pathNotFound(function($path) {
