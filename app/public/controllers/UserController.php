@@ -230,14 +230,20 @@ public function loginPost()
     if ($user && password_verify($password, $user['password'])) {
         // Login successful: store user in session
         $_SESSION['user'] = $user;
-        // Check the user role: if Admin, redirect to admin dashboard
-        if (isset($user['role']) && $user['role'] === 'Admin') {
-            header("Location: /adminDashBoard");
-            exit;
-        } else {
-            header("Location: /");  // Redirect regular user to home page
-            exit;
+
+        // Check the user role and redirect accordingly:
+        if (isset($user['role'])) {
+            if ($user['role'] === 'Admin') {
+                header("Location: /adminDashBoard");
+                exit;
+            } elseif ($user['role'] === 'Employee') {
+                header("Location: /scannerPage");
+                exit;
+            }
         }
+        // Default redirect for regular users
+        header("Location: /");
+        exit;
     } else {
         $error = "Invalid credentials.";
         require_once __DIR__ . '/../views/user/login.php';
