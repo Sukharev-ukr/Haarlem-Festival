@@ -22,3 +22,8 @@ Route::add('/payment-success', function () {
     $controller = new PaymentController();
     $controller->showSuccess();
 }, 'get');
+
+Route::add('/handle-pay-later', function () {
+    $controller = new PaymentController();
+    $controller->handlePayLater();
+}, 'POST');

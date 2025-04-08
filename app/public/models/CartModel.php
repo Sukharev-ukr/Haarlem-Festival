@@ -211,6 +211,14 @@ class CartModel extends BaseModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getOrderItemById($orderItemID) {
+        $stmt = $this->db->prepare("SELECT oi.orderItemID, oi.price AS total, o.status FROM OrderItem oi
+                                    LEFT JOIN `Order` o ON o.orderID = oi.orderID
+                                    WHERE oi.orderItemID = ? LIMIT 1");
+        $stmt->execute([$orderItemID]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function getOrderItems($orderId) {
         $stmt = $this->db->prepare("SELECT orderItemID, orderID, price, bookingType FROM OrderItem WHERE orderID = ?");
         $stmt->execute([$orderId]);

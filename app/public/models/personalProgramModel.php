@@ -95,7 +95,7 @@ class PersonalProgramModel extends BaseModel
         if (isset($orderItem['sessionTime']) && in_array($orderItem['sessionTime'], $validSessionTimes)) {
             $sessionTime = $orderItem['sessionTime'];
         } elseif ($itemType === 'Dance') {
-            $sessionTime = 'Evening'; // Default fallback for dance
+            $sessionTime = 'Evening';
         }
 
         $reservationID = $orderItem['reservationID'] ?? null;
@@ -112,5 +112,4 @@ class PersonalProgramModel extends BaseModel
             $sessionTime
         ]);
     }
-
 }
