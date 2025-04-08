@@ -155,7 +155,7 @@
 
 /* Icon Section */
 .event-icon {
-  background-color: #030145;
+  background: #080250;
   padding: 12px;
   border-radius: 50px 0 0 50px;
   display: flex;
@@ -170,19 +170,15 @@
 
 /* Arrow Section */
 .event-arrow {
-  background-color: #a30000;
+  background-color: #080250;
   padding: 10px;
   border-radius: 50%;
   color: white;
 }
 
-/* Hover Effect */
 .event-button:hover {
-  background-color: #f59a23;
-  color: white;
-}
-
-.event-button:hover .event-arrow {
-  background-color: white;
+  background-color: rgb(255, 190, 84);
   color: #a30000;
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
