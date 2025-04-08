@@ -172,16 +172,23 @@ class PaymentController {
         require_once __DIR__ . '/../lib/pdfGenerator.php';
         require_once __DIR__ . '/../lib/mailer.php';
     
-        // You might have a user model or method to fetch user info
-        $userInfo = $this->model->getUserByID($userID); // You may need to implement this in PaymentModel
+        // Ensure the invoice directory exists
+        $invoiceDir = __DIR__ . "/../assets/invoice";
+        if (!file_exists($invoiceDir)) {
+            mkdir($invoiceDir, 0777, true);  // Create directory with write permissions
+        }
     
-        $invoicePath = __DIR__ . "/../assets/invoice/invoice_$orderID.pdf";
-
+        // Define the invoice path
+        $invoicePath = $invoiceDir . "/invoice_$orderID.pdf";
+    
+        // You might have a user model or method to fetch user info
+        $userInfo = $this->model->getUserByID($userID);
+    
         $invoiceItems = [];
-
+    
         foreach ($orderItems as $item) {
             $description = $item['bookingType'] . ' - ';
-
+    
             if ($item['bookingType'] === 'Restaurant') {
                 $description .= $item['restaurantName'] ?? 'Restaurant Reservation';
             } elseif ($item['bookingType'] === 'Dance') {
@@ -191,20 +198,22 @@ class PaymentController {
             } else {
                 $description .= 'Item';
             }
-
+    
             $invoiceItems[] = [
                 'description' => $description,
                 'price' => $item['itemPrice'] ?? 0
             ];
         }
+    
+        // Generate the PDF
         generateInvoicePDF($orderID, $userInfo['username'], $invoiceItems, $invoicePath);
-
+    
         // You can also generate ticket PDFs here if needed
         $ticketPaths = []; // Optional for now
     
+        // Send email with invoice attached
         sendEmailAndTickets($userInfo['username'], $userInfo['email'], $invoicePath, $ticketPaths);
-    }
-    
+    }    
 
     public function handlePaymentSuccess() {
         $userID = $this->getAuthenticatedUserID();
