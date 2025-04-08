@@ -158,7 +158,6 @@
         <div id="paidOrderSection" class="card mt-4">
         <div class="card-header bg-success text-white d-flex justify-content-between">
             <h3>Paid Orders</h3>
-            <button class="btn btn-info" onclick="exportPaidOrders()">Export CSV/Excel</button>
         </div>
         <div class="card-body">
             <table class="table table-bordered table-striped" id="paidOrderTable">
