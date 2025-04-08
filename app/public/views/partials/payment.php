@@ -1,7 +1,7 @@
 <main class="hf-payment-container">
   <section class="hf-payment-left">
     <h2>1. Enter an email address</h2>
-    <input type="email" class="hf-input" placeholder="name@example.com" />
+    <input type="email" class="hf-input" placeholder="name@example.com" id="email" />
     <label class="hf-checkbox">
       <input type="checkbox" />
       Yes, I would like to receive updates about The Haarlem Festival.
@@ -9,42 +9,17 @@
 
     <h2>2. Select a payment method</h2>
 
-    <!-- iDEAL -->
+    <!-- Unified Pay Button (Stripe Checkout) -->
     <div class="hf-payment-method">
-      <button class="hf-payment-button" onclick="showPaymentMethod('ideal')">IDEAL</button>
-      <div class="hf-payment-info" id="ideal-info" style="display: none;">
-        <label for="hf-bank">Select Bank:</label>
-        <select id="hf-bank" class="hf-input">
-          <option>ING</option>
-          <option>Rabobank</option>
-          <option>ABN AMRO</option>
-        </select>
-        <p class="hf-note">iDEAL payments are processed securely via your bank.</p>
-        <button class="hf-pay-btn">Continue to iDEAL</button>
-      </div>
+      <button class="hf-payment-button" id="pay-button">Pay with IDeal and Debit/Credit Card</button>
     </div>
 
-    <!-- Credit Card -->
+    <!-- Pay Later Button -->
     <div class="hf-payment-method">
-      <button class="hf-payment-button" onclick="showPaymentMethod('card')">Credit or Debit Card</button>
-      <div class="hf-payment-info" id="card-info" style="display: none;">
-        <div id="loading-message">Loading payment form...</div>
-        <form id="payment-form" style="display: none;">
-          <div id="payment-element" style="margin-bottom: 16px;"></div>
-          <div id="payment-message" style="color: red; margin-bottom: 10px;"></div>
-          <button type="submit" class="hf-pay-btn">Pay</button>
-        </form>
-      </div>
+      <button class="hf-payment-button" id="pay-later-button">Pay Later</button>
     </div>
+  </section>
 
-    <!-- Crypto -->
-    <div class="hf-payment-method">
-      <button class="hf-payment-button" onclick="showPaymentMethod('crypto')">Cryptocurrency</button>
-      <div class="hf-payment-info" id="crypto-info" style="display: none;">
-        <p class="hf-note">Cryptocurrency payments are processed via third-party providers.</p>
-        <button class="hf-pay-btn">Continue</button>
-      </div>
-    </div>
   </section>
 
   <aside class="hf-order-summary">
@@ -88,16 +63,14 @@
       <p><strong>VAT (21%):</strong> €<span id="vat-amount"></span></p>
       <p><strong>Total with VAT:</strong> €<span id="total-with-vat"></span></p>
     </div>
-
-    <!-- No need for a duplicate total -->
   </aside>
 </main>
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
+// Initialize Stripe globally
 let stripe;
-let elements;
-let paymentMounted = false;
+let sessionId;
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -112,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         try {
             data = JSON.parse(raw);
         } catch (err) {
-            console.error("❌ Invalid JSON from /create-payment:", raw);
+            console.error("Invalid JSON from /create-payment:", raw);
             alert("Unexpected response:\n" + raw);
             return;
         }
@@ -122,81 +95,59 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        // Initialize Stripe with clientSecret
+        // Initialize Stripe with the public key
         stripe = Stripe("<?= STRIPE_PUBLIC_KEY ?>");
-        elements = stripe.elements({ clientSecret: data.clientSecret });
 
         // Update VAT and total with VAT in the order summary
         document.getElementById("vat-amount").textContent = data.vatAmount.toFixed(2);
         document.getElementById("total-with-vat").textContent = data.totalWithVat.toFixed(2);
 
+        // Store sessionId for checkout
+        sessionId = data.sessionId;
+
+        // Add event listener to the Pay button
+        document.getElementById("pay-button").addEventListener("click", startPayment);
+        document.getElementById("pay-later-button").addEventListener("click", payLater);
+
     } catch (err) {
-        console.error("❌ Failed to initialize Stripe:", err);
+        console.error("Failed to initialize Stripe:", err);
         alert("Stripe setup failed");
-    }
-
-    // Setup form submission
-    const form = document.getElementById("payment-form");
-    if (form) {
-        form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const { error } = await stripe.confirmPayment({
-                elements,
-                confirmParams: {
-                    return_url: "http://localhost/payment-success"  // Redirect to this page on success
-                }
-            });
-
-            if (error) {
-                document.getElementById("payment-message").textContent = error.message;
-            } else {
-                // Send a request to backend to handle payment success
-                const response = await fetch('/handle-payment-success', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        orderID: '<?= $_SESSION['order']['orderID'] ?>', // Send orderID from session
-                        userID: '<?= $_SESSION['user']['userID'] ?>'  // Send userID from session
-                    })
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    window.location.href = "/personal-program";  // Redirect after successful handling
-                } else {
-                    alert("There was an issue processing your payment.");
-                }
-            }
-        });
     }
 });
 
-function showPaymentMethod(type) {
-    // Hide all payment info sections
-    ['ideal-info', 'card-info', 'crypto-info'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.style.display = 'none';
+// Start payment and redirect to Stripe Checkout
+async function startPayment() {
+    if (!sessionId) {
+        alert('Session ID is missing');
+        return;
+    }
+
+    const { error } = await stripe.redirectToCheckout({
+        sessionId: sessionId // sessionId returned by backend
     });
 
-    // Show selected method section
-    const selectedEl = document.getElementById(`${type}-info`);
-    if (selectedEl) {
-        selectedEl.style.display = 'block';
-
-        // Only mount Stripe Elements once
-        if (type === 'card' && !paymentMounted && elements) {
-            const paymentElement = elements.create("payment");
-            paymentElement.mount("#payment-element");
-
-            // Hide loader, show form
-            document.getElementById("loading-message").style.display = "none";
-            document.getElementById("payment-form").style.display = "block";
-
-            paymentMounted = true;
-        }
+    if (error) {
+        console.error('Error:', error);
     }
 }
+
+// Start Pay Later flow (use Pay Later with Klarna, Affirm, etc.)
+async function payLater() {
+    const res = await fetch('/handle-pay-later', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            orderID: '<?= $_SESSION['order']['orderID'] ?>',
+            userID: '<?= $_SESSION['user']['userID'] ?>'
+        })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+        window.location.href = "/personal-program"; // Redirect after adding to personal program
+    } else {
+        alert("There was an issue adding your order to the personal program.");
+    }
+}
+
 </script>

@@ -54,7 +54,6 @@ class PaymentController {
             return;
         }
     
-        require_once __DIR__ . '/../vendor/autoload.php'; // Load Stripe SDK
         \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
     
         // Calculate VAT and total with VAT
@@ -64,27 +63,38 @@ class PaymentController {
         $totalWithVat = $orderTotal + $vatAmount;
     
         try {
-            // Create Stripe PaymentIntent with total including VAT
-            $intent = \Stripe\PaymentIntent::create([
-                'amount' => intval($totalWithVat * 100), // Convert to cents
-                'currency' => 'eur',
+            // Create Stripe Checkout session
+            $checkout_session = \Stripe\Checkout\Session::create([
+                'payment_method_types' => ['ideal', 'card'], // List of available methods
+                'line_items' => [
+                    [
+                        'price_data' => [
+                            'currency' => 'eur',
+                            'product_data' => [
+                                'name' => 'Order #' . $order['orderID'],
+                            ],
+                            'unit_amount' => $totalWithVat * 100, // Convert to cents
+                        ],
+                        'quantity' => 1,
+                    ],
+                ],
+                'mode' => 'payment',
+                'success_url' => 'http://localhost/payment-success?session_id={CHECKOUT_SESSION_ID}', // Ensure correct success URL
+                'cancel_url' => 'http://localhost/payment-cancel',
                 'metadata' => ['order_id' => $order['orderID']],
             ]);
     
-            // Store VAT and total with VAT in session
-            $_SESSION['vatAmount'] = $vatAmount;
-            $_SESSION['totalWithVat'] = $totalWithVat;
-    
             echo json_encode([
-                'clientSecret' => $intent->client_secret,
+                'sessionId' => $checkout_session->id,
                 'vatAmount' => $vatAmount,
-                'totalWithVat' => $totalWithVat
+                'totalWithVat' => $totalWithVat,
             ]);
-        } catch (Exception $e) {
-            error_log("❌ Stripe error: " . $e->getMessage());
+        } catch (\Stripe\Exception\ApiErrorException $e) {
             echo json_encode(['error' => 'Failed to create payment intent']);
         }
     }
+    
+    
     
     public function showSuccess() {
         // Ensure session data exists
@@ -114,14 +124,24 @@ class PaymentController {
     private function processOrderItems($orderItems, $programID) {
         foreach ($orderItems as $item) {
             $itemType = $this->determineItemType($item['bookingType']);
-            $this->personalProgramModel->createPersonalProgramItem($programID, $item, $itemType);
+            
+            // Fix: Pass reservationID explicitly
+            $reservationID = $item['reservationID'] ?? null;
     
+            // Call createPersonalProgramItem with reservationID
+            $this->personalProgramModel->createPersonalProgramItem($programID, $item, $itemType, $reservationID);
+        
             if ($itemType === 'Restaurant') {
                 $this->adjustSlotCapacity($item);
             }
         }
     }
     
+    private function getOrderItems($orderID) {
+        $cartModel = new CartModel();
+        return $cartModel->getCartItemsByOrderID($orderID);
+    }    
+
     private function determineItemType($bookingType) {
         switch ($bookingType) {
             case 'Restaurant': return 'Restaurant';
@@ -202,7 +222,10 @@ class PaymentController {
         }
     
         $programID = $this->createPersonalProgram($userID, $orderID);
-        $this->processOrderItems($orderItems, $programID);
+        foreach ($orderItems as $item) {
+            $itemType = $this->determineItemType($item['bookingType']);
+            $this->personalProgramModel->createPersonalProgramItem($programID, $item, $itemType, $item['reservationID']);
+        }
         $this->model->updateOrderStatusToPaid($orderID);
         $this->sendInvoiceAndTickets($userID, $orderID, $orderItems);
     
@@ -210,4 +233,100 @@ class PaymentController {
         exit();
     }
     
+
+    public function handlePayLater() {
+        $userID = $this->getAuthenticatedUserID();
+        $orderID = $_SESSION['order']['orderID'] ?? null;
+    
+        if (!$orderID) {
+            die("Order ID not found.");
+        }
+    
+        // Log for debugging
+        error_log("User ID: $userID, Order ID: $orderID");
+    
+        // Save the order in the Personal Program (pending)
+        $programID = $this->addToPersonalProgram($userID, $orderID);
+    
+        // Update order status to "pending"
+        $this->model->updateOrderStatusToPending($orderID);
+    
+        // Log for debugging
+        error_log("Program added: Program ID $programID");
+    
+        // Redirect to the personal program page
+        header("Location: /personal-program");
+        exit();
+    }
+    
+    private function addToPersonalProgram($userID, $orderID) {
+        // Create the personal program for the user
+        $programID = $this->personalProgramModel->createPersonalProgram($userID, "Order #$orderID");
+    
+        // Get the order items
+        $orderItems = $this->getOrderItems($orderID); // Ensure this function retrieves the order items
+    
+        // Log for debugging
+        error_log("Adding items to program: Program ID $programID");
+    
+        // Loop through each order item and add it to the program
+        foreach ($orderItems as $item) {
+            // Determine the item type
+            $itemType = $this->determineItemType($item['bookingType']);
+            $this->personalProgramModel->createPersonalProgramItem($programID, $item, $itemType);
+    
+            // Log for debugging
+            error_log("Item added: " . $item['orderItemID'] . " with type " . $itemType);
+        }
+    
+        return $programID; // Return the program ID
+    }
+
+    public function handlePayNow() {
+        $orderItemID = $_POST['orderItemID'] ?? null; // Retrieve orderItemID
+        $userID = $_SESSION['user']['userID'] ?? null;
+    
+        if (!$orderItemID || !$userID) {
+            die("Order Item ID or User ID missing.");
+        }
+    
+        // Fetch the corresponding order item
+        $cartModel = new CartModel();
+        $orderItem = $cartModel->getOrderItemById($orderItemID); // Use the new method to fetch order item details
+    
+        if (!$orderItem || $orderItem['status'] !== 'pending') {
+            die("Order Item not found or already paid.");
+        }
+    
+        // Create a payment intent and redirect to Stripe checkout
+        \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
+    
+        try {
+            // Create Stripe Checkout session
+            $checkout_session = \Stripe\Checkout\Session::create([
+                'payment_method_types' => ['ideal', 'card'], 
+                'line_items' => [
+                    [
+                        'price_data' => [
+                            'currency' => 'eur',
+                            'product_data' => [
+                                'name' => 'Order Item #' . $orderItem['orderItemID'], // Use orderItemID here
+                            ],
+                            'unit_amount' => $orderItem['total'] * 100, // Convert to cents (ensure 'total' is correct)
+                        ],
+                        'quantity' => 1,
+                    ],
+                ],
+                'mode' => 'payment',
+                'success_url' => 'http://localhost/payment-success?session_id={CHECKOUT_SESSION_ID}', 
+                'cancel_url' => 'http://localhost/payment-cancel',
+                'metadata' => ['order_item_id' => $orderItem['orderItemID']], // Store orderItemID in metadata
+            ]);
+    
+            echo json_encode(['sessionId' => $checkout_session->id]);
+    
+        } catch (\Stripe\Exception\ApiErrorException $e) {
+            echo json_encode(['error' => 'Failed to create payment intent']);
+        }
+    }    
 }

@@ -43,4 +43,12 @@ class PaymentModel extends BaseModel {
         $stmt->execute([$userID]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function updateOrderStatusToPending($orderID) {
+        // Ensure order status is updated to "pending"
+        $sql = "UPDATE `Order` SET status = 'pending' WHERE orderID = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$orderID]);
+    }
+    
 }
