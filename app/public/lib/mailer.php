@@ -61,4 +61,41 @@ function sendEmailReset($email, $reset_token)
         $_SESSION['email_error'] = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
         return false;
     }
+
+    function sendInvoiceAndTickets($username, $email, $invoicePath, $ticketPaths = [])
+    {
+        $mail = new PHPMailer(true);
+
+        try {
+            $mail->isSMTP();
+            $mail->Host       = 'smtp.gmail.com';
+            $mail->SMTPAuth   = true;
+            $mail->Username   = 'igorsu415@gmail.com';
+            $mail->Password   = 'xsed fxcr rshr zpdr';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port       = 465;
+
+            $mail->setFrom('igorsu415@gmail.com', 'Haarlem Festival');
+            $mail->addAddress($email, $username);
+
+            $mail->isHTML(true);
+            $mail->Subject = 'Your Haarlem Festival Invoice & Tickets';
+            $mail->Body    = "Hi $username,<br><br>Thank you for your purchase! Please find your invoice and tickets attached.<br><br>Enjoy the event!<br><strong>Haarlem Festival Team</strong>";
+
+            // Attach invoice PDF
+            $mail->addAttachment($invoicePath, 'invoice.pdf');
+
+            // Attach tickets if any
+            foreach ($ticketPaths as $index => $ticketPath) {
+                $mail->addAttachment($ticketPath, "ticket_" . ($index + 1) . ".pdf");
+            }
+
+            $mail->send();
+            return true;
+        } catch (Exception $e) {
+            $_SESSION['email_error'] = "Failed to send invoice/tickets: {$mail->ErrorInfo}";
+            return false;
+        }
+    }
+
 }

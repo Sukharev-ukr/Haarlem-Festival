@@ -133,8 +133,27 @@ class PaymentController {
     
             // Save the program item with the correct itemType
             $this->personalProgramModel->createPersonalProgramItem($programID, $item, $itemType);
+
+            // CHANGE CAPACITY
+            if ($item['bookingType'] === 'Restaurant') {
+                // Get how many seats were reserved
+                $totalGuests = (int)$item['amountAdults'] + (int)$item['amountChildren'];
+                $slotID = $item['slotID'] ?? null; // You need to make sure this is available in $item
+            
+                if ($slotID && $totalGuests > 0) {
+                    $stmt = $this->model->getDB()->prepare("
+                        UPDATE RestaurantSlot
+                        SET capacity = capacity - :guests
+                        WHERE slotID = :slotID AND capacity >= :guests
+                    ");
+                    $stmt->execute([
+                        'guests' => $totalGuests,
+                        'slotID' => $slotID
+                    ]);
+                }
+            }
         }
-    
+        
         // Optional Step 3: Update order status to "paid" if necessary
         $this->model->updateOrderStatusToPaid($orderID);
     

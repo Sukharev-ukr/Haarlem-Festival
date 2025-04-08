@@ -143,7 +143,7 @@ class CartModel extends BaseModel {
     public function getCartItemsByOrderID($orderId) {
         $sql = "
             SELECT 
-                O.orderID, O.orderDate, O.total, O.status, OI.orderItemID, OI.price AS itemPrice, OI.bookingType,
+                O.orderID, O.orderDate, O.total, O.status, OI.orderItemID, OI.price AS itemPrice, OI.bookingType, RS.slotID,
     
                 -- Dance Tickets
                 GROUP_CONCAT(DISTINCT A.name ORDER BY A.name ASC SEPARATOR ', ') AS artistName,
@@ -175,6 +175,7 @@ class CartModel extends BaseModel {
             -- Restaurant Reservation Joins
             LEFT JOIN Reservation R ON R.orderItemID = OI.orderItemID
             LEFT JOIN Restaurant Rest ON Rest.restaurantID = R.restaurantID
+            LEFT JOIN ReservationSlot RS ON RS.reservationID = R.reservationID
     
             WHERE O.orderID = ?
             GROUP BY O.orderID, OI.orderItemID, D.danceID, TT.ticketTypeID, DTO.ticketQuantity, HTR.reservationID, R.reservationID;

@@ -1,6 +1,6 @@
 <?php 
 // ✅ Start session if not started yet
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../../config.php';
 ensure_logged_in();
 $userId = $_SESSION['user']['userID'];
 

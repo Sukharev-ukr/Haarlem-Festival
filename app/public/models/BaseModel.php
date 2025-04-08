@@ -35,4 +35,8 @@ class BaseModel
         $statement->execute($params);
         return $statement;
     }
+
+    public function getDB() {
+        return $this->db;
+    }
 }

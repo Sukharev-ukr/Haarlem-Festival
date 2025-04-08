@@ -46,31 +46,27 @@ class ReservationController {
         return $errors;
     }
 
-    public function reserve() {
+    private function getAuthenticatedUserID() {
         $userID = $_SESSION['user']['userID'] ?? null;
         if (!$userID) {
             header("Location: /login");
             exit;
         }
+        return $userID;
+    }
     
-        // 1. Get and convert the date first
-        $inputDate = $_POST['reservationDate'] ?? null;
-
-        // var_dump($inputDate);
-        // exit;
-
-        $dateObj = DateTime::createFromFormat('Y-m-d', $inputDate);
-    
+    private function validateAndConvertDate($dateStr, $restaurantID) {
+        $dateObj = DateTime::createFromFormat('Y-m-d', $dateStr);
         if (!$dateObj) {
-            echo "Invalid reservation date format";
+            $_SESSION['reservation_error'] = "Please select a time slot.";
+            header("Location: /restaurant?restaurantID=" . $restaurantID);
             exit;
         }
+        return $dateObj->format('Y-m-d');
+    }
     
-        // 2. Then format it correctly
-        $convertedDate = $dateObj->format('Y-m-d');
-    
-        // 3. Now safely populate $data with converted value
-        $data = [
+    private function collectReservationData($convertedDate) {
+        return [
             'restaurantID' => $_POST['restaurantID'],
             'slotID' => $_POST['slotID'],
             'fullName' => $_POST['fullName'],
@@ -79,24 +75,61 @@ class ReservationController {
             'adults' => $_POST['adults'],
             'children' => $_POST['children'],
             'specialRequests' => $_POST['specialRequests'] ?? '',
-            'reservationDate' => $convertedDate  // ✅ fixed here
+            'reservationDate' => $convertedDate
         ];
+    }
     
-        // 4. Calculate reservation pricing
+    private function validateGroupSize($data) {
+        $maxGuests = 20;
+        $totalGuests = (int)$data['adults'] + (int)$data['children'];
+        if ($totalGuests > $maxGuests) {
+            $_SESSION['reservation_error'] = "For groups larger than $maxGuests people, please contact the restaurant directly.";
+            header("Location: /restaurant?restaurantID=" . $data['restaurantID']);
+            exit;
+        }
+    }
+    
+    private function checkSlotCapacity($data) {
+        $slotID = $data['slotID'];
+        $stmt = $this->model->getDB()->prepare("SELECT capacity FROM RestaurantSlot WHERE slotID = ?");
+        $stmt->execute([$slotID]);
+        $slot = $stmt->fetch();
+    
+        if (!$slot) {
+            $_SESSION['reservation_error'] = "Invalid time slot selected.";
+            header("Location: /restaurant?restaurantID=" . $data['restaurantID']);
+            exit;
+        }
+    
+        $totalGuests = (int)$data['adults'] + (int)$data['children'];
+        if ($totalGuests > (int)$slot['capacity']) {
+            $_SESSION['reservation_error'] = "Sorry, not enough seats available for this time slot.";
+            header("Location: /restaurant?restaurantID=" . $data['restaurantID']);
+            exit;
+        }
+    }
+    
+
+    public function reserve() {
+        $userID = $this->getAuthenticatedUserID();
+        $convertedDate = $this->validateAndConvertDate($_POST['reservationDate'], $_POST['restaurantID']);
+    
+        $data = $this->collectReservationData($convertedDate);
+    
+        $this->validateGroupSize($data);
+        $this->checkSlotCapacity($data);
+    
         $pricing = $this->model->calculateReservationCosts(
-            $data['restaurantID'],
-            $data['adults'],
-            $data['children']
+            $data['restaurantID'], $data['adults'], $data['children']
         );
     
-        // 5. Add to cart
         $cartModel = new CartModel();
         $cartModel->addReservationToCart($userID, $data, $pricing);
     
-        // 6. Redirect to shopping cart
         header("Location: /shoppingCart");
         exit;
     }
+    
     
 }
 
