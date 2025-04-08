@@ -11,5 +11,6 @@ $artists = $danceController->getAllDanceArtists();
 $danceFriday = $danceController->getDanceAtFriday();
 $danceSaturday = $danceController->getDanceAtSaturday();
 $danceSunday = $danceController->getDanceAtSunday();
+$artists = $danceController->getAllDanceArtists();
 
 require __DIR__ . '/../views/pages/home.php';

@@ -9,7 +9,6 @@ if (session_status() === PHP_SESSION_NONE) {
         <a class="nav-item nav-link active" href="/">Home Page</a>
         <a class="nav-item nav-link active" href="/dancePage">Dance</a>
         <a class="nav-item nav-link active" href="/restaurants">Dining</a>
-        <a class="nav-item nav-link active" href="#">Magic Tyler</a>
         <a class="nav-item nav-link active" href="/personal-program">Personal Program</a>
         <a class="nav-item nav-link active" href="/shoppingCart">Cart</a>
         <div>
