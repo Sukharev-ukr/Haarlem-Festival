@@ -41,17 +41,31 @@ Route::add("/ticketSelection", function () {
     }
 
     if (!isset($_SESSION['user']['userID'])) {
-        header("Location: /login"); // or whatever your login page is
+        header("Location: /user/login");
         exit;
     }
 
+    $userId = $_SESSION['user']['userID'];
     $danceID = $_GET['danceID'] ?? null;
+
+    require_once(__DIR__ . "/../controllers/DanceController.php");
+    $danceController = new DanceController();
+
     if ($danceID) {
-        require_once(__DIR__ . "/../views/pages/ticketSelection.php");
+        $eventDetails = $danceController->getEventDetails($danceID);
+        $ticketDetails = $danceController->getTicketDetails($danceID);
+
+        if ($eventDetails && $ticketDetails) {
+            // These variables will be available inside the PHP page
+            require_once(__DIR__ . "/../views/pages/ticketSelection.php");
+        } else {
+            echo "<h3>No details found for the selected event.</h3>";
+        }
     } else {
         echo "<h3>Dance ID not found.</h3>";
     }
 }, 'GET');
+
 
 
 // API Route to add tickets to cart

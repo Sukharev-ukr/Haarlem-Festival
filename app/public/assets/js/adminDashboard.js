@@ -479,17 +479,17 @@ function htmlEntities(str) {
     .replace(/'/g, "&#39;");
 }
 
-// ✅ Open Add Artist Modal
+// Open Add Artist Modal
 function openAddArtistModal() {
   document.getElementById("artistModalTitle").textContent = "Add Artist";
   document.getElementById("artistID").value = "";
 
-  // ✅ Only plain inputs now
+  //Only plain inputs now
   document.getElementById("artistName").value = "";
   document.getElementById("artistStyle").value = "";
   document.getElementById("artistOrigin").value = "";
 
-  // ✅ Only keep trix for description
+  //Only keep trix for description
   document.getElementById("artistDescription").value = "";
   document
     .querySelector("trix-editor[input='artistDescription']")
@@ -501,17 +501,17 @@ function openAddArtistModal() {
   $("#artistModal").modal("show");
 }
 
-// ✅ Open Edit Artist Modal
+//Open Edit Artist Modal
 function openEditArtistModal(button) {
   document.getElementById("artistModalTitle").textContent = "Edit Artist";
   document.getElementById("artistID").value = button.dataset.id;
 
-  // ✅ Plain inputs
+  //Plain inputs
   document.getElementById("artistName").value = button.dataset.name;
   document.getElementById("artistStyle").value = button.dataset.style;
   document.getElementById("artistOrigin").value = button.dataset.origin;
 
-  // ✅ Trix editor only for description
+  // Trix editor only for description
   document.getElementById("artistDescription").value =
     button.dataset.description;
   document
@@ -528,7 +528,7 @@ function openEditArtistModal(button) {
   $("#artistModal").modal("show");
 }
 
-// ✅ Save Artist (Add or Update)
+//Save Artist (Add or Update)
 function saveArtist() {
   let artistID = document.getElementById("artistID").value;
   let name = document.getElementById("artistName").value;
@@ -563,7 +563,7 @@ function saveArtist() {
     .catch((error) => console.error("❌ Error saving artist:", error));
 }
 
-// ✅ Preview the image immediately when selected
+//Preview the image immediately when selected
 function previewArtistImage(event) {
   const input = event.target;
   const preview = document.getElementById("artistPreview");

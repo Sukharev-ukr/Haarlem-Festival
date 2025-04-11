@@ -27,7 +27,7 @@
         return $stmt->fetchAll();
     }
 
-      //Get Dance and Artist by DanceID (Using For dancePage)
+      //Get Dance and Artist by DanceID (Using For dancePage) Should be deleted
      public function getDanceAndArtistByDanceID($danceID) {
          $sql = "SELECT 
                 D.danceID,
