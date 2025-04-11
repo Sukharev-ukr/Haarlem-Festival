@@ -24,21 +24,21 @@ class DanceController {
     }
     
 
-    // public function getDanceAndArtistByArtistID($danceID) {
-    //     try {
-    //         $detail = $this->danceModel-> getDanceAndArtistByDanceID($danceID);
-    //         if ($detail) {
-    //             return $detail;
-    //         }
-    //         else {
-    //             echo "No details found for dance and artist by artist ID: $danceID";
-    //         }
-    //     }
-    //     catch (PDOException $ex) {
-    //         error_log("Database Error: " . $ex->getMessage());
-    //         echo "An error occurred while fetching dance details. Please try again later.";
-    //     }
-    // }
+    public function getDanceAndArtistByArtistID($danceID) {
+        try {
+            $detail = $this->danceModel-> getDanceAndArtistByDanceID($danceID);
+            if ($detail) {
+                return $detail;
+            }
+            else {
+                echo "No details found for dance and artist by artist ID: $danceID";
+            }
+        }
+        catch (PDOException $ex) {
+            error_log("Database Error: " . $ex->getMessage());
+            echo "An error occurred while fetching dance details. Please try again later.";
+        }
+    }
 
     public function  getArtistDetailsByDanceID($danceID) {
         try {

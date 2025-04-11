@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>  
 <nav class="navbar" style="background-color:rgb(0, 0, 0) !important; color: white;">
     <div class="container-fluid">
-        <a class="navbar-brand" style="color: white;" href="/">My Site</a>
+        <a class="navbar-brand" style="color: white;" href="/">Haarlem Festival</a>
         <a class="nav-item nav-link active" href="/">Home Page</a>
         <a class="nav-item nav-link active" href="/dancePage">Dance</a>
         <a class="nav-item nav-link active" href="/restaurants">Dining</a>
