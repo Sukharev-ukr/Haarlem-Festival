@@ -17,21 +17,6 @@ class ReservationModel extends BaseModel {
         return $this->query($sql, [$restaurantID])->fetch();
     }
     
-    public function getOrCreateOrder($userID) {
-        // Check for open order
-        $sql = "SELECT orderID FROM `Order` WHERE userID = ? AND status = 'open' LIMIT 1";
-        $result = $this->query($sql, [$userID])->fetch();
-    
-        if ($result) {
-            return $result['orderID'];
-        } else {
-            // Create new order
-            $sql = "INSERT INTO `Order` (userID, status, created_at) VALUES (?, 'open', NOW())";
-            $this->query($sql, [$userID]);
-            return $this->lastInsertId();
-        }
-    }
-
     public function calculateReservationCosts($restaurantID, $adults, $children) {
         $stmt = self::$pdo->prepare("SELECT pricePerAdult, pricePerChild FROM Restaurant WHERE restaurantID = ?");
         $stmt->execute([$restaurantID]);
