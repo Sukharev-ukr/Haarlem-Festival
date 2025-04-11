@@ -130,25 +130,16 @@
     <h2>Looking for more?</h2>
     <div class="event-links">
         <a href="/" class="event-button">
-            <div class="event-icon">
-                <img src="/assets/icons/historybutton.svg" alt="History">
-            </div>
             <span>History</span>
             <div class="event-arrow">➜</div>
         </a>
 
-        <a href="/" class="event-button">
-            <div class="event-icon">
-                <img src="/assets/icons/dancebutton.svg" alt="Dance">
-            </div>
+        <a href="/dancePage" class="event-button">
             <span>Dance!</span>
             <div class="event-arrow">➜</div>
         </a>
 
         <a href="/" class="event-button">
-            <div class="event-icon">
-                <img src="/assets/icons/magicbutton.svg" alt="Magic">
-            </div>
             <span>Magic @ Teylers</span>
             <div class="event-arrow">➜</div>
         </a>
