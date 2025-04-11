@@ -28,29 +28,29 @@
     }
 
       //Get Dance and Artist by DanceID (Using For dancePage) Should be deleted
-     public function getDanceAndArtistByDanceID($danceID) {
-         $sql = "SELECT 
-                D.danceID,
-                D.location,
-                D.danceDate,
-                DAYNAME(D.danceDate) AS day,
-                D.startTime,
-                A.name AS artistName,
-                A.style,
-                A.description,
-                A.origin,
-                GROUP_CONCAT(AL.title SEPARATOR ', ') AS albumTitles
-            FROM Dance D
-            INNER JOIN DanceArtist DA ON D.danceID = DA.danceID
-            INNER JOIN Artist A ON DA.artistID = A.artistID
-            LEFT JOIN Albums AL ON A.artistID = AL.artistID
-            WHERE D.danceID = ?
-            GROUP BY D.danceID, A.artistID";
+    //  public function getDanceAndArtistByDanceID($danceID) {
+    //      $sql = "SELECT 
+    //             D.danceID,
+    //             D.location,
+    //             D.danceDate,
+    //             DAYNAME(D.danceDate) AS day,
+    //             D.startTime,
+    //             A.name AS artistName,
+    //             A.style,
+    //             A.description,
+    //             A.origin,
+    //             GROUP_CONCAT(AL.title SEPARATOR ', ') AS albumTitles
+    //         FROM Dance D
+    //         INNER JOIN DanceArtist DA ON D.danceID = DA.danceID
+    //         INNER JOIN Artist A ON DA.artistID = A.artistID
+    //         LEFT JOIN Albums AL ON A.artistID = AL.artistID
+    //         WHERE D.danceID = ?
+    //         GROUP BY D.danceID, A.artistID";
 
-            $stmt = self::$pdo->prepare($sql);
-            $stmt -> execute([$danceID]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-     } 
+    //         $stmt = self::$pdo->prepare($sql);
+    //         $stmt -> execute([$danceID]);
+    //         return $stmt->fetch(PDO::FETCH_ASSOC);
+    //  } 
 
      //Using for detailArtistPage
      public function getArtistDetailsByDanceID($danceID) {
