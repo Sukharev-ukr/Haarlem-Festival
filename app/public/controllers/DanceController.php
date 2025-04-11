@@ -47,7 +47,7 @@ class DanceController {
             if ($detail) {
                 return $detail;
             } else {
-                echo "No details found for artists at Lichfabriek on Friday";
+                echo "No details found for artists";
             }
         }
         catch (PDOException $ex) {
