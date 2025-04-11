@@ -1,23 +1,28 @@
 <?php
+// Include the models needed for reservations and cart operations
 require_once "models/ReservationModel.php";
 require_once "models/CartModel.php";
 
 class ReservationController {
     private $model;
 
+    // Constructor: sets up the ReservationModel so we can use it throughout the controller
     public function __construct() {
         $this->model = new ReservationModel();
     }
 
+    // Fetches all available time slots for a given restaurant
     public function getAvailableSessions($restaurantID) {
     $slots = $this->model->fetchSessionsByRestaurant($restaurantID);
     return $slots;
 }
 
+    // Fetches restaurant details by ID (e.g., name, address, pricing)
     public function getRestaurantByID($restaurantID) {
         return $this->model->getRestaurantByID($restaurantID);
     }
 
+    // Gets the logged-in user's ID, redirects to login page if not authenticated
     private function getAuthenticatedUserID() {
         $userID = $_SESSION['user']['userID'] ?? null;
         if (!$userID) {
@@ -27,6 +32,7 @@ class ReservationController {
         return $userID;
     }
     
+    // Validates and converts the reservation date from form into correct format
     private function validateAndConvertDate($dateStr, $restaurantID) {
         $dateObj = DateTime::createFromFormat('Y-m-d', $dateStr);
         if (!$dateObj) {
@@ -37,6 +43,7 @@ class ReservationController {
         return $dateObj->format('Y-m-d');
     }
     
+    // Collects and structures form data into an associative array for processing
     private function collectReservationData($convertedDate) {
         return [
             'restaurantID' => $_POST['restaurantID'],
@@ -51,6 +58,7 @@ class ReservationController {
         ];
     }
     
+    // Checks if the total guest count exceeds a set limit (20)
     private function validateGroupSize($data) {
         $maxGuests = 20;
         $totalGuests = (int)$data['adults'] + (int)$data['children'];
@@ -61,6 +69,7 @@ class ReservationController {
         }
     }
     
+    // Checks if the selected time slot exists and has enough capacity for the reservation
     private function checkSlotCapacity($data) {
         $slotID = $data['slotID'];
         $stmt = $this->model->getDB()->prepare("SELECT capacity FROM RestaurantSlot WHERE slotID = ?");
@@ -81,7 +90,7 @@ class ReservationController {
         }
     }
     
-
+    // Main method that handles form submission to make a reservation
     public function reserve() {
         $userID = $this->getAuthenticatedUserID();
         $convertedDate = $this->validateAndConvertDate($_POST['reservationDate'], $_POST['restaurantID']);
