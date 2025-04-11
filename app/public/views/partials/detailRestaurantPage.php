@@ -167,7 +167,6 @@ if (file_exists($_SERVER['DOCUMENT_ROOT'] . $imgPathJpg)) {
 
     <!-- Buttons -->
     <div class="reservation-buttons">
-        <button type="button" class="cart-btn">Go to Cart</button>
         <button type="submit" class="reserve-btn">Reserve</button>
     </div>
 </form>

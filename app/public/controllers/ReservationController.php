@@ -18,34 +18,6 @@ class ReservationController {
         return $this->model->getRestaurantByID($restaurantID);
     }
 
-    private function getLoggedInUserID() {
-        return $_SESSION['user']['userID'] ?? null;
-    }
-    
-    private function getPostData() {
-        return [
-            'fullName' => $_POST['fullName'] ?? '',
-            'phoneNumber' => $_POST['phoneNumber'] ?? '',
-            'email' => $_POST['email'] ?? '',
-            'adults' => $_POST['adults'] ?? 0,
-            'children' => $_POST['children'] ?? 0,
-            'specialRequests' => $_POST['specialRequests'] ?? '',
-            'slotID' => $_POST['slotID'] ?? null,
-            'reservationDate' => $_POST['reservationDate'] ?? null
-        ];
-    }
-    
-    private function validateReservationFields($data) {
-        $errors = [];
-    
-        if (empty($data['fullName'])) $errors[] = "Full name is required";
-        if (empty($data['phoneNumber'])) $errors[] = "Phone number is required";
-        if (empty($data['slotID'])) $errors[] = "Please select a time slot";
-        if (empty($data['reservationDate'])) $errors[] = "Please pick a reservation date";
-    
-        return $errors;
-    }
-
     private function getAuthenticatedUserID() {
         $userID = $_SESSION['user']['userID'] ?? null;
         if (!$userID) {

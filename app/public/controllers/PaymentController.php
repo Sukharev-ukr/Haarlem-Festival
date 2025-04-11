@@ -32,7 +32,7 @@ class PaymentController {
             die("Order not found.");
         }
     
-        // Update total in DB just to be safe
+        // Update total in DB
         $cartModel->updateOrderTotal($orderId);
     
         // Refresh order after update
@@ -231,17 +231,19 @@ class PaymentController {
         }
     
         $programID = $this->createPersonalProgram($userID, $orderID);
-        foreach ($orderItems as $item) {
-            $itemType = $this->determineItemType($item['bookingType']);
-            $this->personalProgramModel->createPersonalProgramItem($programID, $item, $itemType, $item['reservationID']);
-        }
+    
+        // ✅ Use the standardized logic
+        $this->processOrderItems($orderItems, $programID);
+    
+        // ✅ Update payment status
         $this->model->updateOrderStatusToPaid($orderID);
+    
+        // ✅ Email confirmation
         $this->sendInvoiceAndTickets($userID, $orderID, $orderItems);
     
         header("Location: /personal-program");
         exit();
     }
-    
 
     public function handlePayLater() {
         $userID = $this->getAuthenticatedUserID();
@@ -291,6 +293,7 @@ class PaymentController {
         return $programID; // Return the program ID
     }
 
+    // SINGLE ITEM
     public function handlePayNow() {
         $orderItemID = $_POST['orderItemID'] ?? null; // Retrieve orderItemID
         $userID = $_SESSION['user']['userID'] ?? null;
